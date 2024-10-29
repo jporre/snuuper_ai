@@ -55,6 +55,7 @@ export async function GET(event: RequestEvent): Promise<Response> {
                     path: '.',
                     ...sessionCookie.attributes
                 });
+                
             } else {
                 // el usuario existe pero no tiene registrada su cuenta de google, entonces lo registro y lo dejo pasar. 
                 const newOAuthAccount = await db.insert(oauthAccount).values({
@@ -69,7 +70,8 @@ export async function GET(event: RequestEvent): Promise<Response> {
                     path: '.',
                     ...sessionCookie.attributes
                 });
-            }
+            } 
+            redirect(302, '/dh');
         } else {
             // el usuario no existe, pero era un usuario valido de google.
             if (event.locals.session) {
@@ -89,11 +91,11 @@ export async function GET(event: RequestEvent): Promise<Response> {
         });
 
     } catch (e) {
-          console.log("🚀 ~ ln 95 ~ e:", e);
+        //  console.log("🚀 ~ ln 95 ~ e:", e);
         if (e instanceof OAuth2RequestError) {
             redirect(302, '/');
         }
-        redirect(302, '/');
+        redirect(302, '/dh');
         return new Response(null, {
             status: 500,
             headers: {

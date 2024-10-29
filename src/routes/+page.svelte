@@ -3,22 +3,8 @@
   import LogoManager from "$lib/images/managerlogo.png?enhanced";
 	import { onMount } from 'svelte';
 
-  // make a post request to chat endpoint
-  
-  async function postChat() {
-    const res = await fetch('./chat', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ mensaje: 'Hello from SvelteKit!' })
-    });
-    console.log("esta es la respuesta",res);
-    const data = await res.json();
-    console.log(data);
-  }
    onMount(() => {
-    postChat();
+
    });
 </script>
 

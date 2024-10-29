@@ -10,6 +10,8 @@
 	let { children, data }: { children: Snippet; data: LayoutData } = $props();
 	type ConversationType = { who: string; msg: string }[];
 	import Chasing from '$lib/spinners/Chasing.svelte';
+	import { setUserState } from '$lib/state.svelte';
+	const user = setUserState(data.userData);
 
 	let searchText = $state('');
 	let Conversation: ConversationType = $state([]);
@@ -119,9 +121,9 @@
 						<DropdownMenu.Root>
 							<DropdownMenu.Trigger class="w-fit">
 								<div class="flex items-center gap-x-4">
-									<img class="w-8 h-8 rounded-full bg-gray-50" src={data.userData.foto} alt="foto del usuario" />
+									<img class="w-8 h-8 rounded-full bg-gray-50" src={user.foto} alt="foto del usuario" />
 									<span class="hidden lg:flex lg:items-center">
-										<span class="ml-4 text-sm font-semibold leading-6 text-gray-900" aria-hidden="true">{data?.userData?.nombre || ''}</span>
+										<span class="ml-4 text-sm font-semibold leading-6 text-gray-900" aria-hidden="true">{user.nombre || ''}</span>
 										<svg class="w-5 h-5 ml-2 text-gray-400" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true" data-slot="icon">
 											<path fill-rule="evenodd" d="M5.22 8.22a.75.75 0 0 1 1.06 0L10 11.94l3.72-3.72a.75.75 0 1 1 1.06 1.06l-4.25 4.25a.75.75 0 0 1-1.06 0L5.22 9.28a.75.75 0 0 1 0-1.06Z" clip-rule="evenodd" />
 										</svg>
@@ -133,7 +135,7 @@
 									<DropdownMenu.Label>Mis datos</DropdownMenu.Label>
 									<DropdownMenu.Separator />
 									<DropdownMenu.Item>Perfil</DropdownMenu.Item>
-									<DropdownMenu.Item>Salir</DropdownMenu.Item>
+									<DropdownMenu.Item><a href="./logout">Salir</a></DropdownMenu.Item>
 								</DropdownMenu.Group>
 							</DropdownMenu.Content>
 						</DropdownMenu.Root>
@@ -172,11 +174,11 @@
 										{#each Conversation as item}
 											{#if item.who == 'user'}
 												<li class="relative flex flex-row max-w-full float-end gap-x-4">
-													<img src={data.userData.foto} alt="imagen del usuario" class="relative flex-none w-6 h-6 mt-3 rounded-full bg-gray-50" />
+													<img src={user.foto} alt="imagen del usuario" class="relative flex-none w-6 h-6 mt-3 rounded-full bg-gray-50" />
 													<div class="flex-auto p-3 rounded-md ring-1 ring-inset ring-gray-200">
 														<div class="flex justify-between gap-x-4">
 															<div class="py-0.5 text-xs leading-5 text-gray-500">
-																<span class="font-medium text-gray-900">{data.userData.nombre}</span>
+																<span class="font-medium text-gray-900">{user.nombre}</span>
 															</div>
 															<time datetime="2023-01-23T15:56" class="flex-none py-0.5 text-xs leading-5 text-gray-500"></time>
 														</div>

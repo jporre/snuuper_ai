@@ -5,7 +5,6 @@ export const load = (async (event) => {
     if (!event.locals.user) {
 		return redirect(302, "/login/google");
 	}
-    const userData = event.locals.user;
-    const PublicUserData = { nombre: userData.nombre, email: userData.email, foto: userData.foto };
-    return {userData: PublicUserData};
+   
+    return {userData: { nombre: event.locals.user.nombre, email: event.locals.user.email, foto: event.locals.user.foto }};
 }) satisfies LayoutServerLoad;
