@@ -58,7 +58,7 @@
 </script>
 
 <svelte:head>
-	<title>Zona de Información</title>
+	<title>Zona de Cliente</title>
 </svelte:head>
 <div class="">
 	<div class="realtive md:fixed md:inset-y-0 md:min-h-screen lg:z-50 lg:flex lg:w-52 md:w-16 lg:flex-col">
