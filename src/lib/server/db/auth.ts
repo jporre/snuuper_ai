@@ -5,8 +5,10 @@ import { Lucia, TimeSpan } from "lucia";
 import { dev } from "$app/environment";
 import { env } from '$env/dynamic/private';
 import { Google } from "arctic";
+import { adapter } from "$lib/server/db//mongodb";
+import type { ObjectId } from "mongodb";
 
-const adapter = new DrizzlePostgreSQLAdapter(db, userSession, authUser);
+//const adapter = new DrizzlePostgreSQLAdapter(db, userSession, authUser);
 
 export const lucia = new Lucia(adapter, {
 	sessionExpiresIn: new TimeSpan(10, "d"),
@@ -18,13 +20,21 @@ export const lucia = new Lucia(adapter, {
 	},getUserAttributes: (attributes) => {
 		return {
 			// attributes has the type of DatabaseUserAttributes
-			username: attributes.username,
 			email: attributes.email,
-			nombre: attributes.nombre,
-			foto: attributes.foto,
-			idn: attributes.idn,
-			id_largo: attributes.id_largo,
-			otros: attributes.otros
+			personalData: {
+				firstname: attributes.personalData.firstname,
+				lastname: attributes.personalData.lastname,
+				secondlastname: attributes.personalData.secondlastname,
+				gender: attributes.personalData.gender,
+				cellphone: attributes.personalData.cellphone,
+			},
+			accountData: {
+				status: attributes.accountData.status,
+				role: attributes.accountData.role,
+				companyId: attributes.accountData.companyId,
+				isCompanyAdmin: attributes.accountData.isCompanyAdmin,
+				picture: attributes.accountData.picture
+			}
 		};
 	}
 });
@@ -32,6 +42,7 @@ export const lucia = new Lucia(adapter, {
 declare module "lucia" {
 	interface Register {
 		Lucia: typeof lucia;
+		UserId: ObjectId;
 		DatabaseUserAttributes: DatabaseUserAttributes;
 	}
 }
@@ -43,13 +54,21 @@ interface OtrosDatosUsuario {
 }
 
 interface DatabaseUserAttributes {
-	username: string;
 	email: string;
-	nombre: string;
-	foto: string;
-	idn: number;
-	id_largo: string;
-	otros: OtrosDatosUsuario;
+	personalData: {
+        firstname: string | '';
+        lastname: string | '';
+        secondlastname: string | '';
+        gender: string | '';
+        cellphone: string | '';
+    },
+	accountData: {
+		status: string | 'pending';
+		role: string | 'user';
+		companyId: ObjectId | null;
+		isCompanyAdmin: boolean;
+		picture: string | '';
+	};
 }
 
 const googleRedirectUrl = dev

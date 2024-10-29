@@ -1,18 +1,43 @@
 import { getContext, setContext } from "svelte";
 
 type UserData = {
-    nombre: string;
+    firstname: string;
+    lastname: string;
+    secondlastname: string;
+    gender: string;
+    cellphone: string;
     email: string;
-    foto: string;
+    status: string;
+    role: string;
+    companyId: string;
+    isCompanyAdmin: boolean;
+    picture: string;
     };
 class User {
-    nombre: string = $state('');
+    firstname: string = $state('');
+    lastname: string = $state('');
+    secondlastname: string = $state('');
+    gender: string = $state('');
+    cellphone: string = $state('');
     email: string = $state('');
-    foto: string = $state('');
-    constructor(initialData: UserData = {nombre: '', email:'', foto:''}) {
-        this.nombre = initialData.nombre;
+    status: string = $state('');
+    role: string = $state('');
+    companyId: string = $state('');
+    isCompanyAdmin: boolean = $state(false);
+    picture: string = $state('');
+
+    constructor(initialData: UserData = {firstname: '', lastname: '', secondlastname:'', gender:'', cellphone : '', email: '',  status: '', role: '', companyId: '', isCompanyAdmin: false, picture: ''}) {
+        this.firstname = initialData.firstname;
+        this.lastname = initialData.lastname;
+        this.secondlastname = initialData.secondlastname;
+        this.gender = initialData.gender;
+        this.cellphone = initialData.cellphone;
         this.email = initialData.email;
-        this.foto = initialData.foto;
+        this.status = initialData.status;
+        this.role = initialData.role;
+        this.companyId = initialData.companyId;
+        this.isCompanyAdmin = initialData.isCompanyAdmin;
+        this.picture = initialData.picture;
     }
 }
 const USER_CTX = 'USER_CTX';
