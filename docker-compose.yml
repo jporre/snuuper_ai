@@ -1,10 +1,36 @@
+version: "3"
 services:
-  db:
-    image: postgres
+  comms-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
     restart: always
     ports:
-      - 5432:5432
-    environment: 
-      POSTGRES_USER: root
-      POSTGRES_PASSWORD: mysecretpassword
-      POSTGRES_DB: local
+      - '5050'
+    environment:
+      - MONGODB_USERNAME=${MONGODB_USERNAME}
+      - MONGODB_PASSWORD=${MONGODB_PASSWORD}
+      - MONGODB_HOST=${MONGODB_HOST}
+      - MONGODB_PORT=${MONGODB_PORT}
+      - MONGODB_NAME=${MONGODB_NAME}
+    networks:
+      - interna-snuuper
+
+  comms-cache:
+    image: redis:6.2-alpine
+    restart: always
+    ports:
+      - '6379'
+    command: redis-server --save 20 1 --loglevel warning --requirepass eYVX7EwH07a-jp?wij8wp21*DkmamwMtyKVge8oLd2t81
+    volumes:
+      - comms_redis_cache:/data
+    networks:
+      - interna-snuuper
+
+networks:
+  interna-snuuper:
+    external: true
+    name: interna-snuuper
+    driver: bridge
+volumes:
+  comms_redis_cache:

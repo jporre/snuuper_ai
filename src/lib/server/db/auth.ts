@@ -1,14 +1,25 @@
-import { DrizzlePostgreSQLAdapter } from "@lucia-auth/adapter-drizzle";
-import {db} from "$lib/server/db/pgcon";
-import {authUser, userSession} from "$lib/server/db/schema";
 import { Lucia, TimeSpan } from "lucia";
 import { dev } from "$app/environment";
 import { env } from '$env/dynamic/private';
 import { Google } from "arctic";
-import { adapter } from "$lib/server/db//mongodb";
-import type { ObjectId } from "mongodb";
 
+//* Este es el caso en que la base de datos de usuarios esté en postgresql
+//import { DrizzlePostgreSQLAdapter } from "@lucia-auth/adapter-drizzle";
+//import {db} from "$lib/server/db/pgcon";
 //const adapter = new DrizzlePostgreSQLAdapter(db, userSession, authUser);
+
+//* Este es el caso en que la base de datos de usuarios esté en mongodb
+import { Collection, MongoClient, ObjectId } from 'mongodb';  
+import { MONGODB_HOST, MONGODB_USERNAME, MONGODB_PASSWORD } from '$env/static/private';
+import { MongodbAdapter } from '@lucia-auth/adapter-mongodb';
+
+const client = new MongoClient(`mongodb+srv://${MONGODB_USERNAME}:${MONGODB_PASSWORD}@${MONGODB_HOST}/?retryWrites=true&w=majority`);
+await client.connect();
+const MongoDBCL = client.db('snuuper');
+const User = MongoDBCL.collection("User") as Collection<DatabaseUserAttributes>;
+const Session = MongoDBCL.collection("Sessions") as Collection<SessionDoc>;
+const adapter = new MongodbAdapter(Session, User);
+
 
 export const lucia = new Lucia(adapter, {
 	sessionExpiresIn: new TimeSpan(10, "d"),
@@ -47,13 +58,15 @@ declare module "lucia" {
 	}
 }
 
-interface OtrosDatosUsuario {
-	empresa: number;
-	perfil: string;
-	codigo_perfil: string;
+// Esta es la definicion de la tabla en la BD donde se guardaran las Sessiones
+interface SessionDoc {
+	_id: string;
+	expires_at: Date;
+	user_id: ObjectId;
 }
-
+// Estos son los datos del usuario que estàn (o estarán) en la tabla de la base de datos)
 interface DatabaseUserAttributes {
+	_id: ObjectId;
 	email: string;
 	personalData: {
         firstname: string | '';

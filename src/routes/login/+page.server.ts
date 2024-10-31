@@ -2,9 +2,7 @@ import { lucia } from "$lib/server/db/auth";
 import { fail, redirect, type Actions } from "@sveltejs/kit";
 import { Argon2id } from "oslo/password";
 import { Bcrypt } from "oslo/password";
-import { db } from "$lib/server/db/mongodb";
-
-//const argon2id = new Argon2id();
+import { MongoDBCL } from "$lib/server/db/mongodb";
 
 const argon2id = new Argon2id();
 
@@ -26,7 +24,7 @@ export const actions: Actions = {
 				message: "Invalid password"
 			});
 		}
-		const existingUserMongo = await db.collection('User').findOne({ email: email });
+		const existingUserMongo = await MongoDBCL.collection('User').findOne({ email: email });
 		console.log("🚀 ~ loginWithEmailAndPassword: ~ existingUserMongo:", existingUserMongo)
 		
 		if (!existingUserMongo) {
