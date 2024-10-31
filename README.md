@@ -39,3 +39,17 @@ A partir del contenido de `package.json`, esta aplicación llamada "snuuper-inte
 ### 8. **Despliegue y Hosting**
 La aplicacion sveltekit puede probarse localmente ejecutando npm run dev
 en produccion o para produccion se debe ejecutar npm run build
+
+## Instrucciones especificas para Docker
+gcloud auth login
+gcloud config set project snuuper
+# para autenticar con el repo de docker
+gcloud auth configure-docker \
+    us-central1-docker.pkg.dev
+
+docker buildx create --use desktop-linux
+
+# para construir la imagen completa en dos partes y subirla atiro
+docker buildx build --platform linux/amd64,linux/arm64 . --no-cache --rm -t us-central1-docker.pkg.dev/snuuper-01/snuuper/snuuper-interno --push
+# para hacer los commits y push automaticos
+summary=$(git diff | fabric --language=es --model="gpt-4o-mini" -p summarize_git_diff -c) git add -A && git commit -m "$summary" && git push

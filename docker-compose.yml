@@ -1,9 +1,7 @@
-version: "3"
 services:
-  comms-app:
-    build:
-      context: .
-      dockerfile: Dockerfile
+  snuuper-interno:
+    image: us-central1-docker.pkg.dev/snuuper-01/snuuper/snuuper-interno:latest
+    container_name: snuuper-interno
     restart: always
     ports:
       - '5050'
