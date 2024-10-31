@@ -52,4 +52,5 @@ docker buildx create --use desktop-linux
 # para construir la imagen completa en dos partes y subirla atiro
 docker buildx build --platform linux/amd64,linux/arm64 . --no-cache --rm -t us-central1-docker.pkg.dev/snuuper-01/snuuper/snuuper-interno --push
 # para hacer los commits y push automaticos
-summary=$(git diff | fabric --language=es --model="gpt-4o-mini" -p summarize_git_diff -c) git add -A && git commit -m "$summary" && git push
+summary=$(git diff | fabric --language=es --model="gpt-4o-mini" -p summarize_git_diff -c)
+git add -A && git commit -m "$summary" && git push
