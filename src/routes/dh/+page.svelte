@@ -8,7 +8,7 @@
 
 <section>
 	<div class="relative flex flex-col items-start justify-between w-1/5 p-3 mb-3 border shadow-md rounded-3xl border-gray-700/70 bg-background">
-		{user.nombre}
+		{user.firstname}
 		<BorderBeam size={150} duration={12} />
 	</div>
 	
@@ -76,3 +76,6 @@
 		</div>
 	</div>
 </section>
+
+
+

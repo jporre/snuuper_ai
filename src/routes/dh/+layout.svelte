@@ -1,7 +1,6 @@
 <script lang="ts">
 	import type { LayoutData } from './$types';
 	import LogoSnuuperPequeño from '$lib/images/logosnuuper.png?enhanced';
-	import DefaultAvatar from '$lib/images/PinMapaSnuuperAzul.png';
 	import IlustracionSnuuper1 from '$lib/images/ilustracionsnupper1.webp?enhanced';
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
 	import type { Snippet, onMount, afterUpdate } from 'svelte';
@@ -13,6 +12,7 @@
 	import Chasing from '$lib/spinners/Chasing.svelte';
 	import { setUserState } from '$lib/state.svelte';
 	const user = setUserState(data.userData);
+	import DefaultAvatar from '$lib/images/PinMapaSnuuperAzul.png';
 	let userPhoto = $state('https://files.snuuper.com/' + user.picture);
 	if(user.picture == '') {
 		userPhoto = DefaultAvatar;

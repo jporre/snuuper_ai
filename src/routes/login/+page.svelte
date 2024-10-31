@@ -109,7 +109,7 @@
 
 					<div class="grid grid-cols-2 gap-4 mt-6">
 						<a
-							href="/"
+							href="/login/google"
 							class="flex items-center justify-center w-full gap-3 px-3 py-2 text-sm font-semibold text-gray-900 bg-white rounded-md shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus-visible:ring-transparent"
 						>
 							<svg class="w-5 h-5" viewBox="0 0 24 24" aria-hidden="true">
