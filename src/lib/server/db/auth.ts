@@ -85,7 +85,7 @@ interface DatabaseUserAttributes {
 }
 
 const googleRedirectUrl = dev
-	? 'http://localhost:5173/login/google/callback'
+	? 'http://localhost:5173/login/google/callback'      
 	: env.GOOGLE_REDIRECT_URI;
 
 export const google = new Google(env.GOOGLE_CLIENT_ID, env.GOOGLE_CLIENT_SECRET, googleRedirectUrl);

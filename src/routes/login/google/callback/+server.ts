@@ -1,4 +1,4 @@
-import { OAuth2RequestError, ArcticFetchError, decodeIdToken } from 'arctic';
+import { OAuth2RequestError } from 'arctic';
 import { google, lucia } from '$lib/server/db/auth';
 import type { RequestEvent } from '@sveltejs/kit';
 import { redirect } from '@sveltejs/kit';

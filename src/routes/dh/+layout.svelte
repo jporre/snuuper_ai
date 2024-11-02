@@ -8,7 +8,7 @@
 	import * as m from '$lib/paraglide/messages.js';
 	let MobileMenu = $state(false);
 	let { children, data }: { children: Snippet; data: LayoutData } = $props();
-	type ConversationType = { who: string; msg: string }[];
+	type ConversationType = { role: string; content: string }[];
 	import Chasing from '$lib/spinners/Chasing.svelte';
 	import { setUserState } from '$lib/state.svelte';
 	const user = setUserState(data.userData);
@@ -24,37 +24,34 @@
 	let chatDisplay = $state(false);
 	let ShowLoader = $state(false);
 
+
 	async function handleSearch() {
 		chatDisplay = true;
 		ShowLoader = true;
-		let addToConversation = { who: 'user', msg: searchText };
+		let addToConversation = { role: 'user', content: searchText };
 		Conversation = [...Conversation, addToConversation];
-		const res = await fetch('./chat', {
+		const res = await fetch('./openai', {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json'
 			},
-			body: JSON.stringify({ mensaje: searchText })
+			body: JSON.stringify({ Conversation})
 		});
 
 		const data = await res.json();
-		addToConversation = { who: 'ai', msg: data.text };
+		addToConversation = { role: 'assistant', content: data.content };
 		Conversation = [...Conversation, addToConversation];
 		searchText = '';
 		scrollToBottom();
 		ShowLoader = false;
 	}
-	let chatContainer: HTMLDivElement;
-	// Function to scroll to bottom
+	let scrollToDiv: HTMLDivElement
+
 	function scrollToBottom() {
-		if (chatContainer) {
-			chatContainer.scrollTop = chatContainer.scrollHeight;
-		}
+		setTimeout(function () {
+			scrollToDiv.scrollIntoView({ behavior: 'smooth', block: 'end', inline: 'nearest' })
+		}, 100)
 	}
-	// Scroll to bottom after each update
-	// afterUpdate(() => {
-	//     scrollToBottom();
-	// });
 </script>
 
 <svelte:head>
@@ -175,10 +172,10 @@
 							<div class="w-full mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left">
 								<h3 class="text-base font-semibold leading-6 text-gray-900" id="modal-title">Chat</h3>
 								<!-- Chat container with fixed height and auto-scroll -->
-								<div bind:this={chatContainer} class="h-[75vh] mt-2 overflow-y-auto custom-scrollbar">
+								<div class="h-[75vh] mt-2 overflow-y-auto custom-scrollbar">
 									<ul role="list" class="flex flex-col space-y-6">
 										{#each Conversation as item}
-											{#if item.who == 'user'}
+											{#if item.role == 'user'}
 												<li class="relative flex flex-row max-w-full float-end gap-x-4">
 													<img src={userPhoto} alt="imagen del usuario" class="relative flex-none w-6 h-6 mt-3 rounded-full bg-gray-50" />
 													<div class="flex-auto p-3 rounded-md ring-1 ring-inset ring-gray-200">
@@ -188,12 +185,12 @@
 															</div>
 															<time datetime="2023-01-23T15:56" class="flex-none py-0.5 text-xs leading-5 text-gray-500"></time>
 														</div>
-														<p class="text-sm leading-6 text-gray-500">{item.msg}</p>
+														<p class="text-sm leading-6 text-gray-500">{item.content}</p>
 													</div>
 												</li>
-											{:else}
-												<li class="relative flex flex-row-reverse max-w-full float-end gap-x-4">
-													<enhanced:img src={LogoSnuuperPequeño} alt="Logo Snuuper" class="relative flex-none w-6 h-6 mt-3 rounded-full bg-gray-50" />
+											{/if}
+											{#if item.role == 'assistant'}
+												<li class="relative flex flex-row max-w-full float-end gap-x-4">
 													<div class="flex-auto p-3 rounded-md ring-1 ring-inset ring-gray-200">
 														<div class="flex justify-between gap-x-4">
 															<div class="py-0.5 text-xs leading-5 text-gray-500">
@@ -201,8 +198,9 @@
 															</div>
 															<time datetime="2023-01-23T15:56" class="flex-none py-0.5 text-xs leading-5 text-gray-500"></time>
 														</div>
-														<p class="text-sm leading-6 text-gray-500">{@html marked(item.msg)}</p>
+														<p class="text-sm leading-6 text-gray-500">{@html marked(item.content)}</p>
 													</div>
+													<enhanced:img src={LogoSnuuperPequeño} alt="Logo Snuuper" class="relative flex-none w-6 h-6 mt-3 rounded-full bg-gray-50" />
 												</li>
 											{/if}
 										{/each}
@@ -210,6 +208,7 @@
 									<div class="mt-5 {ShowLoader ? '' : 'hidden'}">
 										<Chasing size="50" color="blue" duration="1s" />
 									</div>
+									<div class="" bind:this={scrollToDiv} ></div>
 								</div>
 							</div>
 						</div>
