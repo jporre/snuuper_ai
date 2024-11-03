@@ -2,7 +2,6 @@ import { env } from "$env/dynamic/private";
 import { error, redirect } from '@sveltejs/kit';
 import type { RequestHandler } from "@sveltejs/kit";
 import OpenAI from "openai";
-import type { Request } from "openai/_shims/auto/types";
 const openai = new OpenAI({
     apiKey: env.OPENAI_API_KEY ?? '',
 });
@@ -42,17 +41,29 @@ export const POST: RequestHandler = async (event) => {
         "temperature": 0.4
        });
 
-    const stream = await openai.chat.completions.create({
+    const completionResponse = await openai.chat.completions.create({
         model: "gpt-4o-mini",
         messages: conversationLog,
         temperature: 0.4,
         stream: true,
     });
-    for await (const chunk of stream) {
-        process.stdout.write(chunk.choices[0]?.delta?.content || "");
-    }
     
-    const result = await completion.choices[0].message;
+    const headers = {
+        'Content-Type': 'text/event-stream',
+        'Cache-Control': 'no-cache',
+        'Connection': 'keep-alive',
+    };
+    
+    // const result = await completion.choices[0].message;
    
-    return new Response(JSON.stringify(result), { status: 200 });
+    const stream = new ReadableStream({
+        async start(controller) {
+            for await (const chunk of completionResponse) {
+                controller.enqueue(`data: ${JSON.stringify(chunk)}\n\n`);
+            }
+            controller.close();
+        }
+    });
+
+    return new Response(stream, { headers });
 };

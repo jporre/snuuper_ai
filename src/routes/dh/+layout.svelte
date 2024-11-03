@@ -13,6 +13,8 @@
 	import { setUserState } from '$lib/state.svelte';
 	const user = setUserState(data.userData);
 	import DefaultAvatar from '$lib/images/PinMapaSnuuperAzul.png';
+	import { SSE } from 'sse.js'
+
 	let userPhoto = $state('https://files.snuuper.com/' + user.picture);
 	if(user.picture == '') {
 		userPhoto = DefaultAvatar;
@@ -25,7 +27,7 @@
 	let ShowLoader = $state(false);
 
 
-	async function handleSearch() {
+	async function handleSearch_bk() {
 		chatDisplay = true;
 		ShowLoader = true;
 		let addToConversation = { role: 'user', content: searchText };
@@ -46,11 +48,63 @@
 		ShowLoader = false;
 	}
 	let scrollToDiv: HTMLDivElement
-
 	function scrollToBottom() {
 		setTimeout(function () {
 			scrollToDiv.scrollIntoView({ behavior: 'smooth', block: 'end', inline: 'nearest' })
 		}, 100)
+	}
+
+	let query = $state('');
+	let answer = $state('');
+
+	const handleSearch = async () => {
+		chatDisplay = true;
+		ShowLoader = true
+		let addToConversation = { role: 'user', content: searchText };
+		Conversation = [...Conversation, addToConversation];
+
+		const eventSource = new SSE('./openai', {
+			headers: {
+				'Content-Type': 'application/json'
+			},
+			payload: JSON.stringify({ Conversation })
+		})
+
+		query = ''
+		Conversation = [...Conversation, { role: 'assistant', content: '' }];
+		eventSource.addEventListener('error', handleError)
+
+		eventSource.addEventListener('message', (e) => {
+			// console.log(e)
+			
+			scrollToBottom()
+			try {
+				ShowLoader = false
+				const data = JSON.parse(e.data);
+				if (data.choices[0].finish_reason === 'stop') {
+					// End of Stream
+					answer='';
+					return;
+				}
+
+				const { content } = data.choices[0].delta;
+				answer = (answer ?? '') + content;
+				Conversation[Conversation.length - 1].content = answer;
+				
+			} catch (err) {
+				handleError(err)
+			}
+		})
+		eventSource.stream()
+		scrollToBottom()
+		searchText = '';
+	}
+
+	function handleError<T>(err: T) {
+		ShowLoader = false
+		query = ''
+		answer = ''
+		console.error(err)
 	}
 </script>
 
@@ -189,7 +243,7 @@
 													</div>
 												</li>
 											{/if}
-											{#if item.role == 'assistant'}
+											{#if (item.role == 'assistant' && item.content != '')}
 												<li class="relative flex flex-row max-w-full float-end gap-x-4">
 													<div class="flex-auto p-3 rounded-md ring-1 ring-inset ring-gray-200">
 														<div class="flex justify-between gap-x-4">
