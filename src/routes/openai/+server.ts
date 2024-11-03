@@ -1,6 +1,7 @@
 import { env } from "$env/dynamic/private";
 import { error, redirect } from '@sveltejs/kit';
 import type { RequestHandler } from "@sveltejs/kit";
+import { getPrompt } from "$lib/prompts";
 import OpenAI from "openai";
 const openai = new OpenAI({
     apiKey: env.OPENAI_API_KEY ?? '',
@@ -27,10 +28,12 @@ export const POST: RequestHandler = async (event) => {
     } catch (e: any) {
         error(e.status, e.error.message)
     }
+    const origenConsulta = mensaje.origen || 'default';
+    let prompt = getPrompt({origen: origenConsulta, promptName: "sysP_Generico", reemplazos: [{name: "NOMBRE_USUARIO", value:userData?.personalData.firstname}]});
     
     let mensajesIniciales =  [
         { 
-          "role": `system`,"content": `Eres un analista de datos que trabaja en Snuuper. Snuuper es una empresa que realiza encuestas y mediciones de mercado a través de herramientas de tecnológia. Estás hablando con ${userData?.personalData.firstname} , que es cliente de snuuper y por lo mismo sólo estás autorizado a responder temas de snuuper o de la encuesta que ${userData?.personalData.firstname} està revisando`
+          "role": `system`,"content": prompt
         }
     ];
     

@@ -14,13 +14,14 @@
 	const user = setUserState(data.userData);
 	import DefaultAvatar from '$lib/images/PinMapaSnuuperAzul.png';
 	import { SSE } from 'sse.js'
+	import { page } from '$app/stores';
 
 	let userPhoto = $state('https://files.snuuper.com/' + user.picture);
 	if(user.picture == '') {
 		userPhoto = DefaultAvatar;
 	}
 
-
+	
 	let searchText = $state('');
 	let Conversation: ConversationType = $state([]);
 	let chatDisplay = $state(false);
@@ -62,12 +63,13 @@
 		ShowLoader = true
 		let addToConversation = { role: 'user', content: searchText };
 		Conversation = [...Conversation, addToConversation];
+		let origen = $page.url.pathname;
 
-		const eventSource = new SSE('./openai', {
+		const eventSource = new SSE('/openai', {
 			headers: {
 				'Content-Type': 'application/json'
 			},
-			payload: JSON.stringify({ Conversation })
+			payload: JSON.stringify({ Conversation , origen: origen})
 		})
 
 		query = ''
@@ -124,11 +126,11 @@
 						<ul role="list" class="-mx-2 space-y-1">
 							<li>
 								<!-- Current: "bg-gray-800 text-white", Default: "text-gray-400 hover:text-white hover:bg-gray-800" -->
-								<a href="/" class="flex p-2 text-sm font-semibold leading-6 text-white bg-gray-800 rounded-md group gap-x-3">
+								<a href="/dh" class="flex p-2 text-sm font-semibold leading-6 text-white bg-gray-800 rounded-md group gap-x-3">
 									<svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon">
 										<path stroke-linecap="round" stroke-linejoin="round" d="m2.25 12 8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
 									</svg>
-									<span class="md:hidden lg:inline"> Home</span>
+									<span class="md:hidden lg:inline"> Home </span>
 								</a>
 							</li>
 						</ul>
