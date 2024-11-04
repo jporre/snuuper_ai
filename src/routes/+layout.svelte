@@ -45,7 +45,7 @@
 	<meta name="theme-color" content="#ffffff" />
 </svelte:head>
 <ParaglideJS {i18n}>
-<main>
-	    {@render children()}  
-	</main>
+<div class="w-auto max-w-dvw">
+	{@render children()}  
+</div>
 </ParaglideJS>

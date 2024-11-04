@@ -8,14 +8,14 @@
 
 </script>
 
-<section>
-	<div class="relative flex flex-col items-start justify-between w-1/5 p-3 mb-3 border shadow-md rounded-3xl border-gray-700/70 bg-background">
+<div>
+	<div class="relative z-0 flex flex-col items-start justify-between w-2/5 p-3 mb-3 border shadow-md opacity-90 rounded-3xl border-gray-700/70 ">
 		{user.firstname}
 		<BorderBeam size={150} duration={12} />
 	</div>
 	
 	<div class="grid grid-cols-5 gap-4">
-		<div class="col-span-4">
+		<div class="col-span-5">
 			<ul role="list" class="divide-y divide-gray-100">
 				{#await data.tareas}
 					<div>Cargando las tareas...</div>
@@ -35,7 +35,7 @@
 							<svg viewBox="0 0 2 2" class="h-0.5 w-0.5 fill-current">
 								<circle cx="1" cy="1" r="1" />
 							</svg>
-							<p class="truncate">Created by Leslie Alexander</p>
+							<p class="truncate">{tarea.companyDetails[0]?.name}</p>
 						</div>
 					</div>
 					<div class="flex items-center flex-none gap-x-4">
@@ -58,7 +58,7 @@
 			</ul>
 		</div>
 	</div>
-</section>
+</div>
 
 
 

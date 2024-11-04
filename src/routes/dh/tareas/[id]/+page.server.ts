@@ -1,6 +1,6 @@
 import { redirect } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
-import { getActivetask } from '$lib/server/data/tasks';
+import { getActivetask, getStepDetails, getTaskAnswers } from '$lib/server/data/tasks';
 
 export const load = (async (event) => {
     if (!event.locals.user) {
@@ -10,6 +10,8 @@ export const load = (async (event) => {
   // let tarea = await getActivetasks();
   // console.log("🚀 ~ load ~ tarea:", tarea)
    return {
-      tarea : await getActivetask(taskId)
+      tarea : await getActivetask(taskId),
+      pasos: getStepDetails(taskId),
+      respuestas: getTaskAnswers(taskId)
    };
 }) satisfies PageServerLoad;

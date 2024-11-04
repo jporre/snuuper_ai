@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { LayoutData } from './$types';
-	import LogoSnuuperPequeño from '$lib/images/logosnuuper.png?enhanced';
+	import LogoSnuuperPequeno from '$lib/images/logosnuuper.png?enhanced';
 	import IlustracionSnuuper1 from '$lib/images/ilustracionsnupper1.webp?enhanced';
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
 	import type { Snippet, onMount, afterUpdate } from 'svelte';
@@ -13,20 +13,18 @@
 	import { setUserState } from '$lib/state.svelte';
 	const user = setUserState(data.userData);
 	import DefaultAvatar from '$lib/images/PinMapaSnuuperAzul.png';
-	import { SSE } from 'sse.js'
+	import { SSE } from 'sse.js';
 	import { page } from '$app/stores';
 
 	let userPhoto = $state('https://files.snuuper.com/' + user.picture);
-	if(user.picture == '') {
+	if (user.picture == '') {
 		userPhoto = DefaultAvatar;
 	}
 
-	
 	let searchText = $state('');
 	let Conversation: ConversationType = $state([]);
 	let chatDisplay = $state(false);
 	let ShowLoader = $state(false);
-
 
 	async function handleSearch_bk() {
 		chatDisplay = true;
@@ -38,7 +36,7 @@
 			headers: {
 				'Content-Type': 'application/json'
 			},
-			body: JSON.stringify({ Conversation})
+			body: JSON.stringify({ Conversation })
 		});
 
 		const data = await res.json();
@@ -48,11 +46,11 @@
 		scrollToBottom();
 		ShowLoader = false;
 	}
-	let scrollToDiv: HTMLDivElement
+	let scrollToDiv: HTMLDivElement;
 	function scrollToBottom() {
 		setTimeout(function () {
-			scrollToDiv.scrollIntoView({ behavior: 'smooth', block: 'end', inline: 'nearest' })
-		}, 100)
+			scrollToDiv.scrollIntoView({ behavior: 'smooth', block: 'end', inline: 'nearest' });
+		}, 100);
 	}
 
 	let query = $state('');
@@ -60,7 +58,7 @@
 
 	const handleSearch = async () => {
 		chatDisplay = true;
-		ShowLoader = true
+		ShowLoader = true;
 		let addToConversation = { role: 'user', content: searchText };
 		Conversation = [...Conversation, addToConversation];
 		let origen = $page.url.pathname;
@@ -69,56 +67,54 @@
 			headers: {
 				'Content-Type': 'application/json'
 			},
-			payload: JSON.stringify({ Conversation , origen: origen})
-		})
+			payload: JSON.stringify({ Conversation, origen: origen })
+		});
 
-		query = ''
+		query = '';
 		Conversation = [...Conversation, { role: 'assistant', content: '' }];
-		eventSource.addEventListener('error', handleError)
+		eventSource.addEventListener('error', handleError);
 
 		eventSource.addEventListener('message', (e) => {
 			// console.log(e)
-			
-			scrollToBottom()
+
+			scrollToBottom();
 			try {
-				ShowLoader = false
+				ShowLoader = false;
 				const data = JSON.parse(e.data);
 				if (data.choices[0].finish_reason === 'stop') {
 					// End of Stream
-					answer='';
+					answer = '';
 					return;
 				}
 
 				const { content } = data.choices[0].delta;
 				answer = (answer ?? '') + content;
 				Conversation[Conversation.length - 1].content = answer;
-				
 			} catch (err) {
-				handleError(err)
+				handleError(err);
 			}
-		})
-		eventSource.stream()
-		scrollToBottom()
+		});
+		eventSource.stream();
+		scrollToBottom();
 		searchText = '';
-	}
+	};
 
 	function handleError<T>(err: T) {
-		ShowLoader = false
-		query = ''
-		answer = ''
-		console.error(err)
+		ShowLoader = false;
+		query = '';
+		answer = '';
+		console.error(err);
 	}
 </script>
 
 <svelte:head>
 	<title>Zona de Cliente</title>
 </svelte:head>
-<div class="">
-	<div class="realtive md:fixed md:inset-y-0 md:min-h-screen lg:z-50 lg:flex lg:w-52 md:w-16 lg:flex-col">
-		<!-- Sidebar component, swap this element with another sidebar if you like -->
-		<div class="absolute top-0 flex flex-col min-h-full px-6 pb-4 overflow-y-auto bg-gray-900 md:w-full transition transform ease-in-out {MobileMenu ? 'translate-x-0 w-full' : '-translate-x-96'} md:translate-x-0 md:px-4 grow gap-y-5">
+<div class="max-w-screen">
+	<div class="z-40 md:fixed md:inset-y-0 md:min-h-screen lg:z-50 lg:flex lg:w-52 md:w-16 lg:flex-col">
+		<div class="absolute top-0 flex flex-col min-h-full px-6 pb-4 overflow-y-auto bg-gray-900 md:w-full transition transform ease-in-out {MobileMenu ? 'translate-x-0 w-full' : '-translate-x-96'} md:translate-x-0 md:px-4 gap-y-5">
 			<div class="flex items-center h-16 md:h-8 lg:h-16 md:mt-3">
-				<enhanced:img class="w-8 h-8" src={LogoSnuuperPequeño} alt="Your Company"> </enhanced:img>
+				<enhanced:img class="w-8 h-8" src={LogoSnuuperPequeno} alt="Snuuper"> </enhanced:img>
 			</div>
 			<nav class="flex flex-col flex-1">
 				<ul role="list" class="flex flex-col flex-1 gap-y-7">
@@ -188,7 +184,7 @@
 										</svg>
 									</span>
 								</div>
-						</DropdownMenu.Trigger>
+							</DropdownMenu.Trigger>
 							<DropdownMenu.Content>
 								<DropdownMenu.Group>
 									<DropdownMenu.Label>Mis datos</DropdownMenu.Label>
@@ -202,83 +198,83 @@
 				</div>
 			</div>
 		</div>
-		<!-- Chat -->
-		<div class="{chatDisplay ? 'z-10' : 'z-0'} relative " aria-labelledby="modal-title" role="dialog" aria-modal="true">
-			<div class="{chatDisplay ? 'bg-opacity-75' : 'bg-opacity-0'} fixed inset-0 bg-gray-500 transition-opacity duration-300 ease-in lg:pl-52 md:pl-16" aria-hidden="true"></div>
-			<div class="fixed inset-0 z-10 w-screen overflow-y-auto">
-				<div class="flex items-start justify-center min-h-full p-4 mt-16 text-center sm:p-0 lg:pl-52 md:pl-16">
-					<div class="{chatDisplay ? 'ease-out opacity-100 translate-y-0 sm:scale-100' : 'ease-in opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95'} relative transform duration-500 overflow-hidden rounded-lg bg-white px-4 pb-4 pt-5 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-7xl sm:translate-y-0 sm:p-6">
-						<!-- Close button -->
-						<div class="absolute top-0 right-0 hidden pt-4 pr-4 sm:block">
-							<button
-								type="button"
-								onclick={() => {
-									chatDisplay = !chatDisplay;
-								}}
-								class="text-gray-400 bg-white rounded-md hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-							>
-								<span class="sr-only">Cerrar</span>
-								<svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon">
-									<path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
-								</svg>
-							</button>
-						</div>
+	</div>
+	<!-- Chat -->
+	<div class="{chatDisplay ? 'z-10' : 'z-0 hidden'} relative " aria-labelledby="modal-title" role="dialog" aria-modal="true">
+		<div class="{chatDisplay ? 'bg-opacity-75 h-full' : 'bg-opacity-0 hidden'} fixed inset-0 bg-gray-500 transition-opacity duration-300 ease-in lg:pl-52 md:pl-16" aria-hidden="true"></div>
+		<div class="fixed inset-0 z-10 w-screen overflow-y-auto">
+			<div class="flex items-start justify-center p-4 mt-16 text-center sm:p-0 lg:pl-52 md:pl-16">
+				<div class="{chatDisplay ? 'ease-out opacity-100 translate-y-0 sm:scale-100' : 'ease-in opacity-0 max-h-0 translate-y-4 sm:translate-y-0 sm:scale-95'} relative transform duration-500 overflow-hidden rounded-lg bg-white px-4 pb-4 pt-5 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-7xl sm:translate-y-0 sm:p-6">
+					<!-- Close button -->
+					<div class="absolute top-0 right-0 hidden pt-4 pr-4 sm:block">
+						<button
+							type="button"
+							onclick={() => {
+								chatDisplay = !chatDisplay;
+							}}
+							class="text-gray-400 bg-white rounded-md hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+						>
+							<span class="sr-only">Cerrar</span>
+							<svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon">
+								<path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+							</svg>
+						</button>
+					</div>
 
-						<div class="flex">
-							<div class="w-full mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left">
-								<h3 class="text-base font-semibold leading-6 text-gray-900" id="modal-title">Chat</h3>
-								<!-- Chat container with fixed height and auto-scroll -->
-								<div class="h-[75vh] mt-2 overflow-y-auto custom-scrollbar">
-									<ul role="list" class="flex flex-col space-y-6">
-										{#each Conversation as item}
-											{#if item.role == 'user'}
-												<li class="relative flex flex-row max-w-full float-end gap-x-4">
-													<img src={userPhoto} alt="imagen del usuario" class="relative flex-none w-6 h-6 mt-3 rounded-full bg-gray-50" />
-													<div class="flex-auto p-3 rounded-md ring-1 ring-inset ring-gray-200">
-														<div class="flex justify-between gap-x-4">
-															<div class="py-0.5 text-xs leading-5 text-gray-500">
-																<span class="font-medium text-gray-900">{user.firstname}</span>
-															</div>
-															<time datetime="2023-01-23T15:56" class="flex-none py-0.5 text-xs leading-5 text-gray-500"></time>
+					<div class="flex">
+						<div class="w-full mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left">
+							<h3 class="text-base font-semibold leading-6 text-gray-900" id="modal-title">Chat</h3>
+							<!-- Chat container with fixed height and auto-scroll -->
+							<div class="h-[75vh] mt-2 overflow-y-auto custom-scrollbar">
+								<ul role="list" class="flex flex-col space-y-6">
+									{#each Conversation as item}
+										{#if item.role == 'user'}
+											<li class="relative flex flex-row max-w-full float-end gap-x-4">
+												<img src={userPhoto} alt="imagen del usuario" class="relative flex-none w-6 h-6 mt-3 rounded-full bg-gray-50" />
+												<div class="flex-auto p-3 rounded-md ring-1 ring-inset ring-gray-200">
+													<div class="flex justify-between gap-x-4">
+														<div class="py-0.5 text-xs leading-5 text-gray-500">
+															<span class="font-medium text-gray-900">{user.firstname}</span>
 														</div>
-														<p class="text-sm leading-6 text-gray-500">{item.content}</p>
+														<time datetime="2023-01-23T15:56" class="flex-none py-0.5 text-xs leading-5 text-gray-500"></time>
 													</div>
-												</li>
-											{/if}
-											{#if (item.role == 'assistant' && item.content != '')}
-												<li class="relative flex flex-row max-w-full float-end gap-x-4">
-													<div class="flex-auto p-3 rounded-md ring-1 ring-inset ring-gray-200">
-														<div class="flex justify-between gap-x-4">
-															<div class="py-0.5 text-xs leading-5 text-gray-500">
-																<span class="font-medium text-gray-900">Snuuper</span>
-															</div>
-															<time datetime="2023-01-23T15:56" class="flex-none py-0.5 text-xs leading-5 text-gray-500"></time>
+													<p class="text-sm leading-6 text-gray-500">{item.content}</p>
+												</div>
+											</li>
+										{/if}
+										{#if (item.role == 'assistant' && item.content != '')}
+											<li class="relative flex flex-row max-w-full float-end gap-x-4">
+												<div class="flex-auto p-3 rounded-md ring-1 ring-inset ring-gray-200">
+													<div class="flex justify-between gap-x-4">
+														<div class="py-0.5 text-xs leading-5 text-gray-500">
+															<span class="font-medium text-gray-900">Snuuper</span>
 														</div>
-														<p class="text-sm leading-6 text-gray-500">{@html marked(item.content)}</p>
+														<time datetime="2023-01-23T15:56" class="flex-none py-0.5 text-xs leading-5 text-gray-500"></time>
 													</div>
-													<enhanced:img src={LogoSnuuperPequeño} alt="Logo Snuuper" class="relative flex-none w-6 h-6 mt-3 rounded-full bg-gray-50" />
-												</li>
-											{/if}
-										{/each}
-									</ul>
-									<div class="mt-5 {ShowLoader ? '' : 'hidden'}">
-										<Chasing size="50" color="blue" duration="1s" />
-									</div>
-									<div class="" bind:this={scrollToDiv} ></div>
+													<p class="text-sm leading-6 text-gray-500">{@html marked(item.content)}</p>
+												</div>
+												<enhanced:img src={LogoSnuuperPequeno} alt="Logo Snuuper" class="relative flex-none w-6 h-6 mt-3 rounded-full bg-gray-50" />
+											</li>
+										{/if}
+									{/each}
+								</ul>
+								<div class="mt-5 {ShowLoader ? '' : 'hidden'}">
+									<Chasing size="50" color="blue" duration="1s" />
 								</div>
+								<div class="" bind:this={scrollToDiv} ></div>
 							</div>
 						</div>
 					</div>
 				</div>
 			</div>
 		</div>
-		<!-- en chat -->
-		<div class="absolute z-0 w-full min-h-screen py-3 grow bg-slate-50">
-			<div class="relative z-10 px-4 sm:px-6 lg:px-2">
-				{@render children()}
-			</div>
-			<div class="absolute top-0 z-0 flex flex-col w-screen h-screen"><enhanced:img src={IlustracionSnuuper1} class="object-cover object-center w-full min-h-screen grow opacity-15" alt="fondo-ilustrado"></enhanced:img></div>
+	</div>
+	<!-- en chat -->
+	<div class="z-20 min-h-screen py-3 lg:pl-52 md:pl-16 bg-slate-50">
+		<div class="z-40 px-4 sm:px-6 lg:px-2">
+			{@render children()}
 		</div>
+		<!-- div class="absolute top-0 z-0 flex flex-col w-screen h-screen"><enhanced:img src={IlustracionSnuuper1} class="object-cover object-center w-full min-h-screen grow opacity-15" alt="fondo-ilustrado"></enhanced:img></!-->
 	</div>
 </div>
 
