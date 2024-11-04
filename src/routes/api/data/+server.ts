@@ -35,6 +35,7 @@ export const POST: RequestHandler = async (event) => {
         ]).toArray();
     
         let lista_tareas = JSON.stringify(task);
+        console.log("🚀 ~ constPOST:RequestHandler= ~ lista_tareas:", lista_tareas)
 
     return new Response(lista_tareas,{ status: 200});
 };
