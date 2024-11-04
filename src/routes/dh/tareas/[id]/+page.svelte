@@ -1,4 +1,5 @@
 <script lang="ts">
+	import KpiRespuestas from '$lib/components/kpiRespuestas.svelte';
 	import type { PageData } from './$types';
 	import { marked } from 'marked';
 
@@ -53,7 +54,8 @@
 					{#await data.respuestas}
 						<p class="mt-6 text-gray-600 text-lg/8 sm:text-base">Cargando...</p>
 					{:then respuestas} 
-						<div>Se presentan {respuestas.length} respuestas</div>
+						<div>Se presentan {respuestas.totalResponses} respuestas</div>
+						<KpiRespuestas taskAnswers={respuestas} />
 					{/await}
 					<p class="mt-6 text-gray-600 text-lg/8 sm:text-base"></p>
 				</div>

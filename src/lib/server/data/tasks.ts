@@ -1,4 +1,4 @@
-import { MongoDBCL } from '$lib/server/db/mongodb'; 
+import { MongoDBCL } from '$lib/server/db/mongodb';
 import { redirect, type RequestHandler } from '@sveltejs/kit';
 import { ObjectId } from 'mongodb';
 
@@ -6,37 +6,41 @@ export async function getActivetasks() {
     const task = await MongoDBCL
         .collection('Task')
         .aggregate([{
-            $match: {'constraints.status':'active'}
+            $match: { 'constraints.status': 'active' }
         },
-            { $lookup: {
-              from: 'Company',
-              localField: 'constraints.companyId',
-              foreignField: '_id',
-              as: 'companyDetails'
-            }},
-           {$project: {
-            _id:1,
-            title: 1,
-            description: 1,
-            type: 1,
-            subtype: 1,
-            mode: 1,
-            createdAt: 1,
-            companyDetails: 1,
-            'reward.credits': 1,
-            'reward.experience': 1,
-            visibility: 1,
-            "status":"$constraints.status",
-            'constraints.level': 1,
-            'constraints.active': 1,
-            'constraints.completionTime': 1,
-           }}
+        {
+            $lookup: {
+                from: 'Company',
+                localField: 'constraints.companyId',
+                foreignField: '_id',
+                as: 'companyDetails'
+            }
+        },
+        {
+            $project: {
+                _id: 1,
+                title: 1,
+                description: 1,
+                type: 1,
+                subtype: 1,
+                mode: 1,
+                createdAt: 1,
+                companyDetails: 1,
+                'reward.credits': 1,
+                'reward.experience': 1,
+                visibility: 1,
+                "status": "$constraints.status",
+                'constraints.level': 1,
+                'constraints.active': 1,
+                'constraints.completionTime': 1,
+            }
+        }
         ]).toArray();
-        
-        let lista_tareas = JSON.parse(JSON.stringify(task));
-       // console.log("🚀 ~ getActivetasks ~ lista_tareas:", lista_tareas)
-    
-        return lista_tareas;
+
+    let lista_tareas = JSON.parse(JSON.stringify(task));
+    // console.log("🚀 ~ getActivetasks ~ lista_tareas:", lista_tareas)
+
+    return lista_tareas;
 }
 type viActiveTaskType = {
     _id: OidObject;
@@ -70,20 +74,17 @@ type viActiveTaskType = {
     countryObj: Country[];
     companyObj: Company[];
     groupTaskObj: any[]; // Specify if known
-  };
-  
-  // Definitions of individual components
+};
 
-  
-  type Reward = {
+type Reward = {
     credits: number;
     bonus: number;
     experience: number;
     refunds: number;
     giftcard: number;
-  };
-  
-  type Constraints = {
+};
+
+type Constraints = {
     limitLocksByDays: LimitLocksByDays;
     level: number;
     priority: null | string;
@@ -122,15 +123,15 @@ type viActiveTaskType = {
     gender: {};
     gse: any[];
     stepAlertWithPdf: boolean;
-  };
-  
-  type LimitLocksByDays = {
+};
+
+type LimitLocksByDays = {
     enabled: boolean;
     daysAmount: number;
     limitByAddresses: boolean;
-  };
-  
-  type HasSetup = {
+};
+
+type HasSetup = {
     hasLastStep: boolean;
     hasAutoForce: boolean;
     hasAutoMessage: boolean;
@@ -149,11 +150,11 @@ type viActiveTaskType = {
     hasDateInStepAlert: boolean;
     hasGse: boolean;
     hasApprovedTaskAlert: boolean;
-  };
-  
-  type TaskAlert = { emails: any[] };
-  
-  type ApprovedTaskAlert = {
+};
+
+type TaskAlert = { emails: any[] };
+
+type ApprovedTaskAlert = {
     emails: ApprovedTaskAlertEmail[];
     useCustomPdf: null | boolean;
     customPdf: any[];
@@ -165,29 +166,29 @@ type viActiveTaskType = {
     hasPdfFooter: boolean;
     message: string;
     specialEmail: null | string;
-  };
-  
-  type ApprovedTaskAlertEmail = {
+};
+
+type ApprovedTaskAlertEmail = {
     _id: OidObject;
     email: string;
-  };
-  
-  type Schedule = { isScheduled: boolean; onTime: boolean };
-  
-  type ApprovedStepAlert = {
+};
+
+type Schedule = { isScheduled: boolean; onTime: boolean };
+
+type ApprovedStepAlert = {
     maxAnswers: number;
     _id: OidObject;
     emails: ApprovedTaskAlertEmail[];
     stepId: OidObject;
     alternativeId: OidObject;
     message: string;
-  };
-  
-  type LastStep = { comment: boolean; info: boolean; rating: boolean };
-  
-  type AutoMessage = { approve: string; reject: string };
-  
-  type Address = {
+};
+
+type LastStep = { comment: boolean; info: boolean; rating: boolean };
+
+type AutoMessage = { approve: string; reject: string };
+
+type Address = {
     _id: OidObject;
     geolocation: Geolocation;
     mysqlId?: number;
@@ -202,9 +203,9 @@ type viActiveTaskType = {
     comentario?: null | string;
     status: string;
     metadata?: Metadata[];
-  };
-  
-  type Geolocation = {
+};
+
+type Geolocation = {
     physicalAddress: string;
     timestamp?: null | string;
     countryId: OidObject;
@@ -213,18 +214,18 @@ type viActiveTaskType = {
     communeId: OidObject;
     position: Position;
     displayAddress: string;
-  };
-  
-  type Position = { type: string; coordinates: [number, number] };
-  
-  type Metadata = {
+};
+
+type Position = { type: string; coordinates: [number, number] };
+
+type Metadata = {
     _id: OidObject;
     title: string;
     value: string;
     companyId: OidObject;
-  };
-  
-  type AddressConstraint = {
+};
+
+type AddressConstraint = {
     addressId: OidObject;
     bonus: number;
     refund: number;
@@ -233,14 +234,14 @@ type viActiveTaskType = {
     stock: number;
     instruction: TaskInstruction[];
     priority: number;
-  };
-  
-  type TaskInstruction = {
+};
+
+type TaskInstruction = {
     instructionId: OidObject;
     instructionText: string;
-  };
-  
-  type Country = {
+};
+
+type Country = {
     _id: OidObject;
     mysqlId: number;
     name: string;
@@ -248,9 +249,9 @@ type viActiveTaskType = {
     createdAt: string;
     updatedAt: string;
     googleAPI: string[];
-  };
-  
-  type Company = {
+};
+
+type Company = {
     _id: OidObject;
     mysqlId?: number;
     name: string;
@@ -267,22 +268,22 @@ type viActiveTaskType = {
     training: boolean;
     areas?: Area[];
     reports?: any[] | null;
-  };
-  
-  type Area = { _id: OidObject; name: string };
-  
-export async function getActivetask(taskId: string):Promise<viActiveTaskType> {
+};
+
+type Area = { _id: OidObject; name: string };
+
+export async function getActivetask(taskId: string): Promise<viActiveTaskType> {
 
     const tid = ObjectId.createFromHexString(taskId);
     const task = await MongoDBCL
-        .collection('vi_ActiveTask').findOne({_id: tid});
-        
-        let tarea = JSON.parse(JSON.stringify(task));
-       // console.log("🚀 ~ getActivetasks ~ lista_tareas:", lista_tareas)
-    
-        return tarea;
+        .collection('vi_ActiveTask').findOne({ _id: tid });
+
+    let tarea = JSON.parse(JSON.stringify(task));
+    // console.log("🚀 ~ getActivetasks ~ lista_tareas:", lista_tareas)
+
+    return tarea;
 }
- type stepsType = {
+type stepsType = {
     _id: OidObject;
     conditional: ConditionalObject;
     constraints: ConstraintsObject;
@@ -303,20 +304,20 @@ export async function getActivetask(taskId: string):Promise<viActiveTaskType> {
     updatedAt: DateObject;
     __v: number;
     totalWeight: number;
-  };
-  
-  type OidObject = {
+};
+
+type OidObject = {
     $oid: string;
-  };
-  
-  type ConditionalObject = {
+};
+
+type ConditionalObject = {
     expectedConditional: {
-      conditionals: any[]; // Ajustar según el tipo de datos esperado si es necesario
+        conditionals: any[]; // Ajustar según el tipo de datos esperado si es necesario
     };
     isConditional: number;
-  };
-  
-  type ConstraintsObject = {
+};
+
+type ConstraintsObject = {
     optional: boolean;
     hidden: boolean;
     reportable: boolean;
@@ -326,49 +327,228 @@ export async function getActivetask(taskId: string):Promise<viActiveTaskType> {
     addresses: any[]; // Ajustar según el tipo de datos esperado si es necesario
     alwaysAccountWeight: boolean;
     accountWeightWhenParent: boolean;
-  };
-  
-  type ScaleObject = {
+};
+
+type ScaleObject = {
     valMin: number;
     valMax: number;
-  };
-  
-  type Instruction = {
+};
+
+type Instruction = {
     _id: OidObject;
     data: string;
     type: string;
-  };
-  
-  type Alternative = {
+};
+
+type Alternative = {
     tags: any[]; // Ajustar según el tipo de datos esperado si es necesario
     value: string;
     _id: OidObject;
     weight: number;
-  };
-  
-  type DateObject = {
+};
+
+type DateObject = {
     $date: string;
-  };
-  
-export async function getStepDetails(taskId: string):Promise<stepsType[]> {
+};
+
+export async function getStepDetails(taskId: string): Promise<stepsType[]> {
     const tid = ObjectId.createFromHexString(taskId);
     const steps = await MongoDBCL.collection('Step')
-    .find({taskId:tid})
-    .toArray();
-    if(!steps) return [];
-    if(steps.length === 0) return [];
+        .find({ taskId: tid })
+        .toArray();
+    if (!steps) return [];
+    if (steps.length === 0) return [];
     steps.sort((a, b) => a.correlativeNumber - b.correlativeNumber);
 
     return JSON.parse(JSON.stringify(steps));
 
 }
 import type { TaskAnswerType } from './Mongotypes';
-export async function getTaskAnswers(taskId: string):Promise<TaskAnswerType[]> {
+export async function getTaskAnswers(taskId: string): Promise<TaskAnswerType[]> {
     const tid = ObjectId.createFromHexString(taskId);
     const answers = await MongoDBCL.collection('TaskAnswer')
-    .find({taskId:tid}).project({_id:1, "geolocation.position.coordinates":1, "checkInGeolocation.position.coordinates":1, "timestamp.start":1, "timestamp.stop":1, status:1, credit:1, bono:1, refund:1, comment:1, addressId:1, stepAnswerDetails:1 })
-    .toArray();
-    if(!answers) return [];
-    if(answers.length === 0) return [];
+        .find({ taskId: tid }).project({ _id: 1, "geolocation.position.coordinates": 1, "checkInGeolocation.position.coordinates": 1, "timestamp.start": 1, "timestamp.stop": 1, status: 1, credit: 1, bono: 1, refund: 1, comment: 1, addressId: 1, stepAnswerDetails: 1 })
+        .toArray();
+    if (!answers) return [];
+    if (answers.length === 0) return [];
     return JSON.parse(JSON.stringify(answers));
+}
+
+export type DashboardStats = {
+    totalResponses: number;
+    averageCompletionTime: number;
+    totalCredits: number;
+    totalBonos: number;
+    statusDistribution: Record<string, number>;
+    multipleChoiceStats: Record<string, Record<string, number>>;
+    timeDistribution: {
+        hour: number;
+        count: number;
+    }[];
+    geographicDistribution: {
+        coordinates: [number, number];
+        count: number;
+    }[];
+}
+
+export async function getTaskStats(taskId: string): Promise<DashboardStats> {
+    const tid = ObjectId.createFromHexString(taskId);
+
+    const pipeline = [
+        {
+            $match: {
+                taskId: tid
+            }
+        },
+        {
+            $facet: {
+                // Estadísticas básicas
+                basicStats: [
+                    {
+                        $group: {
+                            _id: null,
+                            totalResponses: { $sum: 1 },
+                            totalCredits: { $sum: "$credit" },
+                            totalBonos: { $sum: "$bono" },
+                            avgCompletionTime: {
+                                $avg: {
+                                    $divide: [
+                                        { $subtract: ["$timestamp.stop", "$timestamp.start"] },
+                                        60000 // Convertir a minutos
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                ],
+
+                // Distribución por status
+                statusDistribution: [
+                    {
+                        $group: {
+                            _id: "$status",
+                            count: { $sum: 1 }
+                        }
+                    }
+                ],
+
+                // Distribución geográfica
+                geoDistribution: [
+                    {
+                        $match: {
+                            "geolocation.position.coordinates": { $exists: true }
+                        }
+                    },
+                    {
+                        $group: {
+                            _id: "$geolocation.position.coordinates",
+                            count: { $sum: 1 }
+                        }
+                    },
+                    {
+                        $project: {
+                            coordinates: "$_id",
+                            count: 1,
+                            _id: 0
+                        }
+                    }
+                ],
+
+                // Distribución por hora del día
+                timeDistribution: [
+                    {
+                        $project: {
+                            hour: { $hour: "$timestamp.start" }
+                        }
+                    },
+                    {
+                        $group: {
+                            _id: "$hour",
+                            count: { $sum: 1 }
+                        }
+                    },
+                    {
+                        $project: {
+                            hour: "$_id",
+                            count: 1,
+                            _id: 0
+                        }
+                    },
+                    {
+                        $sort: { hour: 1 }
+                    }
+                ],
+
+                // Estadísticas de preguntas múltiples
+                multipleChoiceStats: [
+                    {
+                        $unwind: "$stepAnswerDetails"
+                    },
+                    {
+                        $match: {
+                            "stepAnswerDetails.tipo_paso": {
+                                $in: ["mult_mult", "mult_one"]
+                            }
+                        }
+                    },
+                    {
+                        $unwind: "$stepAnswerDetails.respuesta_texto"
+                    },
+                    {
+                        $group: {
+                            _id: {
+                                pregunta: "$stepAnswerDetails.texto_pregunta",
+                                respuesta: {
+                                    $cond: {
+                                        if: { $eq: [{ $type: "$stepAnswerDetails.respuesta_texto" }, "string"] },
+                                        then: "$stepAnswerDetails.respuesta_texto",
+                                        else: "$stepAnswerDetails.respuesta_texto.value"
+                                    }
+                                }
+                            },
+                            count: { $sum: 1 }
+                        }
+                    },
+                    {
+                        $group: {
+                            _id: "$_id.pregunta",
+                            respuestas: {
+                                $push: {
+                                    k: "$_id.respuesta",
+                                    v: "$count"
+                                }
+                            }
+                        }
+                    },
+                    {
+                        $project: {
+                            _id: 0,
+                            pregunta: "$_id",
+                            respuestas: { $arrayToObject: "$respuestas" }
+                        }
+                    }
+                ]
+            }
+        }
+    ];
+
+    const result = await MongoDBCL.collection('TaskAnswer').aggregate(pipeline).toArray();
+    const stats = result[0];
+   
+
+    // Transformar el resultado en el formato esperado
+    return {
+        totalResponses: stats.basicStats[0]?.totalResponses || 0,
+        averageCompletionTime: stats.basicStats[0]?.avgCompletionTime || 0,
+        totalCredits: stats.basicStats[0]?.totalCredits || 0,
+        totalBonos: stats.basicStats[0]?.totalBonos || 0,
+        statusDistribution: Object.fromEntries(
+            stats.statusDistribution.map(({ _id, count }) => [_id, count])
+        ),
+        multipleChoiceStats: Object.fromEntries(
+            stats.multipleChoiceStats.map(({ pregunta, respuestas }) => [pregunta, respuestas])
+        ),
+        timeDistribution: stats.timeDistribution,
+        geographicDistribution: stats.geoDistribution
+    };
 }

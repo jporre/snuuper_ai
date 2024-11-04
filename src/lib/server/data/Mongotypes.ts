@@ -25,7 +25,7 @@ export type TaskAnswerType = {
     };
   };
   
-  type StepAnswerDetail = {
+export   type StepAnswerDetail = {
     _id: ObjectId;
     stepAnswerId: ObjectId;
     taskAnswerId: ObjectId;
