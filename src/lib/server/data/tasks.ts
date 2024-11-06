@@ -374,181 +374,250 @@ export async function getTaskAnswers(taskId: string): Promise<TaskAnswerType[]> 
     return JSON.parse(JSON.stringify(answers));
 }
 
+
 export type DashboardStats = {
-    totalResponses: number;
-    averageCompletionTime: number;
-    totalCredits: number;
-    totalBonos: number;
-    statusDistribution: Record<string, number>;
-    multipleChoiceStats: Record<string, Record<string, number>>;
-    timeDistribution: {
-        hour: number;
-        count: number;
-    }[];
-    geographicDistribution: {
-        coordinates: [number, number];
-        count: number;
-    }[];
+  totalResponses: number;
+  averageCompletionTime: number;
+  totalCredits: number;
+  totalBonos: number;
+  statusDistribution: Record<string, number>;
+  multipleChoiceStats: Record<string, Record<string, number>>;
+  yesNoStats: Record<string, { yes: number; no: number }>;
+  timeDistribution: {
+    hour: number;
+    count: number;
+  }[];
+  geographicDistribution: {
+    coordinates: [number, number];
+    count: number;
+  }[];
 }
 
 export async function getTaskStats(taskId: string): Promise<DashboardStats> {
-    const tid = ObjectId.createFromHexString(taskId);
-
-    const pipeline = [
-        {
+  const tid = ObjectId.createFromHexString(taskId);
+  
+  const pipeline = [
+    {
+      $match: {
+        taskId: tid
+      }
+    },
+    {
+      $facet: {
+        // Estadísticas básicas (sin cambios)
+        basicStats: [
+          {
+            $group: {
+              _id: null,
+              totalResponses: { $sum: 1 },
+              totalCredits: { $sum: "$credit" },
+              totalBonos: { $sum: "$bono" },
+              avgCompletionTime: {
+                $avg: {
+                  $divide: [
+                    { $subtract: ["$timestamp.stop", "$timestamp.start"] },
+                    60000 // Convertir a minutos
+                  ]
+                }
+              }
+            }
+          }
+        ],
+        
+        // Distribución por status (sin cambios)
+        statusDistribution: [
+          {
+            $group: {
+              _id: "$status",
+              count: { $sum: 1 }
+            }
+          }
+        ],
+        
+        // Estadísticas Yes/No (nuevo)
+        yesNoStats: [
+          {
+            $unwind: "$stepAnswerDetails"
+          },
+          {
             $match: {
-                taskId: tid
+              "stepAnswerDetails.tipo_paso": "yes_no"
             }
-        },
-        {
-            $facet: {
-                // Estadísticas básicas
-                basicStats: [
-                    {
-                        $group: {
-                            _id: null,
-                            totalResponses: { $sum: 1 },
-                            totalCredits: { $sum: "$credit" },
-                            totalBonos: { $sum: "$bono" },
-                            avgCompletionTime: {
-                                $avg: {
-                                    $divide: [
-                                        { $subtract: ["$timestamp.stop", "$timestamp.start"] },
-                                        60000 // Convertir a minutos
-                                    ]
-                                }
-                            }
-                        }
+          },
+          {
+            $project: {
+              pregunta: "$stepAnswerDetails.texto_pregunta",
+              respuesta: {
+                $let: {
+                  vars: {
+                    respuesta: {
+                      $arrayElemAt: ["$stepAnswerDetails.respuesta_texto", 0]
                     }
-                ],
-
-                // Distribución por status
-                statusDistribution: [
-                    {
-                        $group: {
-                            _id: "$status",
-                            count: { $sum: 1 }
-                        }
+                  },
+                  in: {
+                    $cond: {
+                      if: { $eq: ["$$respuesta", "No"] },
+                      then: "no",
+                      else: "yes"
                     }
-                ],
-
-                // Distribución geográfica
-                geoDistribution: [
-                    {
-                        $match: {
-                            "geolocation.position.coordinates": { $exists: true }
-                        }
-                    },
-                    {
-                        $group: {
-                            _id: "$geolocation.position.coordinates",
-                            count: { $sum: 1 }
-                        }
-                    },
-                    {
-                        $project: {
-                            coordinates: "$_id",
-                            count: 1,
-                            _id: 0
-                        }
-                    }
-                ],
-
-                // Distribución por hora del día
-                timeDistribution: [
-                    {
-                        $project: {
-                            hour: { $hour: "$timestamp.start" }
-                        }
-                    },
-                    {
-                        $group: {
-                            _id: "$hour",
-                            count: { $sum: 1 }
-                        }
-                    },
-                    {
-                        $project: {
-                            hour: "$_id",
-                            count: 1,
-                            _id: 0
-                        }
-                    },
-                    {
-                        $sort: { hour: 1 }
-                    }
-                ],
-
-                // Estadísticas de preguntas múltiples
-                multipleChoiceStats: [
-                    {
-                        $unwind: "$stepAnswerDetails"
-                    },
-                    {
-                        $match: {
-                            "stepAnswerDetails.tipo_paso": {
-                                $in: ["mult_mult", "mult_one"]
-                            }
-                        }
-                    },
-                    {
-                        $unwind: "$stepAnswerDetails.respuesta_texto"
-                    },
-                    {
-                        $group: {
-                            _id: {
-                                pregunta: "$stepAnswerDetails.texto_pregunta",
-                                respuesta: {
-                                    $cond: {
-                                        if: { $eq: [{ $type: "$stepAnswerDetails.respuesta_texto" }, "string"] },
-                                        then: "$stepAnswerDetails.respuesta_texto",
-                                        else: "$stepAnswerDetails.respuesta_texto.value"
-                                    }
-                                }
-                            },
-                            count: { $sum: 1 }
-                        }
-                    },
-                    {
-                        $group: {
-                            _id: "$_id.pregunta",
-                            respuestas: {
-                                $push: {
-                                    k: "$_id.respuesta",
-                                    v: "$count"
-                                }
-                            }
-                        }
-                    },
-                    {
-                        $project: {
-                            _id: 0,
-                            pregunta: "$_id",
-                            respuestas: { $arrayToObject: "$respuestas" }
-                        }
-                    }
-                ]
+                  }
+                }
+              }
             }
-        }
-    ];
+          },
+          {
+            $group: {
+              _id: {
+                pregunta: "$pregunta",
+                respuesta: "$respuesta"
+              },
+              count: { $sum: 1 }
+            }
+          },
+          {
+            $group: {
+              _id: "$_id.pregunta",
+              respuestas: {
+                $push: {
+                  k: "$_id.respuesta",
+                  v: "$count"
+                }
+              }
+            }
+          },
+          {
+            $project: {
+              _id: 0,
+              pregunta: "$_id",
+              stats: {
+                $arrayToObject: "$respuestas"
+              }
+            }
+          }
+        ],
+        
+        // Estadísticas de preguntas múltiples (sin cambios)
+        multipleChoiceStats: [
+          {
+            $unwind: "$stepAnswerDetails"
+          },
+          {
+            $match: {
+              "stepAnswerDetails.tipo_paso": { 
+                $in: ["mult_mult", "mult_one"] 
+              }
+            }
+          },
+          {
+            $unwind: "$stepAnswerDetails.respuesta_texto"
+          },
+          {
+            $group: {
+              _id: {
+                pregunta: "$stepAnswerDetails.texto_pregunta",
+                respuesta: {
+                  $cond: {
+                    if: { $eq: [{ $type: "$stepAnswerDetails.respuesta_texto" }, "string"] },
+                    then: "$stepAnswerDetails.respuesta_texto",
+                    else: "$stepAnswerDetails.respuesta_texto.value"
+                  }
+                }
+              },
+              count: { $sum: 1 }
+            }
+          },
+          {
+            $group: {
+              _id: "$_id.pregunta",
+              respuestas: {
+                $push: {
+                  k: "$_id.respuesta",
+                  v: "$count"
+                }
+              }
+            }
+          },
+          {
+            $project: {
+              _id: 0,
+              pregunta: "$_id",
+              respuestas: { $arrayToObject: "$respuestas" }
+            }
+          }
+        ],
+        
+        // Distribución geográfica (sin cambios)
+        geoDistribution: [
+          {
+            $match: {
+              "geolocation.position.coordinates": { $exists: true }
+            }
+          },
+          {
+            $group: {
+              _id: "$geolocation.position.coordinates",
+              count: { $sum: 1 }
+            }
+          },
+          {
+            $project: {
+              coordinates: "$_id",
+              count: 1,
+              _id: 0
+            }
+          }
+        ],
+        
+        // Distribución por hora (sin cambios)
+        timeDistribution: [
+          {
+            $project: {
+              hour: { $hour: "$timestamp.start" }
+            }
+          },
+          {
+            $group: {
+              _id: "$hour",
+              count: { $sum: 1 }
+            }
+          },
+          {
+            $project: {
+              hour: "$_id",
+              count: 1,
+              _id: 0
+            }
+          },
+          {
+            $sort: { hour: 1 }
+          }
+        ]
+      }
+    }
+  ];
 
-    const result = await MongoDBCL.collection('TaskAnswer').aggregate(pipeline).toArray();
-    const stats = result[0];
-   
+  const result = await MongoDBCL.collection('TaskAnswer').aggregate(pipeline).toArray();
+  const stats = result[0];
+  
+  return {
+    totalResponses: stats.basicStats[0]?.totalResponses || 0,
+    averageCompletionTime: stats.basicStats[0]?.avgCompletionTime || 0,
+    totalCredits: stats.basicStats[0]?.totalCredits || 0,
+    totalBonos: stats.basicStats[0]?.totalBonos || 0,
+    statusDistribution: Object.fromEntries(
+      stats.statusDistribution.map(({ _id, count }) => [_id, count])
+    ),
+    multipleChoiceStats: Object.fromEntries(
+      stats.multipleChoiceStats.map(({ pregunta, respuestas }) => [pregunta, respuestas])
+    ),
+    yesNoStats: Object.fromEntries(
+      stats.yesNoStats.map(({ pregunta, stats }) => [pregunta, {
+        yes: stats.yes || 0,
+        no: stats.no || 0
+      }])
+    ),
+    timeDistribution: stats.timeDistribution,
+    geographicDistribution: stats.geoDistribution
+  };
 
-    // Transformar el resultado en el formato esperado
-    return {
-        totalResponses: stats.basicStats[0]?.totalResponses || 0,
-        averageCompletionTime: stats.basicStats[0]?.avgCompletionTime || 0,
-        totalCredits: stats.basicStats[0]?.totalCredits || 0,
-        totalBonos: stats.basicStats[0]?.totalBonos || 0,
-        statusDistribution: Object.fromEntries(
-            stats.statusDistribution.map(({ _id, count }) => [_id, count])
-        ),
-        multipleChoiceStats: Object.fromEntries(
-            stats.multipleChoiceStats.map(({ pregunta, respuestas }) => [pregunta, respuestas])
-        ),
-        timeDistribution: stats.timeDistribution,
-        geographicDistribution: stats.geoDistribution
-    };
 }

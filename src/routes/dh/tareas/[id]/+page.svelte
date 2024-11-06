@@ -6,6 +6,13 @@
 	import { getUserState } from '$lib/state.svelte';
 	let { data }: { data: PageData } = $props();
 	const user = getUserState();
+
+	let mostrarCompleto = $state(false);
+
+function truncarTexto(texto: string, limite: number) {
+  if (texto.length <= limite) return texto;
+  return texto.slice(0, limite) + '...';
+}
 </script>
 
 <div class="">
@@ -14,7 +21,16 @@
 			<div class="flex flex-row p-6 m-2 mx-auto space-x-2 border-2 border-blue-900 justify-evenly lg:px-8 rounded-xl">
 				<div class="max-w-4xl mx-auto lg:mx-0">
 					<h2 class="text-3xl font-semibold tracking-tight text-gray-900 text-pretty sm:text-xl">{data.tarea.title}</h2>
-					<p class="mt-6 text-gray-600 text-lg/8 sm:text-base">{@html data.tarea.description}</p>
+					<p class="mt-6 text-sm text-gray-600 sm:text-base"> {@html mostrarCompleto ? data.tarea.description : truncarTexto(data.tarea.description, 200)}</p>
+					<button
+					class="text-blue-500 hover:underline"
+					onclick={(event) => {
+						event.preventDefault();
+						mostrarCompleto = !mostrarCompleto;
+					  }}
+				  >
+					{mostrarCompleto ? 'Mostrar menos' : 'Mostrar más'}
+				  </button>
 				</div>
 				<div class="max-w-4xl mx-auto lg:mx-0">
 					<h2 class="text-3xl font-semibold tracking-tight text-gray-900 text-pretty sm:text-xl">Resume Ejecutivo</h2>

@@ -69,5 +69,5 @@ export const POST: RequestHandler = async (event) => {
 
 
     
-    return new Response();
+    return new Response(JSON.stringify({message: 'Task summary created', taskId: body.taskId, taskSummary: respuestaAI}), {status: 200});
 };

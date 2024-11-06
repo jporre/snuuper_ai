@@ -87,3 +87,51 @@
       </div>
     {/each}
   </div>
+  <!-- Sección Yes/No en SurveyDashboard.svelte -->
+  <!-- Preguntas Yes/No -->
+  <div class="p-4 mt-4 bg-white rounded-lg shadow">
+    <h3 class="mb-4 text-lg font-semibold">Preguntas Sí/No</h3>
+    {#each Object.entries(stats.yesNoStats) as [question, answers]}
+      <div class="mb-6">
+        <h4 class="mb-2 font-medium">{question}</h4>
+        <div class="grid grid-cols-2 gap-4">
+          <div class="p-4 rounded bg-green-50">
+            <div class="flex items-center justify-between">
+              <span class="font-medium text-green-700">Sí</span>
+              <span class="text-2xl font-bold text-green-700">{answers.yes}</span>
+            </div>
+            <div class="mt-2">
+              <div class="w-full h-2 bg-gray-200 rounded-full">
+                <div
+                  class="h-2 bg-green-600 rounded-full"
+                  style="width: {(answers.yes / (answers.yes + answers.no) * 100)}%"
+                ></div>
+              </div>
+              <p class="mt-1 text-sm text-green-700">
+                {((answers.yes / (answers.yes + answers.no) * 100)).toFixed(1)}%
+              </p>
+            </div>
+          </div>
+          
+          <div class="p-4 rounded bg-red-50">
+            <div class="flex items-center justify-between">
+              <span class="font-medium text-red-700">No</span>
+              <span class="text-2xl font-bold text-red-700">{answers.no}</span>
+            </div>
+            <div class="mt-2">
+              <div class="w-full h-2 bg-gray-200 rounded-full">
+                <div
+                  class="h-2 bg-red-600 rounded-full"
+                  style="width: {(answers.no / (answers.yes + answers.no) * 100)}%"
+                ></div>
+              </div>
+              <p class="mt-1 text-sm text-red-700">
+                {((answers.no / (answers.yes + answers.no) * 100)).toFixed(1)}%
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    {/each}
+  </div>
+  
