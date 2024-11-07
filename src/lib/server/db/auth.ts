@@ -3,11 +3,6 @@ import { dev } from "$app/environment";
 import { env } from '$env/dynamic/private';
 import { Google } from "arctic";
 
-//* Este es el caso en que la base de datos de usuarios esté en postgresql
-//import { DrizzlePostgreSQLAdapter } from "@lucia-auth/adapter-drizzle";
-//import {db} from "$lib/server/db/pgcon";
-//const adapter = new DrizzlePostgreSQLAdapter(db, userSession, authUser);
-
 //* Este es el caso en que la base de datos de usuarios esté en mongodb
 import { Collection, MongoClient, ObjectId } from 'mongodb';  
 import { MONGODB_HOST, MONGODB_USERNAME, MONGODB_PASSWORD } from '$env/static/private';

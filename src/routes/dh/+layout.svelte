@@ -200,7 +200,7 @@
 		</div>
 	</div>
 	<!-- Chat -->
-	<div class="{chatDisplay ? 'z-10' : 'z-0 hidden'} relative " aria-labelledby="modal-title" role="dialog" aria-modal="true">
+	<div class="{chatDisplay ? 'z-10' : 'z-0 hidden'} relative" aria-labelledby="modal-title" role="dialog" aria-modal="true">
 		<div class="{chatDisplay ? 'bg-opacity-75 h-full' : 'bg-opacity-0 hidden'} fixed inset-0 bg-gray-500 transition-opacity duration-300 ease-in lg:pl-52 md:pl-16" aria-hidden="true"></div>
 		<div class="fixed inset-0 z-10 w-screen overflow-y-auto">
 			<div class="flex items-start justify-center p-4 mt-16 text-center sm:p-0 lg:pl-52 md:pl-16">
@@ -242,7 +242,7 @@
 												</div>
 											</li>
 										{/if}
-										{#if (item.role == 'assistant' && item.content != '')}
+										{#if item.role == 'assistant' && item.content != ''}
 											<li class="relative flex flex-row max-w-full float-end gap-x-4">
 												<div class="flex-auto p-3 rounded-md ring-1 ring-inset ring-gray-200">
 													<div class="flex justify-between gap-x-4">
@@ -261,7 +261,7 @@
 								<div class="mt-5 {ShowLoader ? '' : 'hidden'}">
 									<Chasing size="50" color="blue" duration="1s" />
 								</div>
-								<div class="" bind:this={scrollToDiv} ></div>
+								<div class="" bind:this={scrollToDiv}></div>
 							</div>
 						</div>
 					</div>

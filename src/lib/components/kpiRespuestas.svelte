@@ -1,137 +1,162 @@
 <script lang="ts">
-	import type { DashboardStats } from '$lib/server/data/tasks';
+  import type { DashboardStats } from '$lib/server/data/tasks';
   import { onMount } from 'svelte';
-  let { taskAnswers } : {taskAnswers : DashboardStats} = $props();
-  console.log("🚀 ~ taskAnswers:", taskAnswers)
 
-  const stats = taskAnswers;
+  let { taskAnswers } : { taskAnswers : DashboardStats } = $props();
+  console.log("🚀 ~ taskAnswers:", taskAnswers);
+
+  const stats = taskAnswers.estadisticas;
+//  console.log("🚀 ~ stats:", stats)
+
+  const basicStats = stats.basicStats;
+  const totalResponses = basicStats[0].totalResponses;
+  const totalCredits = basicStats[0].totalCredits;
+  const totalBonos = basicStats[0].totalBonos;
+  const averageCompletionTime = (basicStats[0].avgCompletionTime / 60).toFixed(2);
+  const statusDistribution = stats.statusDistribution;
+  const timeDistribution = stats.timeDistribution;
+  const multipleChoiceStats = stats.multipleChoiceStats;
+  const yesNoStats = stats.yesNoStats;
+  const priceListStats = stats.priceListStats;
+  const scaleStats = stats.scaleStats;
+  const fileStats = stats.fileStats;
 
 
-  </script>
-  <div class="grid grid-cols-1 gap-4 p-4 md:grid-cols-2 lg:grid-cols-4">
-    <!-- KPIs Generales -->
-    <div class="p-4 bg-white rounded-lg shadow">
-      <h3 class="mb-2 text-lg font-semibold">Respuestas Totales</h3>
-      <p class="text-3xl font-bold text-blue-600">{stats.totalResponses}</p>
-    </div>
-    
-    <div class="p-4 bg-white rounded-lg shadow">
-      <h3 class="mb-2 text-lg font-semibold">Tiempo Promedio</h3>
-      <p class="text-3xl font-bold text-green-600">
-        {stats.averageCompletionTime.toFixed(1)} min
-      </p>
-    </div>
-    
-    <div class="p-4 bg-white rounded-lg shadow">
-      <h3 class="mb-2 text-lg font-semibold">Créditos Totales</h3>
-      <p class="text-3xl font-bold text-purple-600">${stats.totalCredits}</p>
-    </div>
-    
-    <div class="p-4 bg-white rounded-lg shadow">
-      <h3 class="mb-2 text-lg font-semibold">Bonos Totales</h3>
-      <p class="text-3xl font-bold text-yellow-600">${stats.totalBonos}</p>
-    </div>
+</script>
+
+<!-- KPIs Generales -->
+<div class="grid grid-cols-1 gap-4 p-4 md:grid-cols-2 lg:grid-cols-4">
+  <div class="p-4 bg-white rounded-lg shadow">
+    <h3 class="mb-2 text-lg font-semibold">Respuestas Totales</h3>
+    <p class="text-3xl font-bold text-blue-600">{totalResponses}</p>
   </div>
+  <div class="p-4 bg-white rounded-lg shadow">
+    <h3 class="mb-2 text-lg font-semibold">Tiempo Promedio</h3>
+    <p class="text-3xl font-bold text-green-600">{averageCompletionTime} min</p>
+  </div>
+  <div class="p-4 bg-white rounded-lg shadow">
+    <h3 class="mb-2 text-lg font-semibold">Créditos Totales</h3>
+    <p class="text-3xl font-bold text-purple-600">${totalCredits}</p>
+  </div>
+  <div class="p-4 bg-white rounded-lg shadow">
+    <h3 class="mb-2 text-lg font-semibold">Bonos Totales</h3>
+    <p class="text-3xl font-bold text-yellow-600">${totalBonos}</p>
+  </div>
+</div>
 
-  <!-- Distribución por Estado -->
-  <div class="p-4 mt-4 bg-white rounded-lg shadow">
-    <h3 class="mb-4 text-lg font-semibold">Distribución por Estado</h3>
-    <div class="grid grid-cols-2 gap-4 md:grid-cols-4">
-      {#each Object.entries(stats.statusDistribution) as [status, count]}
-        <div class="p-2 text-center rounded bg-gray-50">
-          <p class="text-gray-600">{status}</p>
-          <p class="text-2xl font-bold">{count}</p>
-          <p class="text-sm text-gray-500">
-            {((count / stats.totalResponses) * 100).toFixed(1)}%
-          </p>
+<!-- Distribución por Estado -->
+<div class="p-4 mt-4 bg-white rounded-lg shadow">
+  <h3 class="mb-4 text-lg font-semibold">Distribución por Estado</h3>
+  <div class="grid grid-cols-2 gap-4 md:grid-cols-4">
+    {#each statusDistribution as { _id: status, count }}
+      <div class="p-2 text-center rounded bg-gray-50">
+        <p class="text-gray-600">{status}</p>
+        <p class="text-2xl font-bold">{count}</p>
+        <p class="text-sm text-gray-500">{((count / stats.totalResponses) * 100)}%</p>
+      </div>
+    {/each}
+  </div>
+</div>
+
+<!-- Distribución por Hora -->
+<div class="p-4 mt-4 bg-white rounded-lg shadow">
+  <h3 class="mb-4 text-lg font-semibold">Distribución por Hora</h3>
+  <div class="grid grid-cols-6 gap-2 md:grid-cols-12">
+    {#each timeDistribution as { hour, count }}
+      <div class="text-center">
+        <div class="p-1 bg-blue-100 rounded">
+          <p class="text-sm">{hour}:00</p>
+          <p class="font-bold">{count}</p>
         </div>
-      {/each}
-    </div>
+      </div>
+    {/each}
   </div>
+</div>
 
-  <!-- Distribución por Hora -->
-  <div class="p-4 mt-4 bg-white rounded-lg shadow">
-    <h3 class="mb-4 text-lg font-semibold">Distribución por Hora</h3>
-    <div class="grid grid-cols-6 gap-2 md:grid-cols-12">
-      {#each stats.timeDistribution as {hour, count}}
-        <div class="text-center">
-          <div class="p-1 bg-blue-100 rounded">
-            <p class="text-sm">{hour}:00</p>
+<!-- Preguntas de Selección Múltiple -->
+<div class="p-4 mt-4 bg-white rounded-lg shadow">
+  <h3 class="mb-4 text-lg font-semibold">Preguntas de Selección Múltiple</h3>
+  {#each multipleChoiceStats as { pregunta, respuestas }}
+    <div class="mb-6">
+      <h4 class="mb-2 font-medium">{pregunta}</h4>
+      <div class="grid grid-cols-2 gap-2 md:grid-cols-3 lg:grid-cols-4">
+        {#each Object.entries(respuestas) as [answer, count]}
+          <div class="p-2 rounded bg-gray-50">
+            <p class="text-sm">{answer}</p>
             <p class="font-bold">{count}</p>
+            <div class="w-full h-2 bg-gray-200 rounded-full">
+              <div
+                class="h-2 bg-blue-600 rounded-full"
+                style="width: {(count / stats.totalResponses) * 100}%"
+              ></div>
+            </div>
           </div>
-        </div>
-      {/each}
+        {/each}
+      </div>
     </div>
-  </div>
+  {/each}
+</div>
 
-  <!-- Preguntas de Selección Múltiple -->
-  <div class="p-4 mt-4 bg-white rounded-lg shadow">
-    <h3 class="mb-4 text-lg font-semibold">Resumen Preguntas de Selección</h3>
-    {#each Object.entries(stats.multipleChoiceStats) as [question, answers]}
-      <div class="mb-6">
-        <h4 class="mb-2 font-medium">{question}</h4>
-        <div class="grid grid-cols-2 gap-2 md:grid-cols-3 lg:grid-cols-4">
-          {#each Object.entries(answers) as [answer, count]}
-            <div class="p-2 rounded bg-gray-50">
-              <p class="text-sm">{answer}</p>
-              <p class="font-bold">{count}</p>
-              <div class="w-full h-2 bg-gray-200 rounded-full">
-                <div
-                  class="h-2 bg-blue-600 rounded-full"
-                  style="width: {(count / stats.totalResponses) * 100}%"
-                ></div>
-              </div>
-            </div>
-          {/each}
-        </div>
-      </div>
-    {/each}
-  </div>
-  <!-- Sección Yes/No en SurveyDashboard.svelte -->
-  <!-- Preguntas Yes/No -->
-  <div class="p-4 mt-4 bg-white rounded-lg shadow">
-    <h3 class="mb-4 text-lg font-semibold">Preguntas Sí/No</h3>
-    {#each Object.entries(stats.yesNoStats) as [question, answers]}
-      <div class="mb-6">
-        <h4 class="mb-2 font-medium">{question}</h4>
-        <div class="grid grid-cols-2 gap-4">
-          <div class="p-4 rounded bg-green-50">
-            <div class="flex items-center justify-between">
-              <span class="font-medium text-green-700">Sí</span>
-              <span class="text-2xl font-bold text-green-700">{answers.yes}</span>
-            </div>
-            <div class="mt-2">
-              <div class="w-full h-2 bg-gray-200 rounded-full">
-                <div
-                  class="h-2 bg-green-600 rounded-full"
-                  style="width: {(answers.yes / (answers.yes + answers.no) * 100)}%"
-                ></div>
-              </div>
-              <p class="mt-1 text-sm text-green-700">
-                {((answers.yes / (answers.yes + answers.no) * 100)).toFixed(1)}%
-              </p>
-            </div>
+<!-- Preguntas Sí/No -->
+<div class="p-4 mt-4 bg-white rounded-lg shadow">
+  <h3 class="mb-4 text-lg font-semibold">Preguntas Sí/No</h3>
+  {#each yesNoStats as { pregunta, stats: answers }}
+    <div class="mb-6">
+      <h4 class="mb-2 font-medium">{pregunta}</h4>
+      <div class="grid grid-cols-2 gap-4">
+        <div class="p-4 rounded bg-green-50">
+          <div class="flex items-center justify-between">
+            <span class="font-medium text-green-700">Sí</span>
+            <span class="text-2xl font-bold text-green-700">{answers.yes || 0}</span>
           </div>
-          
-          <div class="p-4 rounded bg-red-50">
-            <div class="flex items-center justify-between">
-              <span class="font-medium text-red-700">No</span>
-              <span class="text-2xl font-bold text-red-700">{answers.no}</span>
-            </div>
-            <div class="mt-2">
-              <div class="w-full h-2 bg-gray-200 rounded-full">
-                <div
-                  class="h-2 bg-red-600 rounded-full"
-                  style="width: {(answers.no / (answers.yes + answers.no) * 100)}%"
-                ></div>
-              </div>
-              <p class="mt-1 text-sm text-red-700">
-                {((answers.no / (answers.yes + answers.no) * 100)).toFixed(1)}%
-              </p>
-            </div>
+        </div>
+        <div class="p-4 rounded bg-red-50">
+          <div class="flex items-center justify-between">
+            <span class="font-medium text-red-700">No</span>
+            <span class="text-2xl font-bold text-red-700">{answers.no || 0}</span>
           </div>
         </div>
       </div>
-    {/each}
-  </div>
-  
+    </div>
+  {/each}
+</div>
+
+<!-- Estadísticas de Precios -->
+<div class="p-4 mt-4 bg-white rounded-lg shadow">
+  <h3 class="mb-4 text-lg font-semibold">Estadísticas de Precios</h3>
+  {#each priceListStats as { pregunta, stats: productos }}
+    <div class="mb-6">
+      <h4 class="mb-2 font-medium">{pregunta}</h4>
+      <div class="grid grid-cols-2 gap-2 md:grid-cols-3 lg:grid-cols-4">
+        {#each Object.entries(productos) as [producto, { minimo, promedio, maximo, mediciones }]}
+          <div class="p-2 rounded bg-gray-50">
+            <p class="text-sm font-semibold">{producto}</p>
+            <p class="text-xs text-gray-500">Min: {minimo}, Prom: {promedio.toFixed(2)}, Max: {maximo}, Med: {mediciones}</p>
+          </div>
+        {/each}
+      </div>
+    </div>
+  {/each}
+</div>
+
+<!-- Estadísticas de Escala -->
+<div class="p-4 mt-4 bg-white rounded-lg shadow">
+  <h3 class="mb-4 text-lg font-semibold">Estadísticas de Escala</h3>
+  {#each scaleStats as { pregunta, stats }}
+    <div class="mb-6">
+      <h4 class="font-medium">{pregunta}</h4>
+      <p class="text-xl font-bold text-blue-600">{stats.promedio}</p>
+    </div>
+  {/each}
+</div>
+
+<!-- Estadísticas de Archivos -->
+<div class="p-4 mt-4 bg-white rounded-lg shadow">
+  <h3 class="mb-4 text-lg font-semibold">Archivos Subidos</h3>
+  {#each fileStats as pp}
+    <div class="mb-6">
+      <h4 class="font-medium">{pp.pregunta}</h4>
+      <p class="text-xl font-bold text-purple-600">{pp.stats.total}</p>
+    </div>
+  {/each}
+</div>

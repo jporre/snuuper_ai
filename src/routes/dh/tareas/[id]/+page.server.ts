@@ -12,6 +12,7 @@ export const load = (async (event) => {
    return {
       tarea : await getActivetask(taskId),
       pasos: getStepDetails(taskId),
-      respuestas: getTaskStats(taskId)
+      respuestas: getTaskStats(taskId),
+      taskId: taskId
    };
 }) satisfies PageServerLoad;

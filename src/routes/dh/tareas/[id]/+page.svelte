@@ -2,80 +2,105 @@
 	import KpiRespuestas from '$lib/components/kpiRespuestas.svelte';
 	import type { PageData } from './$types';
 	import { marked } from 'marked';
-
+	import * as Tabs from '$lib/components/ui/tabs/index';
 	import { getUserState } from '$lib/state.svelte';
 	let { data }: { data: PageData } = $props();
 	const user = getUserState();
 
 	let mostrarCompleto = $state(false);
 
-function truncarTexto(texto: string, limite: number) {
-  if (texto.length <= limite) return texto;
-  return texto.slice(0, limite) + '...';
-}
+	function truncarTexto(texto: string, limite: number) {
+		if (texto.length <= limite) return texto;
+		return texto.slice(0, limite) + '...';
+	}
+
+	async function update() {
+		const res = await fetch(`/api/data/PoblarStepAnswerDetails`, {
+			method: 'POST',
+			body: JSON.stringify({ taskId: data.taskId }),
+			headers: {
+				'Content-Type': 'application/json'
+			}
+		});
+		if (res.ok) {
+			const { data: newData } = await res.json();
+			data = newData;
+		}
+	}
 </script>
 
 <div class="">
 	<div class="flex py-12 mx-auto border-2 border-blue-800 rounded-lg shadow-md sm:py-12 bg-slate-200">
 		<div class="flex flex-col mx-auto space-x-4">
-			<div class="flex flex-row p-6 m-2 mx-auto space-x-2 border-2 border-blue-900 justify-evenly lg:px-8 rounded-xl">
-				<div class="max-w-4xl mx-auto lg:mx-0">
-					<h2 class="text-3xl font-semibold tracking-tight text-gray-900 text-pretty sm:text-xl">{data.tarea.title}</h2>
-					<p class="mt-6 text-sm text-gray-600 sm:text-base"> {@html mostrarCompleto ? data.tarea.description : truncarTexto(data.tarea.description, 200)}</p>
-					<button
-					class="text-blue-500 hover:underline"
-					onclick={(event) => {
-						event.preventDefault();
-						mostrarCompleto = !mostrarCompleto;
-					  }}
-				  >
-					{mostrarCompleto ? 'Mostrar menos' : 'Mostrar más'}
-				  </button>
-				</div>
-				<div class="max-w-4xl mx-auto lg:mx-0">
-					<h2 class="text-3xl font-semibold tracking-tight text-gray-900 text-pretty sm:text-xl">Resume Ejecutivo</h2>
-					<p class="mt-6 text-gray-600 text-lg/8 sm:text-base">{@html marked(data.tarea.definicion_ejecutiva) ?? 'No hay definicion Ejecjutiva para esta Tarea'}</p>
-				</div>
-			</div>
-			<div class="flex flex-row justify-between px-6 mx-auto mt-4 space-x-2 lg:px-8">
-				<div class="max-w-2xl mx-auto lg:mx-0">
-					<h2 class="text-3xl font-semibold tracking-tight text-gray-900 text-pretty sm:text-xl">Preguntas:</h2>
-					{#await data.pasos}
-						<div class="text-gray-600 text-lg/8 sm:text-base">Cargando...</div>
-					{:then pasos}
-						<div class="space-y-6">
-							{#each pasos as ans}
-								<div class="overflow-hidden bg-white rounded-lg shadow-md">
-									<div class="grid grid-cols-5 gap-4">
-										<div class="col-span-5 p-4">
-											<span class="text-sm">Numero: {ans.correlativeNumber + 1} de tipo {ans.type}</span>
-											<h2 class="mb-2 text-base font-normal">{@html ans.instruction[0].data || ''}</h2>
-											{#if ans.alternatives && ans.alternatives.length > 0}
-												<span class="text-sm">Alternativas:</span>
-												<ul class="mt-2 ml-5 text-gray-700 list-disc">
-													{#each ans.alternatives as alternativa, i}
-														<li>{i + 1}: {alternativa.value}</li>
-													{/each}
-												</ul>
-											{/if}
+			<Tabs.Root value="resultados" class="w-full">
+				<Tabs.List class="grid w-full grid-cols-2">
+					<Tabs.Trigger value="resultados">Resultados</Tabs.Trigger>
+					<Tabs.Trigger value="tarea">Tarea</Tabs.Trigger>
+				</Tabs.List>
+				<Tabs.Content value="resultados">
+					<div class="max-w-7xl mx-auto lg:mx-0">
+						<h2 class="text-3xl font-semibold tracking-tight text-gray-900 text-pretty sm:text-xl">Resume Ejecutivo</h2>
+						{#if data.tarea.definicion_ejecutiva == ''}
+							<p class="mt-6 text-gray-600 text-lg/8 sm:text-base">No hay definicion Ejecjutiva para esta Tarea</p>
+						{:else}
+							<p class="mt-6 text-gray-600 text-lg/8 sm:text-base">{@html marked(data.tarea.definicion_ejecutiva ?? '')}</p>
+						{/if}
+					</div>
+					<div class="max-w-7xl mx-auto lg:mx-0">
+						<h2 class="text-3xl font-semibold tracking-tight text-gray-900 text-pretty sm:text-xl">Respuestas</h2>
+						<button onclick={update} class="text-blue-500 hover:underline">Actualizar</button>
+						{#await data.respuestas}
+							<p class="mt-6 text-gray-600 text-lg/8 sm:text-base">Cargando...</p>
+						{:then respuestas}
+							<div>Se presentan {respuestas.totalResponses} respuestas</div>
+							<KpiRespuestas taskAnswers={respuestas} />
+						{/await}
+						<p class="mt-6 text-gray-600 text-lg/8 sm:text-base"></p>
+					</div>
+				</Tabs.Content>
+				<Tabs.Content value="tarea">
+					<div class="max-w-7xl mx-auto lg:mx-0">
+						<h2 class="text-3xl font-semibold tracking-tight text-gray-900 text-pretty sm:text-xl">{data.tarea.title}</h2>
+						<p class="mt-6 text-sm text-gray-600 sm:text-base">{@html mostrarCompleto ? data.tarea.description : truncarTexto(data.tarea.description, 200)}</p>
+						<button
+							class="text-blue-500 hover:underline"
+							onclick={(event) => {
+								event.preventDefault();
+								mostrarCompleto = !mostrarCompleto;
+							}}
+						>
+							{mostrarCompleto ? 'Mostrar menos' : 'Mostrar más'}
+						</button>
+					</div>
+					<div class="max-w-7xl mx-auto lg:mx-0">
+						<h2 class="text-3xl font-semibold tracking-tight text-gray-900 text-pretty sm:text-xl">Preguntas:</h2>
+						{#await data.pasos}
+							<div class="text-gray-600 text-lg/8 sm:text-base">Cargando...</div>
+						{:then pasos}
+							<div class="space-y-6">
+								{#each pasos as ans}
+									<div class="overflow-hidden bg-white rounded-lg shadow-md">
+										<div class="grid grid-cols-5 gap-4">
+											<div class="col-span-5 p-4">
+												<span class="text-sm">Numero: {ans.correlativeNumber + 1} de tipo {ans.type}</span>
+												<h2 class="mb-2 text-base font-normal">{@html ans.instruction[0].data || ''}</h2>
+												{#if ans.alternatives && ans.alternatives.length > 0}
+													<span class="text-sm">Alternativas:</span>
+													<ul class="mt-2 ml-5 text-gray-700 list-disc">
+														{#each ans.alternatives as alternativa, i}
+															<li>{i + 1}: {alternativa.value}</li>
+														{/each}
+													</ul>
+												{/if}
+											</div>
 										</div>
 									</div>
-								</div>
-							{/each}
-						</div>
-					{/await}
-				</div>
-				<div class="max-w-4xl mx-auto lg:mx-0">
-					<h2 class="text-3xl font-semibold tracking-tight text-gray-900 text-pretty sm:text-xl">Respuestas</h2>
-					{#await data.respuestas}
-						<p class="mt-6 text-gray-600 text-lg/8 sm:text-base">Cargando...</p>
-					{:then respuestas} 
-						<div>Se presentan {respuestas.totalResponses} respuestas</div>
-						<KpiRespuestas taskAnswers={respuestas} />
-					{/await}
-					<p class="mt-6 text-gray-600 text-lg/8 sm:text-base"></p>
-				</div>
-			</div>
+								{/each}
+							</div>
+						{/await}
+					</div>
+				</Tabs.Content>
+			</Tabs.Root>
 		</div>
 	</div>
 </div>
