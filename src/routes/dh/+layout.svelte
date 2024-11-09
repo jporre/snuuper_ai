@@ -161,7 +161,7 @@
 					<input id="search-field" class="block w-full h-full py-0 pl-8 pr-0 text-gray-900 border-0 rounded-xl placeholder:text-gray-400 focus:ring-1 sm:text-sm" placeholder="Buscar..." type="search" name="search" autocomplete="off" bind:value={searchText} onchange={handleSearch} />
 				</div>
 				<div class="flex items-center gap-x-4 lg:gap-x-6">
-					<button type="button" class="-m-2.5 p-2.5 text-gray-400 hover:text-gray-500">
+					<button type="button" class="-m-2.5 p-2.5 text-gray-400 hover:text-gray-500" onclick={() => {chatDisplay=!chatDisplay}}>
 						<span class="sr-only">View notifications</span>
 						<svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon">
 							<path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0" />
@@ -204,7 +204,7 @@
 		<div class="{chatDisplay ? 'bg-opacity-75 h-full' : 'bg-opacity-0 hidden'} fixed inset-0 bg-gray-500 transition-opacity duration-300 ease-in lg:pl-52 md:pl-16" aria-hidden="true"></div>
 		<div class="fixed inset-0 z-10 w-screen overflow-y-auto">
 			<div class="flex items-start justify-center p-4 mt-16 text-center sm:p-0 lg:pl-52 md:pl-16">
-				<div class="{chatDisplay ? 'ease-out opacity-100 translate-y-0 sm:scale-100' : 'ease-in opacity-0 max-h-0 translate-y-4 sm:translate-y-0 sm:scale-95'} relative transform duration-500 overflow-hidden rounded-lg bg-white px-4 pb-4 pt-5 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-7xl sm:translate-y-0 sm:p-6">
+				<div class="{chatDisplay ? 'ease-out opacity-100 translate-y-0 sm:scale-100' : 'ease-in opacity-0 max-h-0 translate-y-4 sm:translate-y-0 sm:scale-95'} relative transform duration-500 overflow-hidden rounded-lg bg-white px-4 pb-4 pt-5 text-left shadow-xl transition-all sm:my-8 w-full sm:max-w-7xl sm:translate-y-0 sm:p-6">
 					<!-- Close button -->
 					<div class="absolute top-0 right-0 hidden pt-4 pr-4 sm:block">
 						<button
@@ -271,7 +271,7 @@
 	</div></div>
 	<!-- en chat -->
 	<div class="z-20 min-h-screen py-3 lg:pl-52 md:pl-16 bg-slate-50">
-		<div class="z-40 px-4 sm:px-6 lg:px-2">
+		<div class="z-40 min-h-full px-4 sm:px-6 lg:px-2">
 			{@render children()}
 		</div>
 		<!-- div class="absolute top-0 z-0 flex flex-col w-screen h-screen"><enhanced:img src={IlustracionSnuuper1} class="object-cover object-center w-full min-h-screen grow opacity-15" alt="fondo-ilustrado"></enhanced:img></!-->

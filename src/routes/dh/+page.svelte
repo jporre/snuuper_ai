@@ -2,6 +2,14 @@
 	import type { PageData } from './$types';
 	import BorderBeam from '$lib/components/BorderBeam.svelte';
 	import { getUserState } from '$lib/state.svelte';
+	import Search from 'lucide-svelte/icons/search';
+	import Building from 'lucide-svelte/icons/building';
+	import SquareMenu from 'lucide-svelte/icons/square-menu';
+	import Input from '$lib/components/ui/input/input.svelte';
+	import * as Card from '$lib/components/ui/card';
+	import Time, { dayjs } from 'svelte-time';
+	import 'dayjs/locale/es';
+	dayjs.locale('es');
 
 	let { data }: { data: PageData } = $props();
 	const user = getUserState();
@@ -23,17 +31,17 @@
 	});
 
 	function filterTareas(tareas) {
-    if (!tareas) return [];
+		if (!tareas) return [];
 
-    const normalizeText = (text) => text.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
-    const search = normalizeText(searchTerm);
+		const normalizeText = (text: string) =>
+			text
+				.normalize('NFD')
+				.replace(/[\u0300-\u036f]/g, '')
+				.toLowerCase();
+		const search = normalizeText(searchTerm);
 
-    return tareas.filter((tarea) => 
-        normalizeText(tarea.title).includes(search) ||
-        normalizeText(tarea.description).includes(search) ||
-        normalizeText(tarea.status).includes(search)
-    );
-}
+		return tareas.filter((tarea) => normalizeText(tarea.title).includes(search) || normalizeText(tarea.description).includes(search) || normalizeText(tarea.status).includes(search));
+	}
 
 	// Función para paginar resultados
 	function getPaginatedTareas(tareas) {
@@ -49,99 +57,64 @@
 	}
 </script>
 
-<div>
-	<!-- Barra de búsqueda -->
-	<div class="mb-4">
-		<div class="relative">
-			<input type="text" class="w-full px-2 py-2 border border-gray-600 rounded-lg h-14 focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="Buscar tareas..." bind:value={searchTerm} />
-			<svg class="absolute w-8 h-8 text-gray-400 right-3 top-2.5" viewBox="0 0 20 20" fill="currentColor">
-				<path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" />
-			</svg>
-			<BorderBeam size={250} duration={12} />
-		</div>
+<div class="min-w-full min-h-screen space-y-2 columns-1">
+	<div class="bg-background/95 supports-[backdrop-filter]:bg-background/60 p-2 backdrop-blur">
+		<form>
+			<div class="relative drop-shadow-md shadow-blue-800">
+				<Search class="text-muted-foreground absolute left-2 top-[50%] h-4 w-4 translate-y-[-50%]" />
+				<Input placeholder="Filtrar el Listado de Tareas Activas" class="pl-8 rounded-xl" bind:value={searchTerm} />
+				<BorderBeam size={250} duration={12} />
+			</div>
+		</form>
 	</div>
-	<div class="">
-		<div class="">
-			<ul role="list" class="grid grid-cols-2 gap-4 divide-y divide-gray-100">
-				{#await data.tareas}
-					<div>Cargando las tareas...</div>
-				{:then tareas}
-					{#each getPaginatedTareas(tareas) as tarea, i}
-						<li class="z-50 flex items-center justify-between px-2 py-5 border-2 border-blue-900 rounded-lg bg-sky-100 gap-x-6 hover:bg-gray-400">
-							<div class="min-w-0">
-								<div class="flex flex-col items-start gap-x-3">
-									<div class="flex flex-row w-full gap-x-3">
-										<p class="font-mono text-base font-semibold leading-6 text-blue-800 sm:text-2xl">{tarea.title}</p>
-										<span class="inline-flex content-end items-center gap-x-1.5 rounded-full bg-green-100 px-2.5 py-2.5 text-sm sm:text-xl font-medium text-green-800">
-											<svg class="h-1.5 w-1.5 fill-blue-500" viewBox="0 0 6 6" aria-hidden="true">
-											  <circle cx="3" cy="3" r="3" />
-											</svg>
-											{tarea.status}
-										  </span>
-										
-									</div>
-									<p class="text-sm font-semibold leading-6 text-gray-800 sm:text-xl">
-										{@html mostrarCompleto ? tarea.description : truncarTexto(tarea.description, 200)}
-										<button
-											class="text-blue-500 hover:underline"
-											onclick={(event) => {
-												event.preventDefault();
-												mostrarCompleto = !mostrarCompleto;
-											}}
-										>
-											{mostrarCompleto ? '-' : '+'}
-										</button>
-									</p>
-									
-								</div>
-								<div class="flex items-center mt-1 text-xs leading-5 text-gray-500 gap-x-2">
-									<p class="whitespace-nowrap">
-										Creada <time datetime="2023-03-17T00:00Z">{tarea.createdAt}</time>
-									</p>
-									<svg viewBox="0 0 2 2" class="h-0.5 w-0.5 fill-current">
-										<circle cx="1" cy="1" r="1" />
-									</svg>
-									<p class="truncate">{tarea.companyDetails[0]?.name}</p>
-								</div>
-							</div>
-							<div class="flex items-center flex-none gap-x-4">
-								<a href="/dh/tareas/{tarea._id}" class="hidden rounded-md bg-white px-2.5 py-1.5 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:block">
-									Ver Tarea<span class="sr-only">, GraphQL API</span>
-								</a>
-								<div class="relative flex-none">
-									<button type="button" class="-m-2.5 block p-2.5 text-gray-500 hover:text-gray-900" id="options-menu-0-button" aria-expanded="false" aria-haspopup="true">
-										<span class="sr-only">Open options</span>
-										<svg class="w-5 h-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true" data-slot="icon">
-											<path d="M10 3a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM10 8.5a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM11.5 15.5a1.5 1.5 0 1 0-3 0 1.5 1.5 0 0 0 3 0Z" />
-										</svg>
-									</button>
-								</div>
-							</div>
-						</li>
-					{/each}
-					<!-- Paginación -->
-					{#if filterTareas(tareas).length > 0}
-						<div class="flex items-center justify-between px-4 py-3 mt-4 bg-white border-t border-gray-200 sm:px-6">
-							<div class="flex items-center">
-								<select class="px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" value={itemsPerPage} onchange={handleItemsPerPageChange}>
-									<option value="5">5 por página</option>
-									<option value="10">10 por página</option>
-									<option value="20">20 por página</option>
-								</select>
-								<span class="ml-4 text-sm text-gray-700">
-									Mostrando {Math.min((currentPage - 1) * itemsPerPage + 1, filterTareas(tareas).length)} a {Math.min(currentPage * itemsPerPage, filterTareas(tareas).length)} de {filterTareas(tareas).length} resultados
-								</span>
-							</div>
-							<div class="flex space-x-2">
-								<button onclick={() => (currentPage = Math.max(currentPage - 1, 1))} disabled={currentPage === 1} class="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50"> Anterior </button>
-								<button onclick={() => (currentPage = Math.min(currentPage + 1, Math.ceil(filterTareas(tareas).length / itemsPerPage)))} disabled={currentPage >= Math.ceil(filterTareas(tareas).length / itemsPerPage)} class="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50"> Siguiente </button>
-							</div>
+	<div class="grid min-w-full grid-cols-1 gap-1 p-1 md:grid-cols-2 lg:grid-cols-3">
+		{#await data.tareas}
+			<div>Cargando las tareas...</div>
+		{:then tareas}
+			{#each getPaginatedTareas(tareas) as tarea, i}
+				<Card.Root class="p-2 border-blue-600 drop-shadow-xl hover:bg-slate-100">
+					<Card.Header class="flex flex-row items-center justify-between pb-2 space-y-0 font-poppins">
+						<Card.Title>{tarea.title}</Card.Title>
+
+						{#if tarea.companyDetails[0]?.name}
+							<p class="px-2 font-thin text-blue-100 truncate bg-blue-800 text-md rounded-2xl">{tarea.companyDetails[0]?.name}</p>
+						{:else}
+							<Building class="w-4 h-4 text-blue-800" />
+						{/if}
+					</Card.Header>
+					<Card.Content>
+						<p>{@html mostrarCompleto ? tarea.description : truncarTexto(tarea.description, 200)}</p>
+					</Card.Content>
+					<Card.Footer class="flex justify-between font-mono text-xs text-muted-foreground">
+						<Time timestamp={tarea.createdAt} format="dddd @ h:mm A · MMMM D, YYYY"></Time><a href="/dh/tareas/{tarea._id}"> <SquareMenu class="w-6 h-6 p-1 text-green-300 bg-blue-800 rounded-full hover:bg-green-200 hover:text-blue-800" /></a>
+					</Card.Footer>
+				</Card.Root>
+			{/each}
+
+			<div class="grid md:col-span-2 lg:col-span-3">
+				<!-- Paginación -->
+				{#if filterTareas(tareas).length > 0}
+					<div class="flex items-center justify-between px-4 py-3 mt-4 bg-white border-t border-gray-200 sm:px-6">
+						<div class="flex flex-col items-center md:flex-row">
+							<select class="px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" value={itemsPerPage} onchange={handleItemsPerPageChange}>
+								<option value="6">6 por página</option>
+								<option value="10">10 por página</option>
+								<option value="20">20 por página</option>
+								<option value="2000">Todos</option>
+							</select>
+							<span class="ml-4 text-sm text-gray-700">
+								Mostrando {Math.min((currentPage - 1) * itemsPerPage + 1, filterTareas(tareas).length)} a {Math.min(currentPage * itemsPerPage, filterTareas(tareas).length)} de {filterTareas(tareas).length} resultados
+							</span>
 						</div>
-					{/if}
-				{:catch error}
-					<p>{error.message}</p>
-				{/await}
-			</ul>
-		</div>
+						<div class="flex flex-col space-x-2 md:flex-row">
+							<button onclick={() => (currentPage = Math.max(currentPage - 1, 1))} disabled={currentPage === 1} class="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50"> Anterior </button>
+							<button onclick={() => (currentPage = Math.min(currentPage + 1, Math.ceil(filterTareas(tareas).length / itemsPerPage)))} disabled={currentPage >= Math.ceil(filterTareas(tareas).length / itemsPerPage)} class="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50"> Siguiente </button>
+						</div>
+					</div>
+				{/if}
+			</div>
+		{:catch error}
+			<p>{error.message}</p>
+		{/await}
 	</div>
 </div>
