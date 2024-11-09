@@ -25,7 +25,7 @@
 </script>
 
 <!-- KPIs Generales -->
-<div class="grid grid-cols-1 gap-4 p-4 md:grid-cols-2 lg:grid-cols-4">
+<div class="grid grid-cols-2 gap-1 md:grid-cols-3 lg:grid-cols-4">
   <div class="p-4 bg-white rounded-lg shadow">
     <h3 class="mb-2 text-lg font-semibold">Respuestas Totales</h3>
     <p class="text-3xl font-bold text-blue-600">{totalResponses}</p>
@@ -45,7 +45,7 @@
 </div>
 
 <!-- Distribución por Estado -->
-<div class="p-4 mt-4 bg-white rounded-lg shadow">
+<div class="p-4 mt-2 bg-white rounded-lg shadow">
   <h3 class="mb-4 text-lg font-semibold">Distribución por Estado</h3>
   <div class="grid grid-cols-2 gap-4 md:grid-cols-4">
     {#each statusDistribution as { _id: status, count }}
@@ -59,7 +59,7 @@
 </div>
 
 <!-- Distribución por Hora -->
-<div class="p-4 mt-4 bg-white rounded-lg shadow">
+<div class="p-4 mt-2 bg-white rounded-lg shadow">
   <h3 class="mb-4 text-lg font-semibold">Distribución por Hora</h3>
   <div class="grid grid-cols-6 gap-2 md:grid-cols-12">
     {#each timeDistribution as { hour, count }}
@@ -74,7 +74,7 @@
 </div>
 
 <!-- Preguntas de Selección Múltiple -->
-<div class="p-4 mt-4 bg-white rounded-lg shadow">
+<div class="p-4 mt-2 bg-white rounded-lg shadow">
   <h3 class="mb-4 text-lg font-semibold">Preguntas de Selección Múltiple</h3>
   {#each multipleChoiceStats as { pregunta, respuestas }}
     <div class="mb-6">
@@ -98,7 +98,7 @@
 </div>
 
 <!-- Preguntas Sí/No -->
-<div class="p-4 mt-4 bg-white rounded-lg shadow">
+<div class="p-4 mt-2 bg-white rounded-lg shadow">
   <h3 class="mb-4 text-lg font-semibold">Preguntas Sí/No</h3>
   {#each yesNoStats as { pregunta, stats: answers }}
     <div class="mb-6">
@@ -122,6 +122,7 @@
 </div>
 
 <!-- Estadísticas de Precios -->
+ {#if priceListStats.length > 0}
 <div class="p-4 mt-4 bg-white rounded-lg shadow">
   <h3 class="mb-4 text-lg font-semibold">Estadísticas de Precios</h3>
   {#each priceListStats as { pregunta, stats: productos }}
@@ -138,8 +139,10 @@
     </div>
   {/each}
 </div>
+{/if}
 
 <!-- Estadísticas de Escala -->
+ {#if scaleStats.length > 0}
 <div class="p-4 mt-4 bg-white rounded-lg shadow">
   <h3 class="mb-4 text-lg font-semibold">Estadísticas de Escala</h3>
   {#each scaleStats as { pregunta, stats }}
@@ -149,14 +152,17 @@
     </div>
   {/each}
 </div>
-
+{/if}
 <!-- Estadísticas de Archivos -->
-<div class="p-4 mt-4 bg-white rounded-lg shadow">
+<div class="p-4 mt-4 bg-white rounded-lg shadow ">
   <h3 class="mb-4 text-lg font-semibold">Archivos Subidos</h3>
+  <div class="grid grid-cols-2 gap-4 p-2 m-2 mt-4 bg-white rounded-lg shadow md:grid-cols-3 lg:grid-cols-4">
   {#each fileStats as pp}
-    <div class="mb-6">
+    <div class="p-1 m-1 mb-6">
       <h4 class="font-medium">{pp.pregunta}</h4>
       <p class="text-xl font-bold text-purple-600">{pp.stats.total}</p>
     </div>
   {/each}
+  </div>
+
 </div>

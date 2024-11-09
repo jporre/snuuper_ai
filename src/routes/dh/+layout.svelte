@@ -268,7 +268,7 @@
 				</div>
 			</div>
 		</div>
-	</div>
+	</div></div>
 	<!-- en chat -->
 	<div class="z-20 min-h-screen py-3 lg:pl-52 md:pl-16 bg-slate-50">
 		<div class="z-40 px-4 sm:px-6 lg:px-2">
@@ -276,7 +276,7 @@
 		</div>
 		<!-- div class="absolute top-0 z-0 flex flex-col w-screen h-screen"><enhanced:img src={IlustracionSnuuper1} class="object-cover object-center w-full min-h-screen grow opacity-15" alt="fondo-ilustrado"></enhanced:img></!-->
 	</div>
-</div>
+
 
 <style>
 	.custom-scrollbar {

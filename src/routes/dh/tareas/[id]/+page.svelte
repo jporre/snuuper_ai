@@ -44,37 +44,37 @@
 </script>
 
 <div class="">
-	<div class="flex py-12 mx-auto border-2 border-blue-800 rounded-lg shadow-md sm:py-12 bg-slate-200">
-		<div class="flex flex-col mx-auto space-x-4">
-			<Tabs.Root value="resultados" class="w-full">
+	<div class="flex py-12 mx-auto bg-blue-100 border-2 border-blue-800 rounded-lg shadow-md sm:py-12">
+		<div class="flex flex-col m-2 mx-auto space-x-4">
+			<Tabs.Root value="resultados" class="w-full font-poppins">
 				<Tabs.List class="grid w-full grid-cols-2">
 					<Tabs.Trigger value="resultados">Resultados</Tabs.Trigger>
 					<Tabs.Trigger value="tarea">Tarea</Tabs.Trigger>
 				</Tabs.List>
 				<Tabs.Content value="resultados">
-					<div class="mx-auto max-w-7xl lg:mx-0">
-						<h2 class="text-3xl font-semibold tracking-tight text-gray-900 text-pretty sm:text-xl">Resume Ejecutivo</h2>
+					<div class="p-2 mx-auto max-w-7xl lg:mx-0">
+						<h2 class="text-xl font-semibold tracking-tight text-sky-900 text-pretty sm:text-3xl">Resume Ejecutivo</h2>
 						{#if data.tarea.definicion_ejecutiva == '' || data.tarea.definicion_ejecutiva == null}
 							<p class="mt-6 text-gray-600 text-lg/8 sm:text-base">
 							<button onclick={createSummary} class="inline-flex items-center gap-x-2 rounded-md bg-indigo-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">Crear uno</button></p>
 						{:else}
-							<p class="mt-6 text-gray-600 text-lg/8 sm:text-base">{@html marked(data.tarea.definicion_ejecutiva ?? '')}</p>
+							<p class="p-4 mt-6 text-sm text-blue-900 bg-white rounded-md shadow-md sm:text-base ">{@html marked(data.tarea.definicion_ejecutiva ?? '')}</p>
 						{/if}
 					</div>
-					<div class="mx-auto mt-6 max-w-7xl lg:mx-0">
-						<h2 class="text-3xl font-semibold tracking-tight text-gray-900 text-pretty sm:text-xl">Respuestas</h2>
+					<div class="p-2 mx-auto mt-6 max-w-7xl lg:mx-0">
+						<h2 class="text-xl font-semibold tracking-tight text-gray-900 sm:text-3xl text-pretty">Respuestas</h2>
 						<button onclick={update} class="text-blue-500 hover:underline">Actualizar</button>
 						{#await data.respuestas}
 							<p class="mt-6 text-gray-600 text-lg/8 sm:text-base">Cargando...</p>
 						{:then respuestas}
-							<div>Se presentan {respuestas.totalResponses} respuestas</div>
+							<div>Resultado de la Encuesta</div>
 							<KpiRespuestas taskAnswers={respuestas} />
 						{/await}
 						<p class="mt-6 text-gray-600 text-lg/8 sm:text-base"></p>
 					</div>
 				</Tabs.Content>
 				<Tabs.Content value="tarea">
-					<div class="mx-auto max-w-7xl lg:mx-0">
+					<div class="p-2 mx-auto max-w-7xl lg:mx-0">
 						<h2 class="text-3xl font-semibold tracking-tight text-gray-900 text-pretty sm:text-xl">{data.tarea.title}</h2>
 						<p class="mt-6 text-sm text-gray-600 sm:text-base">{@html mostrarCompleto ? data.tarea.description : truncarTexto(data.tarea.description, 200)}</p>
 						<button

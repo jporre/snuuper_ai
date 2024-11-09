@@ -9,7 +9,7 @@
 	// Estados para búsqueda y paginación
 	let searchTerm = $state('');
 	let currentPage = $state(1);
-	let itemsPerPage = $state(5);
+	let itemsPerPage = $state(6);
 	let mostrarCompleto = $state(false);
 	function truncarTexto(texto: string, limite: number) {
 		if (texto.length <= limite) return texto;
@@ -60,18 +60,27 @@
 			<BorderBeam size={250} duration={12} />
 		</div>
 	</div>
-	<div class="grid grid-cols-5 gap-4">
-		<div class="col-span-5">
-			<ul role="list" class="divide-y divide-gray-100">
+	<div class="">
+		<div class="">
+			<ul role="list" class="grid grid-cols-2 gap-4 divide-y divide-gray-100">
 				{#await data.tareas}
 					<div>Cargando las tareas...</div>
 				{:then tareas}
 					{#each getPaginatedTareas(tareas) as tarea, i}
-						<li class="z-50 flex items-center justify-between px-2 py-5 bg-gray-300 rounded-lg gap-x-6 hover:bg-gray-400">
+						<li class="z-50 flex items-center justify-between px-2 py-5 border-2 border-blue-900 rounded-lg bg-sky-100 gap-x-6 hover:bg-gray-400">
 							<div class="min-w-0">
 								<div class="flex flex-col items-start gap-x-3">
-									<p class="text-sm font-semibold leading-6 text-gray-900">{tarea.title}</p>
-									<p class="text-sm font-semibold leading-6 text-gray-700">
+									<div class="flex flex-row w-full gap-x-3">
+										<p class="font-mono text-base font-semibold leading-6 text-blue-800 sm:text-2xl">{tarea.title}</p>
+										<span class="inline-flex content-end items-center gap-x-1.5 rounded-full bg-green-100 px-2.5 py-2.5 text-sm sm:text-xl font-medium text-green-800">
+											<svg class="h-1.5 w-1.5 fill-blue-500" viewBox="0 0 6 6" aria-hidden="true">
+											  <circle cx="3" cy="3" r="3" />
+											</svg>
+											{tarea.status}
+										  </span>
+										
+									</div>
+									<p class="text-sm font-semibold leading-6 text-gray-800 sm:text-xl">
 										{@html mostrarCompleto ? tarea.description : truncarTexto(tarea.description, 200)}
 										<button
 											class="text-blue-500 hover:underline"
@@ -80,10 +89,10 @@
 												mostrarCompleto = !mostrarCompleto;
 											}}
 										>
-											{mostrarCompleto ? 'Mostrar menos' : 'Mostrar más'}
+											{mostrarCompleto ? '-' : '+'}
 										</button>
 									</p>
-									<p class="mt-0.5 whitespace-nowrap rounded-md bg-green-50 px-1.5 py-0.5 text-xs font-medium text-green-700 ring-1 ring-inset ring-green-600/20">{tarea.status}</p>
+									
 								</div>
 								<div class="flex items-center mt-1 text-xs leading-5 text-gray-500 gap-x-2">
 									<p class="whitespace-nowrap">
