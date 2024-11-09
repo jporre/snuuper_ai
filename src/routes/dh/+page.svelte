@@ -2,30 +2,39 @@
 	import type { PageData } from './$types';
 	import BorderBeam from '$lib/components/BorderBeam.svelte';
 	import { getUserState } from '$lib/state.svelte';
-	
+
 	let { data }: { data: PageData } = $props();
 	const user = getUserState();
-	
+
 	// Estados para búsqueda y paginación
 	let searchTerm = $state('');
 	let currentPage = $state(1);
 	let itemsPerPage = $state(5);
-	
+	let mostrarCompleto = $state(false);
+	function truncarTexto(texto: string, limite: number) {
+		if (texto.length <= limite) return texto;
+		return texto.slice(0, limite) + '...';
+	}
+
 	// Función para filtrar tareas
 	$effect(() => {
 		// Reset página cuando cambia el término de búsqueda
 		if (searchTerm) currentPage = 1;
 	});
-	
+
 	function filterTareas(tareas) {
-		if (!tareas) return [];
-		return tareas.filter(tarea => 
-			tarea.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-			tarea.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-			tarea.status.toLowerCase().includes(searchTerm.toLowerCase())
-		);
-	}
-	
+    if (!tareas) return [];
+
+    const normalizeText = (text) => text.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+    const search = normalizeText(searchTerm);
+
+    return tareas.filter((tarea) => 
+        normalizeText(tarea.title).includes(search) ||
+        normalizeText(tarea.description).includes(search) ||
+        normalizeText(tarea.status).includes(search)
+    );
+}
+
 	// Función para paginar resultados
 	function getPaginatedTareas(tareas) {
 		if (!tareas) return [];
@@ -33,7 +42,7 @@
 		const startIndex = (currentPage - 1) * itemsPerPage;
 		return filteredTareas.slice(startIndex, startIndex + itemsPerPage);
 	}
-	
+
 	function handleItemsPerPageChange(event) {
 		itemsPerPage = parseInt(event.target.value);
 		currentPage = 1; // Reset a primera página cuando cambia items por página
@@ -41,34 +50,16 @@
 </script>
 
 <div>
-	<div class="relative z-0 flex flex-col items-start justify-between w-2/5 p-3 mb-3 border shadow-md opacity-90 rounded-3xl border-gray-700/70">
-		{user.firstname}
-		<BorderBeam size={150} duration={12} />
-	</div>
-
 	<!-- Barra de búsqueda -->
 	<div class="mb-4">
 		<div class="relative">
-			<input
-				type="text"
-				class="w-full px-4 py-2 border rounded-lg border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-				placeholder="Buscar tareas..."
-				bind:value={searchTerm}
-			/>
-			<svg 
-				class="absolute w-5 h-5 text-gray-400 right-3 top-2.5"
-				viewBox="0 0 20 20"
-				fill="currentColor"
-			>
-				<path 
-					fill-rule="evenodd"
-					d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"
-					clip-rule="evenodd"
-				/>
+			<input type="text" class="w-full px-2 py-2 border border-gray-600 rounded-lg h-14 focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="Buscar tareas..." bind:value={searchTerm} />
+			<svg class="absolute w-8 h-8 text-gray-400 right-3 top-2.5" viewBox="0 0 20 20" fill="currentColor">
+				<path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" />
 			</svg>
+			<BorderBeam size={250} duration={12} />
 		</div>
 	</div>
-	
 	<div class="grid grid-cols-5 gap-4">
 		<div class="col-span-5">
 			<ul role="list" class="divide-y divide-gray-100">
@@ -80,7 +71,18 @@
 							<div class="min-w-0">
 								<div class="flex flex-col items-start gap-x-3">
 									<p class="text-sm font-semibold leading-6 text-gray-900">{tarea.title}</p>
-									<p class="text-sm font-semibold leading-6 text-gray-700">{@html tarea.description}</p>
+									<p class="text-sm font-semibold leading-6 text-gray-700">
+										{@html mostrarCompleto ? tarea.description : truncarTexto(tarea.description, 200)}
+										<button
+											class="text-blue-500 hover:underline"
+											onclick={(event) => {
+												event.preventDefault();
+												mostrarCompleto = !mostrarCompleto;
+											}}
+										>
+											{mostrarCompleto ? 'Mostrar menos' : 'Mostrar más'}
+										</button>
+									</p>
 									<p class="mt-0.5 whitespace-nowrap rounded-md bg-green-50 px-1.5 py-0.5 text-xs font-medium text-green-700 ring-1 ring-inset ring-green-600/20">{tarea.status}</p>
 								</div>
 								<div class="flex items-center mt-1 text-xs leading-5 text-gray-500 gap-x-2">
@@ -108,16 +110,11 @@
 							</div>
 						</li>
 					{/each}
-					
 					<!-- Paginación -->
 					{#if filterTareas(tareas).length > 0}
 						<div class="flex items-center justify-between px-4 py-3 mt-4 bg-white border-t border-gray-200 sm:px-6">
 							<div class="flex items-center">
-								<select
-									class="px-3 py-2 text-sm border rounded-md border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
-									value={itemsPerPage}
-									onchange={handleItemsPerPageChange}
-								>
+								<select class="px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" value={itemsPerPage} onchange={handleItemsPerPageChange}>
 									<option value="5">5 por página</option>
 									<option value="10">10 por página</option>
 									<option value="20">20 por página</option>
@@ -127,20 +124,8 @@
 								</span>
 							</div>
 							<div class="flex space-x-2">
-								<button
-									onclick={() => currentPage = Math.max(currentPage - 1, 1)}
-									disabled={currentPage === 1}
-									class="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50"
-								>
-									Anterior
-								</button>
-								<button
-									onclick={() => currentPage = Math.min(currentPage + 1, Math.ceil(filterTareas(tareas).length / itemsPerPage))}
-									disabled={currentPage >= Math.ceil(filterTareas(tareas).length / itemsPerPage)}
-									class="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50"
-								>
-									Siguiente
-								</button>
+								<button onclick={() => (currentPage = Math.max(currentPage - 1, 1))} disabled={currentPage === 1} class="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50"> Anterior </button>
+								<button onclick={() => (currentPage = Math.min(currentPage + 1, Math.ceil(filterTareas(tareas).length / itemsPerPage)))} disabled={currentPage >= Math.ceil(filterTareas(tareas).length / itemsPerPage)} class="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50"> Siguiente </button>
 							</div>
 						</div>
 					{/if}

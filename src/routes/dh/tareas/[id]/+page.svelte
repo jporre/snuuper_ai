@@ -27,6 +27,20 @@
 			data = newData;
 		}
 	}
+
+	async function createSummary() {
+		const res = await fetch(`/api/data/createTaskSummary`, {
+			method: 'POST',
+			body: JSON.stringify({ taskId: data.taskId }),
+			headers: {
+				'Content-Type': 'application/json'
+			}
+		});
+		if (res.ok) {
+			const { data: newData } = await res.json();
+			data = newData;
+		}
+	}
 </script>
 
 <div class="">
@@ -38,15 +52,16 @@
 					<Tabs.Trigger value="tarea">Tarea</Tabs.Trigger>
 				</Tabs.List>
 				<Tabs.Content value="resultados">
-					<div class="max-w-7xl mx-auto lg:mx-0">
+					<div class="mx-auto max-w-7xl lg:mx-0">
 						<h2 class="text-3xl font-semibold tracking-tight text-gray-900 text-pretty sm:text-xl">Resume Ejecutivo</h2>
-						{#if data.tarea.definicion_ejecutiva == ''}
-							<p class="mt-6 text-gray-600 text-lg/8 sm:text-base">No hay definicion Ejecjutiva para esta Tarea</p>
+						{#if data.tarea.definicion_ejecutiva == '' || data.tarea.definicion_ejecutiva == null}
+							<p class="mt-6 text-gray-600 text-lg/8 sm:text-base">
+							<button onclick={createSummary} class="inline-flex items-center gap-x-2 rounded-md bg-indigo-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">Crear uno</button></p>
 						{:else}
 							<p class="mt-6 text-gray-600 text-lg/8 sm:text-base">{@html marked(data.tarea.definicion_ejecutiva ?? '')}</p>
 						{/if}
 					</div>
-					<div class="max-w-7xl mx-auto lg:mx-0">
+					<div class="mx-auto mt-6 max-w-7xl lg:mx-0">
 						<h2 class="text-3xl font-semibold tracking-tight text-gray-900 text-pretty sm:text-xl">Respuestas</h2>
 						<button onclick={update} class="text-blue-500 hover:underline">Actualizar</button>
 						{#await data.respuestas}
@@ -59,7 +74,7 @@
 					</div>
 				</Tabs.Content>
 				<Tabs.Content value="tarea">
-					<div class="max-w-7xl mx-auto lg:mx-0">
+					<div class="mx-auto max-w-7xl lg:mx-0">
 						<h2 class="text-3xl font-semibold tracking-tight text-gray-900 text-pretty sm:text-xl">{data.tarea.title}</h2>
 						<p class="mt-6 text-sm text-gray-600 sm:text-base">{@html mostrarCompleto ? data.tarea.description : truncarTexto(data.tarea.description, 200)}</p>
 						<button
@@ -72,7 +87,7 @@
 							{mostrarCompleto ? 'Mostrar menos' : 'Mostrar más'}
 						</button>
 					</div>
-					<div class="max-w-7xl mx-auto lg:mx-0">
+					<div class="mx-auto max-w-7xl lg:mx-0">
 						<h2 class="text-3xl font-semibold tracking-tight text-gray-900 text-pretty sm:text-xl">Preguntas:</h2>
 						{#await data.pasos}
 							<div class="text-gray-600 text-lg/8 sm:text-base">Cargando...</div>
