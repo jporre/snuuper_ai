@@ -4,16 +4,13 @@
 	import { getUserState } from '$lib/state.svelte';
 	import Search from 'lucide-svelte/icons/search';
 	import Building from 'lucide-svelte/icons/building';
-	import SquareMenu from 'lucide-svelte/icons/square-menu';
+	import CircleArrowOutUpRight from 'lucide-svelte/icons/circle-arrow-out-up-right';
 	import Input from '$lib/components/ui/input/input.svelte';
-	import * as Card from '$lib/components/ui/card';
 	import Time, { dayjs } from 'svelte-time';
 	import 'dayjs/locale/es';
 	dayjs.locale('es');
-
 	let { data }: { data: PageData } = $props();
 	const user = getUserState();
-
 	// Estados para búsqueda y paginación
 	let searchTerm = $state('');
 	let currentPage = $state(1);
@@ -23,26 +20,21 @@
 		if (texto.length <= limite) return texto;
 		return texto.slice(0, limite) + '...';
 	}
-
 	// Función para filtrar tareas
 	$effect(() => {
 		// Reset página cuando cambia el término de búsqueda
 		if (searchTerm) currentPage = 1;
 	});
-
 	function filterTareas(tareas) {
 		if (!tareas) return [];
-
 		const normalizeText = (text: string) =>
 			text
 				.normalize('NFD')
 				.replace(/[\u0300-\u036f]/g, '')
 				.toLowerCase();
 		const search = normalizeText(searchTerm);
-
 		return tareas.filter((tarea) => normalizeText(tarea.title).includes(search) || normalizeText(tarea.description).includes(search) || normalizeText(tarea.status).includes(search));
 	}
-
 	// Función para paginar resultados
 	function getPaginatedTareas(tareas) {
 		if (!tareas) return [];
@@ -50,13 +42,11 @@
 		const startIndex = (currentPage - 1) * itemsPerPage;
 		return filteredTareas.slice(startIndex, startIndex + itemsPerPage);
 	}
-
 	function handleItemsPerPageChange(event) {
 		itemsPerPage = parseInt(event.target.value);
 		currentPage = 1; // Reset a primera página cuando cambia items por página
 	}
 </script>
-
 <div class="min-w-full min-h-screen space-y-2 columns-1">
 	<div class="bg-background/95 supports-[backdrop-filter]:bg-background/60 p-2 backdrop-blur">
 		<form>
@@ -72,27 +62,26 @@
 			<div>Cargando las tareas...</div>
 		{:then tareas}
 			{#each getPaginatedTareas(tareas) as tarea, i}
-				<Card.Root class="p-2 border-blue-600 drop-shadow-xl hover:bg-slate-100">
-					<Card.Header class="flex flex-row items-center justify-between pb-2 space-y-0 font-poppins">
-						<Card.Title>{tarea.title}</Card.Title>
-						
-
-						{#if tarea.companyDetails[0]?.name}
-							<p class="px-2 font-thin text-blue-100 truncate bg-blue-800 text-md rounded-2xl">{tarea.companyDetails[0]?.name}</p>
-						{:else}
-							<Building class="w-4 h-4 text-blue-800" />
-						{/if}
-						<Card.Description> hola</Card.Description>
-					</Card.Header>
-					<Card.Content>
+				<div class="card shadow-xl border border-blue-600 hover:bg-slate-100 p-2">
+					<div class="card-body">
+						<div class="card-title flex flex-row items-center justify-between pb-2 space-y-0 font-poppins">
+							<span class="text-lg">{tarea.title}</span>
+							{#if tarea.companyDetails[0]?.name}
+								<span class="badge bg-sky-900 px-3 text-white truncate text-sm py-1">{tarea.companyDetails[0]?.name}</span>
+							{:else}
+								<Building class="w-6 h-6 text-white bg-sky-900 rounded-full p-1" />
+							{/if}
+						</div>
 						<p>{@html mostrarCompleto ? tarea.description : truncarTexto(tarea.description, 200)}</p>
-					</Card.Content>
-					<Card.Footer class="flex justify-between font-mono text-xs text-muted-foreground">
-						<Time timestamp={tarea.createdAt} format="dddd @ h:mm A · MMMM D, YYYY"></Time><a href="/dh/tareas/{tarea._id}"> <SquareMenu class="w-6 h-6 p-1 text-green-300 bg-blue-800 rounded-full hover:bg-green-200 hover:text-blue-800" /></a>
-					</Card.Footer>
-				</Card.Root>
+					</div>
+					<div class="card-actions justify-between font-mono text-xs text-muted-foreground px-2">
+						<Time timestamp={tarea.createdAt} format="dddd @ h:mm A · MMMM D, YYYY"></Time>
+						<a href="/dh/tareas/{tarea._id}">
+							<CircleArrowOutUpRight class="w-6 h-6 p-1 text-white bg-sky-900 rounded-full hover:bg-green-200 hover:text-sky-900" />
+						</a>
+					</div>
+				</div>
 			{/each}
-
 			<div class="grid md:col-span-2 lg:col-span-3">
 				<!-- Paginación -->
 				{#if filterTareas(tareas).length > 0}

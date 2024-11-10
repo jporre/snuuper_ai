@@ -1,12 +1,12 @@
 <script lang="ts">
 	import LogoSnuuperPequeno from '$lib/images/logosnuuper.png?enhanced';
 	import IlustracionSnuuper1 from '$lib/images/ilustracionsnupper1.webp?enhanced';
-	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
-	import type { Snippet, onMount,  } from 'svelte';
+	import type { Snippet } from 'svelte';
+	import type { LayoutData } from './$types';
 	import { marked } from 'marked';
 	import * as m from '$lib/paraglide/messages.js';
 	let MobileMenu = $state(false);
-	let {  data , children}: {data: LayoutData, children: Snippet } = $props();
+	let { data, children }: { data: LayoutData; children: Snippet } = $props();
 	type ConversationType = { role: string; content: string }[];
 	import Chasing from '$lib/spinners/Chasing.svelte';
 	import { setUserState } from '$lib/state.svelte';
@@ -14,18 +14,14 @@
 	import DefaultAvatar from '$lib/images/PinMapaSnuuperAzul.png';
 	import { SSE } from 'sse.js';
 	import { page } from '$app/stores';
-
-
 	let userPhoto = $state('https://files.snuuper.com/' + user.picture);
 	if (user.picture == '') {
 		userPhoto = DefaultAvatar;
 	}
-
 	let searchText = $state('');
 	let Conversation: ConversationType = $state([]);
 	let chatDisplay = $state(false);
 	let ShowLoader = $state(false);
-
 	async function handleSearch_bk() {
 		chatDisplay = true;
 		ShowLoader = true;
@@ -38,7 +34,6 @@
 			},
 			body: JSON.stringify({ Conversation })
 		});
-
 		const data = await res.json();
 		addToConversation = { role: 'assistant', content: data.content };
 		Conversation = [...Conversation, addToConversation];
@@ -52,31 +47,25 @@
 			scrollToDiv.scrollIntoView({ behavior: 'smooth', block: 'end', inline: 'nearest' });
 		}, 100);
 	}
-
 	let query = $state('');
 	let answer = $state('');
-
 	const handleSearch = async () => {
 		chatDisplay = true;
 		ShowLoader = true;
 		let addToConversation = { role: 'user', content: searchText };
 		Conversation = [...Conversation, addToConversation];
 		let origen = $page.url.pathname;
-
 		const eventSource = new SSE('/openai', {
 			headers: {
 				'Content-Type': 'application/json'
 			},
 			payload: JSON.stringify({ Conversation, origen: origen })
 		});
-
 		query = '';
 		Conversation = [...Conversation, { role: 'assistant', content: '' }];
 		eventSource.addEventListener('error', handleError);
-
 		eventSource.addEventListener('message', (e) => {
 			// console.log(e)
-
 			scrollToBottom();
 			try {
 				ShowLoader = false;
@@ -86,7 +75,6 @@
 					answer = '';
 					return;
 				}
-
 				const { content } = data.choices[0].delta;
 				answer = (answer ?? '') + content;
 				Conversation[Conversation.length - 1].content = answer;
@@ -98,7 +86,6 @@
 		scrollToBottom();
 		searchText = '';
 	};
-
 	function handleError<T>(err: T) {
 		ShowLoader = false;
 		query = '';
@@ -110,7 +97,7 @@
 <svelte:head>
 	<title>Zona de Cliente</title>
 </svelte:head>
-<div class="max-w-screen">
+<div class="max-w-screen" data-theme="emerald">
 	<div class="z-40 md:fixed md:inset-y-0 md:min-h-screen lg:z-50 lg:flex lg:w-52 md:w-16 lg:flex-col">
 		<div class="absolute top-0 flex flex-col min-h-full px-6 pb-4 overflow-y-auto bg-gray-900 md:w-full transition transform ease-in-out {MobileMenu ? 'translate-x-0 w-full' : '-translate-x-96'} md:translate-x-0 md:px-4 gap-y-5">
 			<div class="flex items-center h-16 md:h-8 lg:h-16 md:mt-3">
@@ -122,7 +109,7 @@
 						<ul role="list" class="-mx-2 space-y-1">
 							<li>
 								<!-- Current: "bg-gray-800 text-white", Default: "text-gray-400 hover:text-white hover:bg-gray-800" -->
-								<a href="/dh" class="flex p-2 text-sm font-semibold leading-6 text-white bg-gray-800 rounded-md group gap-x-3">
+								<a href="/dh/tareas" class="flex p-2 text-sm font-semibold leading-6 text-white bg-gray-800 rounded-md group gap-x-3">
 									<svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon">
 										<path stroke-linecap="round" stroke-linejoin="round" d="m2.25 12 8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
 									</svg>
@@ -151,7 +138,6 @@
 			</button>
 			<!-- Separator -->
 			<div class="w-px h-6 bg-gray-900/10 lg:hidden" aria-hidden="true"></div>
-
 			<div class="flex self-stretch flex-1 gap-x-4 lg:gap-x-6">
 				<div class="relative flex flex-1">
 					<label for="search-field" class="sr-only">Busca Información</label>
@@ -161,40 +147,44 @@
 					<input id="search-field" class="block w-full h-full py-0 pl-8 pr-0 text-gray-900 border-0 rounded-xl placeholder:text-gray-400 focus:ring-1 sm:text-sm" placeholder="Buscar..." type="search" name="search" autocomplete="off" bind:value={searchText} onchange={handleSearch} />
 				</div>
 				<div class="flex items-center gap-x-4 lg:gap-x-6">
-					<button type="button" class="-m-2.5 p-2.5 text-gray-400 hover:text-gray-500" onclick={() => {chatDisplay=!chatDisplay}}>
+					<button
+						type="button"
+						class="-m-2.5 p-2.5 text-gray-400 hover:text-gray-500"
+						onclick={() => {
+							chatDisplay = !chatDisplay;
+						}}
+					>
 						<span class="sr-only">View notifications</span>
 						<svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon">
 							<path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0" />
 						</svg>
 					</button>
-
 					<!-- Separator -->
 					<div class="hidden lg:block lg:h-6 lg:w-px lg:bg-gray-900/10" aria-hidden="true"></div>
-
 					<!-- Profile dropdown -->
-					<div class="relative">
-						<DropdownMenu.Root>
-							<DropdownMenu.Trigger class="w-fit">
-								<div class="flex items-center gap-x-4">
-									<img class="w-8 h-8 rounded-full bg-gray-50" src={userPhoto} alt="foto del usuario" />
-									<span class="hidden lg:flex lg:items-center">
-										<span class="ml-4 text-sm font-semibold leading-6 text-gray-900" aria-hidden="true">{user.firstname || ''}</span>
-										<svg class="w-5 h-5 ml-2 text-gray-400" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true" data-slot="icon">
-											<path fill-rule="evenodd" d="M5.22 8.22a.75.75 0 0 1 1.06 0L10 11.94l3.72-3.72a.75.75 0 1 1 1.06 1.06l-4.25 4.25a.75.75 0 0 1-1.06 0L5.22 9.28a.75.75 0 0 1 0-1.06Z" clip-rule="evenodd" />
-										</svg>
-									</span>
-								</div>
-							</DropdownMenu.Trigger>
-							<DropdownMenu.Content>
-								<DropdownMenu.Group>
-									<DropdownMenu.Label>Mis datos</DropdownMenu.Label>
-									<DropdownMenu.Separator />
-									<DropdownMenu.Item>Perfil</DropdownMenu.Item>
-									<DropdownMenu.Item><a href="./logout">Salir</a></DropdownMenu.Item>
-								</DropdownMenu.Group>
-							</DropdownMenu.Content>
-						</DropdownMenu.Root>
-					</div>
+					<div class="flex flex-1 justify-end px-2">
+						<div class="dropdown dropdown-end">
+							<div tabindex="0" role="button" class="btn btn-ghost btn-circle avatar">
+							  <div class="w-10 rounded-full">
+								<img
+								  alt="Foto del Usuario"
+								  src="{userPhoto}" />
+							  </div>
+							</div>
+							<ul
+							  
+							  class="menu menu-sm dropdown-content bg-base-100 rounded-box z-[1] mt-3 w-52 p-2 shadow">
+							  <li>
+								<a href="/" class="justify-between">
+								  Perfil
+								</a>
+							  </li>
+							  
+							  <li><a href="/logout">Salir</a></li>
+							</ul>
+						  </div>
+					  </div>
+					
 				</div>
 			</div>
 		</div>
@@ -206,7 +196,7 @@
 			<div class="flex items-start justify-center p-4 mt-16 text-center sm:p-0 lg:pl-52 md:pl-16">
 				<div class="{chatDisplay ? 'ease-out opacity-100 translate-y-0 sm:scale-100' : 'ease-in opacity-0 max-h-0 translate-y-4 sm:translate-y-0 sm:scale-95'} relative transform duration-500 overflow-hidden rounded-lg bg-white px-4 pb-4 pt-5 text-left shadow-xl transition-all sm:my-8 w-full sm:max-w-7xl sm:translate-y-0 sm:p-6">
 					<!-- Close button -->
-					<div class="absolute top-0 right-0 hidden pt-4 pr-4 sm:block">
+					<div class="absolute top-0 right-0  pt-4 pr-4 sm:block">
 						<button
 							type="button"
 							onclick={() => {
@@ -220,7 +210,6 @@
 							</svg>
 						</button>
 					</div>
-
 					<div class="flex">
 						<div class="w-full mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left">
 							<h3 class="text-base font-semibold leading-6 text-gray-900" id="modal-title">Chat</h3>
@@ -268,30 +257,27 @@
 				</div>
 			</div>
 		</div>
-	</div></div>
-	<!-- en chat -->
-	<div class="z-20 min-h-screen py-3 lg:pl-52 md:pl-16 bg-slate-50">
-		<div class="z-40 min-h-full px-4 sm:px-6 lg:px-2">
-			{@render children()}  
-		</div>
-		<!-- div class="absolute top-0 z-0 flex flex-col w-screen h-screen"><enhanced:img src={IlustracionSnuuper1} class="object-cover object-center w-full min-h-screen grow opacity-15" alt="fondo-ilustrado"></enhanced:img></!-->
 	</div>
-
+</div>
+<!-- en chat -->
+<div class="z-20 min-h-screen py-3 lg:pl-52 md:pl-16 bg-slate-50">
+	<div class="z-40 min-h-full px-4 sm:px-6 lg:px-2">
+		{@render children()}
+	</div>
+	<!-- div class="absolute top-0 z-0 flex flex-col w-screen h-screen"><enhanced:img src={IlustracionSnuuper1} class="object-cover object-center w-full min-h-screen grow opacity-15" alt="fondo-ilustrado"></enhanced:img></!-->
+</div>
 
 <style>
 	.custom-scrollbar {
 		scrollbar-width: thin;
 		scrollbar-color: #cbd5e1 transparent;
 	}
-
 	.custom-scrollbar::-webkit-scrollbar {
 		width: 6px;
 	}
-
 	.custom-scrollbar::-webkit-scrollbar-track {
 		background: transparent;
 	}
-
 	.custom-scrollbar::-webkit-scrollbar-thumb {
 		background-color: #cbd5e1;
 		border-radius: 3px;
