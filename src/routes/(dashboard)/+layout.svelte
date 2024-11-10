@@ -1,13 +1,12 @@
 <script lang="ts">
-	import type { LayoutData } from './$types';
 	import LogoSnuuperPequeno from '$lib/images/logosnuuper.png?enhanced';
 	import IlustracionSnuuper1 from '$lib/images/ilustracionsnupper1.webp?enhanced';
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
-	import type { Snippet, onMount, afterUpdate } from 'svelte';
+	import type { Snippet, onMount,  } from 'svelte';
 	import { marked } from 'marked';
 	import * as m from '$lib/paraglide/messages.js';
 	let MobileMenu = $state(false);
-	let { children, data }: { children: Snippet; data: LayoutData } = $props();
+	let {  data , children}: {data: LayoutData, children: Snippet } = $props();
 	type ConversationType = { role: string; content: string }[];
 	import Chasing from '$lib/spinners/Chasing.svelte';
 	import { setUserState } from '$lib/state.svelte';
@@ -15,6 +14,7 @@
 	import DefaultAvatar from '$lib/images/PinMapaSnuuperAzul.png';
 	import { SSE } from 'sse.js';
 	import { page } from '$app/stores';
+
 
 	let userPhoto = $state('https://files.snuuper.com/' + user.picture);
 	if (user.picture == '') {
@@ -272,7 +272,7 @@
 	<!-- en chat -->
 	<div class="z-20 min-h-screen py-3 lg:pl-52 md:pl-16 bg-slate-50">
 		<div class="z-40 min-h-full px-4 sm:px-6 lg:px-2">
-			{@render children()}
+			{@render children()}  
 		</div>
 		<!-- div class="absolute top-0 z-0 flex flex-col w-screen h-screen"><enhanced:img src={IlustracionSnuuper1} class="object-cover object-center w-full min-h-screen grow opacity-15" alt="fondo-ilustrado"></enhanced:img></!-->
 	</div>

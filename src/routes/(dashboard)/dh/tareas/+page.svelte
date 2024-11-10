@@ -75,12 +75,14 @@
 				<Card.Root class="p-2 border-blue-600 drop-shadow-xl hover:bg-slate-100">
 					<Card.Header class="flex flex-row items-center justify-between pb-2 space-y-0 font-poppins">
 						<Card.Title>{tarea.title}</Card.Title>
+						
 
 						{#if tarea.companyDetails[0]?.name}
 							<p class="px-2 font-thin text-blue-100 truncate bg-blue-800 text-md rounded-2xl">{tarea.companyDetails[0]?.name}</p>
 						{:else}
 							<Building class="w-4 h-4 text-blue-800" />
 						{/if}
+						<Card.Description> hola</Card.Description>
 					</Card.Header>
 					<Card.Content>
 						<p>{@html mostrarCompleto ? tarea.description : truncarTexto(tarea.description, 200)}</p>

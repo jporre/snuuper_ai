@@ -2,9 +2,8 @@
 	import { i18n } from "$lib/i18n";
 	import { ParaglideJS } from "@inlang/paraglide-sveltekit";
 	import type { Snippet } from 'svelte';
-	import type { LayoutData } from './$types';
 	import '../app.css';
-	let { children, data } : { children: Snippet, data: LayoutData } = $props();
+	let { children } : { children: Snippet } = $props();
 	import { env } from '$env/dynamic/public';
 	let title : string= env.PUBLIC_SITE_DESCRIPTION || 'Sitio en Desarrollo'
 </script>

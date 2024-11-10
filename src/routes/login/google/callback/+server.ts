@@ -69,7 +69,7 @@ export async function GET(event: RequestEvent): Promise<Response> {
         if (e instanceof OAuth2RequestError) {
             redirect(302, '/');
         }
-        redirect(302, '/dh');
+        redirect(302, '/dh/tareas');
         return new Response(null, {
             status: 500,
             headers: {

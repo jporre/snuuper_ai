@@ -58,6 +58,6 @@ export const actions: Actions = {
 			...sessionCookie.attributes
 		});
 
-		redirect(302, "/dh");
+		redirect(302, "/dh/tareas");
 	}
 };

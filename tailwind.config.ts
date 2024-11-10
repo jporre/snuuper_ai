@@ -4,27 +4,12 @@ import type { Config } from "tailwindcss";
 const config: Config = {
 	darkMode: ["class"],
 	content: ["./src/**/*.{html,js,svelte,ts}"],
+	plugins: [require('daisyui')],
 	safelist: ["dark"],
 	theme: {
 		container: {
 			center: true,
 			padding: "1rem",
-			screens: {
-				'sm': '640px',
-				// => @media (min-width: 640px) { ... }
-		  
-				'md': '768px',
-				// => @media (min-width: 768px) { ... }
-		  
-				'lg': '1440px',
-				// => @media (min-width: 1024px) { ... }
-		  
-				'xl': '1536px',
-				// => @media (min-width: 1280px) { ... }
-		  
-				'2xl': '1536px',
-				// => @media (min-width: 1536px) { ... }
-			  }
 		},
 		extend: {
 			colors: {
