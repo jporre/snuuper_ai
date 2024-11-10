@@ -3,7 +3,7 @@
   import { onMount } from 'svelte';
 
   let { taskAnswers } : { taskAnswers : DashboardStats } = $props();
-  console.log("🚀 ~ taskAnswers:", taskAnswers);
+  //console.log("🚀 ~ taskAnswers:", taskAnswers);
 
   const stats = taskAnswers.estadisticas;
 //  console.log("🚀 ~ stats:", stats)
@@ -52,7 +52,7 @@
       <div class="p-2 text-center rounded bg-gray-50">
         <p class="text-gray-600">{status}</p>
         <p class="text-2xl font-bold">{count}</p>
-        <p class="text-sm text-gray-500">{((count / stats.totalResponses) * 100)}%</p>
+        <p class="text-sm text-gray-500">{((count / totalResponses) * 100).toFixed(2)}%</p>
       </div>
     {/each}
   </div>
@@ -77,7 +77,7 @@
 <div class="p-4 mt-2 bg-white rounded-lg shadow">
   <h3 class="mb-4 text-lg font-semibold">Preguntas de Selección Múltiple</h3>
   {#each multipleChoiceStats as { pregunta, respuestas }}
-    <div class="mb-6">
+    <div class="mb-6 h-full">
       <h4 class="mb-2 font-medium">{pregunta}</h4>
       <div class="grid grid-cols-2 gap-2 md:grid-cols-3 lg:grid-cols-4">
         {#each Object.entries(respuestas) as [answer, count]}
@@ -87,7 +87,7 @@
             <div class="w-full h-2 bg-gray-200 rounded-full">
               <div
                 class="h-2 bg-blue-600 rounded-full"
-                style="width: {(count / stats.totalResponses) * 100}%"
+                style="width: {(count / totalResponses) * 100}%"
               ></div>
             </div>
           </div>
@@ -101,16 +101,16 @@
 <div class="p-4 mt-2 bg-white rounded-lg shadow">
   <h3 class="mb-4 text-lg font-semibold">Preguntas Sí/No</h3>
   {#each yesNoStats as { pregunta, stats: answers }}
-    <div class="mb-6">
+    <div class="mb-6 grid grid-cols-2">
       <h4 class="mb-2 font-medium">{pregunta}</h4>
-      <div class="grid grid-cols-2 gap-4">
-        <div class="p-4 rounded bg-green-50">
+      <div class="grid grid-cols-2 gap-4 ml-3">
+        <div class="p-1 rounded bg-green-50">
           <div class="flex items-center justify-between">
             <span class="font-medium text-green-700">Sí</span>
             <span class="text-2xl font-bold text-green-700">{answers.yes || 0}</span>
           </div>
         </div>
-        <div class="p-4 rounded bg-red-50">
+        <div class="p-1 rounded bg-red-50">
           <div class="flex items-center justify-between">
             <span class="font-medium text-red-700">No</span>
             <span class="text-2xl font-bold text-red-700">{answers.no || 0}</span>
@@ -148,7 +148,7 @@
   {#each scaleStats as { pregunta, stats }}
     <div class="mb-6">
       <h4 class="font-medium">{pregunta}</h4>
-      <p class="text-xl font-bold text-blue-600">{stats.promedio}</p>
+      <p class="text-xl font-bold text-blue-600">{(stats.promedio).toFixed(2)}</p>
     </div>
   {/each}
 </div>

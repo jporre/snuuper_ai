@@ -13,9 +13,11 @@ export const load = (async (event) => {
       error(404, "TaskID no es Valido");
    }
    const taskData = await getActivetask(taskId);
+   event.depends('app:getTask');
    if (!taskData) {
       error(404, "Tarea no encontrada");
    }
+   
 
    return {
       tarea : taskData,

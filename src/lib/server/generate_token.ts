@@ -1,4 +1,5 @@
 import * as crypto from 'crypto';
+import { env } from '$env/dynamic/private';
 
 export function generateToken() {
 const header = {
@@ -35,7 +36,7 @@ const encodedPayload = base64url(payload);
 const token = `${encodedHeader}.${encodedPayload}`;
 
 // Firmar el token
-const jwtSecret = 'dc447559-996d-4761-a306-f47a5eab1623'; // Reemplaza con tu secreto
+const jwtSecret = env.JWT_SECRET; // Reemplaza con tu secreto
 
 const signature = crypto
   .createHmac('sha256', jwtSecret)

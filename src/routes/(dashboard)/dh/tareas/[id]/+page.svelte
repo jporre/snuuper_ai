@@ -4,6 +4,7 @@
 	import { marked } from 'marked';
 	import RotateCcw from 'lucide-svelte/icons/rotate-ccw';
 	import { getUserState } from '$lib/state.svelte';
+	import { invalidate } from '$app/navigation';
 	let { data }: { data: PageData } = $props();
 	let mostrarCompleto = $state(false);
 	function truncarTexto(texto: string, limite: number) {
@@ -19,8 +20,7 @@
 			}
 		});
 		if (res.ok) {
-			const { data: newData } = await res.json();
-			data = newData;
+			invalidate('app:getTask');
 		}
 	}
 	async function createSummary() {
@@ -32,12 +32,12 @@
 			}
 		});
 		if (res.ok) {
-			const { data: newData } = await res.json();
-			data = newData;
+			invalidate('app:getTask');
 		}
 	}
 	function test() {
 		console.log('test');
+		invalidate('app:getTask');
 	}
 </script>
 <div class="w-full">
@@ -50,14 +50,13 @@
 					<!-- Contenido del tab Resultados -->
 					<div class="mx-auto max-w-7xl lg:mx-0 bg-white pl-4">
 						<h2 class="text-2xl font-semibold tracking-tight text-gray-900 text-pretty ">Resume Ejecutivo</h2>
-						<button onclick={test} class="btn btn-sm">Test</button>
 						{#if data.tarea.definicion_ejecutiva == '' || data.tarea.definicion_ejecutiva == null}
 							<p class="mt-6 text-gray-600 text-sm sm:text-md">
 								En este momento no hay un resumen ejecutivo para esta tarea. ¿Deseas crear uno?
 								<button onclick={createSummary} class="btn btn-sm">Crear uno</button>
 							</p>
 						{:else}
-							<p class="p-4 mt-6 text-sm text-blue-900 bg-white rounded-md shadow-md sm:text-base">{@html marked(data.tarea.definicion_ejecutiva ?? '')}</p>
+							<p class="p-4 mt-6 text-sm text-gray-900 font-dosis bg-white rounded-md shadow-md sm:text-lg">{@html marked(data.tarea.definicion_ejecutiva ?? '')}</p>
 						{/if}
 						<div class="mt-6">
 							<div class="flex flex-row justify-between pr-3 mb-2">
