@@ -45,7 +45,7 @@ export async function GET(event: RequestEvent): Promise<Response> {
                     path: '.',
                     ...sessionCookie.attributes
                 });
-            redirect(302, '/dh');
+            redirect(302, '/dh/tareas');
         } else {
             // el usuario no existe, pero era un usuario valido de google.
             if (event.locals.session) {
@@ -60,7 +60,7 @@ export async function GET(event: RequestEvent): Promise<Response> {
         return new Response(JSON.stringify("Usuario o contraseña no encontrados"), {
             status: 302,
             headers: {
-                Location: '/'
+                Location: '/login'
             }
         });
 
@@ -69,7 +69,7 @@ export async function GET(event: RequestEvent): Promise<Response> {
         if (e instanceof OAuth2RequestError) {
             redirect(302, '/');
         }
-        redirect(302, '/dh/tareas');
+        redirect(302, '/');
         return new Response(null, {
             status: 500,
             headers: {
