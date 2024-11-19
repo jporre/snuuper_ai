@@ -54,3 +54,4 @@ docker buildx build --platform linux/amd64,linux/arm64 . --no-cache --rm -t us-c
 # para hacer los commits y push automaticos
 summary=$(git diff | fabric --language=es --model="gpt-4o-mini" -p summarize_git_diff -c)
 git add -A && git commit -m "$summary" && git push
+
