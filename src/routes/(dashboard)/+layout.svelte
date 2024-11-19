@@ -17,6 +17,9 @@
 	if (user.picture == '') {
 		userPhoto = DefaultAvatar;
 	}
+	if(user.picture.startsWith('https')){
+		userPhoto = user.picture;
+	}
 	let searchText = $state('');
 	let Conversation: ConversationType = $state([]);
 	let chatDisplay = $state(false);

@@ -87,6 +87,7 @@
 				<div role="tabpanel" class="tab-content p-6">
 					<div class="mx-auto max-w-7xl lg:mx-0 bg-white pl-4">
 						<h2 class="text-2xl font-semibold tracking-tight text-gray-900 text-pretty ">Resume Ejecutivo</h2>
+						<button onclick={creaReporte} class="btn btn-sm {rotaReport ? 'animate-ping':'animate-none'}">Crear uno</button>
 						{#if data.tarea.resumen_ejecutiva == '' || data.tarea.resumen_ejecutiva == null}
 							<p class="mt-6 text-gray-600 text-sm sm:text-md">
 								En este momento no hay un resumen ejecutivo para esta tarea. ¿Deseas crear uno?

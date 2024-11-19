@@ -122,7 +122,7 @@ ${fileStats.map(file => `- ${file.pregunta}: ${file.stats.total} archivos`).join
     - Adapta tu lenguaje al nivel de comprensión esperado de tu audiencia, evitando jerga técnica innecesaria 
     definicion inicial de la tarea: ${textTarea} su definición ejecutiva es: ${textEspecificcion}`;
     let mensajesIniciales =  [ {  "role": `system`,"name":"openai","content": prompt } ];
-    let mensaje_usuario = [{ "role": `user`,"content": `Hola ! por favor necesito que me entregues un Informe ejecutivo para la encuesta, considerando estos resultados ${textStats}. me interesa que me sugieras preguntas y temas para explorara continuación al mirar en detalle las respuestas de este estudio  ` }];
+    let mensaje_usuario = [{ "role": `user`,"content": `Por Favor, prepara un Informe ejecutivo para la encuesta, considerando estos resultados ${textStats}. me interesa que inluyas preguntas y temas para explorar a continuación,  al mirar en detalle las respuestas de este estudio. Redacta un informe final.   ` }];
     
     const conversationLog = [...mensajesIniciales, ...mensaje_usuario];
 
