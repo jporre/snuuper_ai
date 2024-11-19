@@ -4,7 +4,6 @@
 	import type { Snippet } from 'svelte';
 	import type { LayoutData } from './$types';
 	import { marked } from 'marked';
-	import * as m from '$lib/paraglide/messages.js';
 	let MobileMenu = $state(false);
 	let { data, children }: { data: LayoutData; children: Snippet } = $props();
 	type ConversationType = { role: string; content: string }[];
@@ -50,6 +49,7 @@
 	let query = $state('');
 	let answer = $state('');
 	const handleSearch = async () => {
+		console.log("hola");
 		chatDisplay = true;
 		ShowLoader = true;
 		let addToConversation = { role: 'user', content: searchText };
@@ -262,7 +262,7 @@
 <!-- en chat -->
 <div class="z-20 min-h-screen py-3 lg:pl-52 md:pl-16 bg-slate-50">
 	<div class="z-40 min-h-full px-4 sm:px-6 lg:px-2">
-		{@render children()}
+		{@render children?.()}
 	</div>
 	<!-- div class="absolute top-0 z-0 flex flex-col w-screen h-screen"><enhanced:img src={IlustracionSnuuper1} class="object-cover object-center w-full min-h-screen grow opacity-15" alt="fondo-ilustrado"></enhanced:img></!-->
 </div>

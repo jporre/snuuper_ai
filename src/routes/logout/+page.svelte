@@ -1,6 +1,4 @@
 <script lang="ts">
-	import { goto } from '$app/navigation';
-	import { onMount } from 'svelte';
 	import { enhance } from '$app/forms';
 	import Lobby_salida_snuuper from '$lib/images/Lobby_salida_snuuper.png?enhanced';
 	import type { SubmitFunction } from './$types.js';

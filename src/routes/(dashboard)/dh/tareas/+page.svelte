@@ -8,14 +8,23 @@
 	import Input from '$lib/components/ui/input/input.svelte';
 	import Time, { dayjs } from 'svelte-time';
 	import 'dayjs/locale/es';
+	import { onMount } from 'svelte';
 	dayjs.locale('es');
 	let { data }: { data: PageData } = $props();
+	let tareas = data.tareas;
 	const user = getUserState();
 	// Estados para búsqueda y paginación
 	let searchTerm = $state('');
+	let selectedSubtype = $state('');
+    let selectedMode = $state('');
+    let selectedCompany = $state('');
 	let currentPage = $state(1);
 	let itemsPerPage = $state(6);
 	let mostrarCompleto = $state(false);
+	let uniqueSubtypes = $state([]);
+    let uniqueModes = $state([]);
+    let uniqueCompanies = $state([]);
+
 	function truncarTexto(texto: string, limite: number) {
 		if (texto.length <= limite) return texto;
 		return texto.slice(0, limite) + '...';
@@ -25,16 +34,39 @@
 		// Reset página cuando cambia el término de búsqueda
 		if (searchTerm) currentPage = 1;
 	});
+	function extractUniqueFilters(tareas) {
+        const subtypes = new Set();
+        const modes = new Set();
+        const companies = new Set();
+
+        tareas.forEach(tarea => {
+            if (tarea.subtype) subtypes.add(tarea.subtype);
+            if (tarea.mode) modes.add(tarea.mode);
+            if (tarea.companyDetails[0]?.name) companies.add(tarea.companyDetails[0].name);
+        });
+
+        uniqueSubtypes = Array.from(subtypes);
+        uniqueModes = Array.from(modes);
+        uniqueCompanies = Array.from(companies);
+    }
 	function filterTareas(tareas) {
-		if (!tareas) return [];
-		const normalizeText = (text: string) =>
-			text
-				.normalize('NFD')
-				.replace(/[\u0300-\u036f]/g, '')
-				.toLowerCase();
-		const search = normalizeText(searchTerm);
-		return tareas.filter((tarea) => normalizeText(tarea.title).includes(search) || normalizeText(tarea.description).includes(search) || normalizeText(tarea.status).includes(search));
-	}
+        if (!tareas) return [];
+        const normalizeText = (text: string) =>
+            text
+                .normalize('NFD')
+                .replace(/[\u0300-\u036f]/g, '')
+                .toLowerCase();
+        const search = normalizeText(searchTerm);
+        return tareas.filter(tarea => {
+            const matchesSearchTerm = normalizeText(tarea.title).includes(search) ||
+                normalizeText(tarea.description).includes(search);
+            const matchesSubtype = selectedSubtype ? tarea.subtype === selectedSubtype : true;
+            const matchesMode = selectedMode ? tarea.mode === selectedMode : true;
+            const matchesCompany = selectedCompany ? tarea.companyDetails[0]?.name === selectedCompany : true;
+
+            return matchesSearchTerm && matchesSubtype && matchesMode && matchesCompany;
+        });
+    }
 	// Función para paginar resultados
 	function getPaginatedTareas(tareas) {
 		if (!tareas) return [];
@@ -46,6 +78,10 @@
 		itemsPerPage = parseInt(event.target.value);
 		currentPage = 1; // Reset a primera página cuando cambia items por página
 	}
+	 
+		extractUniqueFilters(tareas);
+		
+
 </script>
 <div class="min-w-full min-h-screen space-y-2 columns-1">
 	<div class="bg-background/95 supports-[backdrop-filter]:bg-background/60 p-2 backdrop-blur">
@@ -55,6 +91,26 @@
 				<Input placeholder="Filtrar el Listado de Tareas Activas" class="pl-8 rounded-xl" bind:value={searchTerm} />
 				<BorderBeam size={250} duration={12} />
 			</div>
+			<div class="flex space-x-2 mt-2">
+                <select bind:value={selectedSubtype} class="select select-bordered">
+                    <option value="">Filtrar por Subtipo</option>
+                    {#each uniqueSubtypes as subtype}
+                        <option value={subtype}>{subtype}</option>
+                    {/each}
+                </select>
+                <select bind:value={selectedMode} class="select select-bordered">
+                    <option value="">Filtrar por Modo</option>
+                    {#each uniqueModes as mode}
+                        <option value={mode}>{mode}</option>
+                    {/each}
+                </select>
+                <select bind:value={selectedCompany} class="select select-bordered">
+                    <option value="">Filtrar por Compañía</option>
+                    {#each uniqueCompanies as company}
+                        <option value={company}>{company}</option>
+                    {/each}
+                </select>
+            </div>
 		</form>
 	</div>
 	<div class="grid min-w-full grid-cols-1 gap-1 p-1 md:grid-cols-2 lg:grid-cols-3">

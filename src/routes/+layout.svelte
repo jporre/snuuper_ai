@@ -1,6 +1,4 @@
 <script lang="ts">
-	import { i18n } from "$lib/i18n";
-	import { ParaglideJS } from "@inlang/paraglide-sveltekit";
 	import type { Snippet } from 'svelte';
 	import '../app.css';
 	let { children } : { children: Snippet } = $props();
@@ -43,8 +41,8 @@
 	<meta name="msapplication-TileImage" content="/ms-icon-144x144.png" />
 	<meta name="theme-color" content="#ffffff" />
 </svelte:head>
-<ParaglideJS {i18n}>
+
 <div class="w-auto max-w-dvw">
-	{@render children()}  
+	{@render children?.()}
 </div>
-</ParaglideJS>
+

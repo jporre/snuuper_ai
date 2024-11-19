@@ -11,7 +11,9 @@
 		if (texto.length <= limite) return texto;
 		return texto.slice(0, limite) + '...';
 	}
+	let rotaDetailes = $state(false);
 	async function update() {
+		rotaDetailes = true;
 		const res = await fetch(`/api/data/PoblarStepAnswerDetails`, {
 			method: 'POST',
 			body: JSON.stringify({ taskId: data.taskId }),
@@ -21,9 +23,14 @@
 		});
 		if (res.ok) {
 			invalidate('app:getTask');
+			rotaDetailes = false;
+		} else {
+			rotaDetailes = false;
 		}
 	}
+	let rotaSummary = $state(false);
 	async function createSummary() {
+		rotaSummary = true;
 		const res = await fetch(`/api/data/createTaskSummary`, {
 			method: 'POST',
 			body: JSON.stringify({ taskId: data.taskId }),
@@ -33,11 +40,42 @@
 		});
 		if (res.ok) {
 			invalidate('app:getTask');
+			rotaSummary = false;
+		} else {
+			rotaSummary = false;}
+	}
+	let rotaReport = $state(false);
+	async function creaReporte() {
+		rotaReport = true;
+		//const res = await fetch(`/api/data/createTaskAnswersEmbeddings`, {
+			const res = await fetch(`/api/data/createTaskReport`, {
+			method: 'POST',
+			body: JSON.stringify({ taskId: data.taskId }),
+			headers: {
+				'Content-Type': 'application/json'
+			}
+		});
+		if (res.ok) {
+			rotaReport = false;
+		} else {
+			rotaReport = false;
 		}
 	}
-	function test() {
-		console.log('test');
-		invalidate('app:getTask');
+	let rotaTest = $state(false);
+	async function test() {
+		rotaTest = true;
+		const res = await fetch(`/api/data/createTaskAnswersEmbeddings`, {
+			method: 'POST',
+			body: JSON.stringify({ taskId: data.taskId }),
+			headers: {
+				'Content-Type': 'application/json'
+			}
+		});
+		if (res.ok) {
+			rotaTest = false;
+		} else {
+			rotaTest = false;
+		}
 	}
 </script>
 <div class="w-full">
@@ -45,15 +83,30 @@
 		<div class="flex flex-col w-full m-2 mx-auto">
 			<div role="tablist" class="tabs tabs-lifted">
 				<!-- Tab controls -->
-				<input type="radio" name="my_tabs_2" role="tab" class="tab" aria-label="Resultados" checked />
+				<input type="radio" name="my_tabs_2" role="tab" class="tab" aria-label="Informe" checked />
+				<div role="tabpanel" class="tab-content p-6">
+					<div class="mx-auto max-w-7xl lg:mx-0 bg-white pl-4">
+						<h2 class="text-2xl font-semibold tracking-tight text-gray-900 text-pretty ">Resume Ejecutivo</h2>
+						{#if data.tarea.resumen_ejecutiva == '' || data.tarea.resumen_ejecutiva == null}
+							<p class="mt-6 text-gray-600 text-sm sm:text-md">
+								En este momento no hay un resumen ejecutivo para esta tarea. ¿Deseas crear uno?
+								<button onclick={creaReporte} class="btn btn-sm {rotaReport ? 'animate-ping':'animate-none'}">Crear uno</button>
+							</p>
+						{:else}
+							<p class="p-4 mt-6 text-sm text-gray-900 font-dosis bg-white rounded-md shadow-md sm:text-lg">{@html marked(data.tarea.resumen_ejecutiva ?? '')}</p>
+						{/if}
+						</div>
+				</div>
+				<input type="radio" name="my_tabs_2" role="tab" class="tab" aria-label="Resultados"  />
 				<div role="tabpanel" class="tab-content p-6">
 					<!-- Contenido del tab Resultados -->
 					<div class="mx-auto max-w-7xl lg:mx-0 bg-white pl-4">
-						<h2 class="text-2xl font-semibold tracking-tight text-gray-900 text-pretty ">Resume Ejecutivo</h2>
+						<h2 class="text-2xl font-semibold tracking-tight text-gray-900 text-pretty ">Características de la Encuesta</h2>
+						<button onclick={test} class="btn btn-circle btn-sm bg-sky-900 text-white"><RotateCcw class="w-6 h-6 {rotaTest ? 'animate-spin':'animate-none'}" /> </button>
 						{#if data.tarea.definicion_ejecutiva == '' || data.tarea.definicion_ejecutiva == null}
 							<p class="mt-6 text-gray-600 text-sm sm:text-md">
 								En este momento no hay un resumen ejecutivo para esta tarea. ¿Deseas crear uno?
-								<button onclick={createSummary} class="btn btn-sm">Crear uno</button>
+								<button onclick={createSummary} class="btn btn-sm {rotaSummary ? 'animate-ping':'animate-none'}">Crear uno</button>
 							</p>
 						{:else}
 							<p class="p-4 mt-6 text-sm text-gray-900 font-dosis bg-white rounded-md shadow-md sm:text-lg">{@html marked(data.tarea.definicion_ejecutiva ?? '')}</p>
@@ -61,7 +114,7 @@
 						<div class="mt-6">
 							<div class="flex flex-row justify-between pr-3 mb-2">
 							<h2 class="text-2xl font-semibold tracking-tight text-gray-900  text-pretty">Información Obtenida</h2>
-							<button onclick={update} class="btn btn-circle btn-sm bg-sky-900 text-white"><RotateCcw class="w-6 h-6" /> </button>
+							<button onclick={update} class="btn btn-circle btn-sm bg-sky-900 text-white"><RotateCcw class="w-6 h-6 {rotaDetailes ? 'animate-spin':'animate-none'}" /> </button>
 							</div>
 							{#await data.respuestas}
 								<p class="mt-6 text-gray-600 text-lg/8 sm:text-base">Cargando...</p>

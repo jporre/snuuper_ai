@@ -1,6 +1,6 @@
 import { error, redirect } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
-import { getActivetask, getStepDetails, getTaskStats } from '$lib/server/data/tasks';
+import { getTask, getStepDetails, getTaskStats } from '$lib/server/data/tasks';
 
 export const load = (async (event) => {
     if (!event.locals.user) {
@@ -12,7 +12,7 @@ export const load = (async (event) => {
    if (!objectIdPattern.test(taskId)) {
       error(404, "TaskID no es Valido");
    }
-   const taskData = await getActivetask(taskId);
+   const taskData = await getTask(taskId);
    event.depends('app:getTask');
    if (!taskData) {
       error(404, "Tarea no encontrada");
