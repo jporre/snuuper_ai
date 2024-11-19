@@ -1,92 +1,44 @@
 <script lang="ts">
-  import GridPattern from '$lib/components/GridPattern.svelte';
-  import LogoManager from "$lib/images/managerlogo.png?enhanced";
+	import GridPattern from '$lib/components/GridPattern.svelte';
+	import LogoManager from '$lib/images/managerlogo.png?enhanced';
 	import { onMount } from 'svelte';
+  import fondo from '$lib/images/ilustracionsnupper1.webp';
 
-   onMount(() => {
-
-   });
+	onMount(() => {});
 </script>
 
-<div class="z-0 flex flex-col mx-auto bg-blue-100">
-  <GridPattern />
-<div class="z-10 py-4 mx-auto bg-white shadow-md sm:py-12 max-w-7xl">
-    <div class="max-w-2xl px-6 mx-auto bg-white lg:max-w-7xl lg:px-8">
-        <div class="flex min-w-full m-2 md:float-right md:min-w-10">
-            <enhanced:img class="object-cover object-center " src={LogoManager} alt="Manager Logo">
-          </div>
-      <h2 class="py-2 mt-4 font-semibold text-blue-900 text-normal sm:text-xl">Sitio Interno</h2>
-      <p class="max-w-lg mt-2 text-xl font-medium tracking-tight sm:text-3xl text-pretty text-gray-950 md:text-5xl">Aplicaciones Internas, Investigación y Desarrollo.</p>
-      <a href="./dh/tareas" class="inline-flex items-center gap-x-1.5 rounded-md bg-indigo-600 px-2.5 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
-        ver mas
-        <svg class="-mr-0.5 h-5 w-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true" data-slot="icon">
-          <path fill-rule="evenodd" d="M10 18a8 8 0 1 0 0-16 8 8 0 0 0 0 16Zm3.857-9.809a.75.75 0 0 0-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 1 0-1.06 1.061l2.5 2.5a.75.75 0 0 0 1.137-.089l4-5.5Z" clip-rule="evenodd" />
-        </svg></a>
-      
-      <div class="grid grid-cols-1 gap-4 mt-10 sm:mt-16 lg:grid-cols-6 lg:grid-rows-2">
-        <div class="relative lg:col-span-3">
-          <div class="absolute inset-px rounded-lg bg-white max-lg:rounded-t-[2rem] lg:rounded-tl-[2rem]"></div>
-          <div class="relative flex h-full flex-col overflow-hidden rounded-[calc(theme(borderRadius.lg)+1px)] max-lg:rounded-t-[calc(2rem+1px)] lg:rounded-tl-[calc(2rem+1px)]">
-            <img class="object-cover object-left h-80" src="https://tailwindui.com/plus/img/component-images/bento-01-performance.png" alt="">
-            <div class="p-10 pt-4">
-              <h3 class="font-semibold text-blue-800 text-sm/4">Performance</h3>
-              <p class="mt-2 font-medium tracking-tight text-lg/7 text-gray-950">Lightning-fast builds</p>
-              <p class="max-w-lg mt-2 text-gray-600 text-sm/6">Lorem ipsum dolor sit amet, consectetur adipiscing elit. In gravida justo et nulla efficitur, maximus egestas sem pellentesque.</p>
-            </div>
-          </div>
-          <div class="pointer-events-none absolute inset-px rounded-lg shadow ring-1 ring-black/5 max-lg:rounded-t-[2rem] lg:rounded-tl-[2rem]"></div>
-        </div>
-        <div class="relative lg:col-span-3">
-          <div class="absolute inset-px rounded-lg bg-white lg:rounded-tr-[2rem]"></div>
-          <div class="relative flex h-full flex-col overflow-hidden rounded-[calc(theme(borderRadius.lg)+1px)] lg:rounded-tr-[calc(2rem+1px)]">
-            <img class="object-cover object-left h-80 lg:object-right" src="https://supabase.4c.cl/storage/v1/object/public/publico/LogoBnex_LetrasIndigo950.png?t=2024-10-22T14%3A19%3A33.780Z" alt="">
-            <div class="p-10 pt-4">
-              <h3 class="font-semibold text-blue-800 text-sm/4">Releases</h3>
-              <p class="mt-2 font-medium tracking-tight text-lg/7 text-gray-950">Push to deploy</p>
-              <p class="max-w-lg mt-2 text-gray-600 text-sm/6">Curabitur auctor, ex quis auctor venenatis, eros arcu rhoncus massa, laoreet dapibus ex elit vitae odio.</p>
-            </div>
-          </div>
-          <div class="pointer-events-none absolute inset-px rounded-lg shadow ring-1 ring-black/5 lg:rounded-tr-[2rem]"></div>
-        </div>
-        <div class="relative lg:col-span-2">
-          <div class="absolute inset-px rounded-lg bg-white lg:rounded-bl-[2rem]"></div>
-          <div class="relative flex h-full flex-col overflow-hidden rounded-[calc(theme(borderRadius.lg)+1px)] lg:rounded-bl-[calc(2rem+1px)]">
-            <img class="object-cover object-left h-80" src="https://tailwindui.com/plus/img/component-images/bento-01-speed.png" alt="">
-            <div class="p-10 pt-4">
-              <h3 class="font-semibold text-blue-800 text-sm/4">Speed</h3>
-              <p class="mt-2 font-medium tracking-tight text-lg/7 text-gray-950">Built for power users</p>
-              <p class="max-w-lg mt-2 text-gray-600 text-sm/6">Sed congue eros non finibus molestie. Vestibulum euismod augue.</p>
-            </div>
-          </div>
-          <div class="pointer-events-none absolute inset-px rounded-lg shadow ring-1 ring-black/5 lg:rounded-bl-[2rem]"></div>
-        </div>
-        <div class="relative lg:col-span-2">
-          <div class="absolute bg-white rounded-lg inset-px"></div>
-          <div class="relative flex h-full flex-col overflow-hidden rounded-[calc(theme(borderRadius.lg)+1px)]">
-            <img class="object-cover object-center h-80" src="https://tailwindui.com/plus/img/component-images/bento-01-integrations.png" alt="">
-            <div class="p-10 pt-4">
-              <h3 class="font-semibold text-blue-800 text-sm/4">Integrations</h3>
-              <p class="mt-2 font-medium tracking-tight text-lg/7 text-gray-950">Connect your favorite tools</p>
-              <p class="max-w-lg mt-2 text-gray-600 text-sm/6">Maecenas at augue sed elit dictum vulputate, in nisi aliquam maximus arcu.</p>
-            </div>
-          </div>
-          <div class="absolute rounded-lg shadow pointer-events-none inset-px ring-1 ring-black/5"></div>
-        </div>
-        <div class="relative lg:col-span-2">
-          <div class="absolute inset-px rounded-lg bg-white max-lg:rounded-b-[2rem] lg:rounded-br-[2rem]"></div>
-          <div class="relative flex h-full flex-col overflow-hidden rounded-[calc(theme(borderRadius.lg)+1px)] max-lg:rounded-b-[calc(2rem+1px)] lg:rounded-br-[calc(2rem+1px)]">
-            <img class="object-cover object-center h-80" src="https://tailwindui.com/plus/img/component-images/bento-01-network.png" alt="">
-            <div class="p-10 pt-4">
-              <h3 class="font-semibold text-blue-800 text-sm/4">Network</h3>
-              <p class="mt-2 font-medium tracking-tight text-lg/7 text-gray-950">Globally distributed CDN</p>
-              <p class="max-w-lg mt-2 text-gray-600 text-sm/6">Aenean vulputate justo commodo auctor vehicula in malesuada semper.</p>
-            </div>
-          </div>
-          <div class="pointer-events-none absolute inset-px rounded-lg shadow ring-1 ring-black/5 max-lg:rounded-b-[2rem] lg:rounded-br-[2rem]"></div>
-        </div>
-      </div>
-    </div>
-  </div>
-  </div>
-
-  
+<div class="flex min-w-full m-2 md:float-right md:min-w-10" style="background-image: url({fondo})">
+	<enhanced:img class="absolute object-cover object-center top-10 right-10" src={LogoManager} alt="Manager Logo"></enhanced:img>
+</div>
+<div class="relative px-6 isolate pt-14 lg:px-8">
+	<div class="absolute inset-x-0 overflow-hidden -top-40 -z-10 transform-gpu blur-3xl sm:-top-80" aria-hidden="true">
+		<div
+			class="relative left-[calc(50%-11rem)] aspect-[1155/678] w-[36.125rem] -translate-x-1/2 rotate-[30deg] bg-gradient-to-tr from-[#ff80b5] to-[#9089fc] opacity-30 sm:left-[calc(50%-30rem)] sm:w-[72.1875rem]"
+			style="clip-path: polygon(74.1% 44.1%, 100% 61.6%, 97.5% 26.9%, 85.5% 0.1%, 80.7% 2%, 72.5% 32.5%, 60.2% 62.4%, 52.4% 68.1%, 47.5% 58.3%, 45.2% 34.5%, 27.5% 76.7%, 0.1% 64.9%, 17.9% 100%, 27.6% 76.8%, 76.1% 97.7%, 74.1% 44.1%)">
+		</div>
+	</div>
+	<div class="max-w-2xl py-32 mx-auto sm:py-48 lg:py-56">
+		<div class="hidden sm:mb-8 sm:flex sm:justify-center">
+			<div class="relative px-3 py-1 text-gray-600 rounded-full text-sm/6 ring-1 ring-gray-900/10 hover:ring-gray-900/20">
+				Quieres ir a manager. <a href="https://manager.snuuper.com" class="font-semibold text-indigo-600">
+					<span class="absolute inset-0" aria-hidden="true"></span>
+					Ir Ahora 
+					<span aria-hidden="true">&rarr;</span>
+				</a>
+			</div>
+		</div>
+		<div class="text-center">
+			<h1 class="text-5xl font-semibold tracking-tight text-gray-900 text-balance sm:text-7xl">Mejora tu experiencia de cliente</h1>
+			<p class="mt-8 text-lg font-medium text-gray-500 text-pretty sm:text-xl/8">Miles de ojos al servicio de tus clientes.</p>
+			<div class="flex items-center justify-center mt-10 gap-x-6">
+				<a href="./dh/tareas" class="rounded-md bg-indigo-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">Entrar</a>
+			</div>
+		</div>
+	</div>
+	<div class="absolute inset-x-0 top-[calc(100%-13rem)] -z-10 transform-gpu overflow-hidden  sm:top-[calc(100%-30rem)]" aria-hidden="true" style="background-image: url({fondo})">
+		<div
+			class="relative left-[calc(50%+3rem)] aspect-[1155/678] w-[36.125rem] -translate-x-1/2 bg-gradient-to-tr from-blue-800 to-[#9089fc] opacity-30 sm:left-[calc(50%+36rem)] sm:w-[72.1875rem]"
+			style="clip-path: polygon(74.1% 44.1%, 100% 61.6%, 97.5% 26.9%, 85.5% 0.1%, 80.7% 2%, 72.5% 32.5%, 60.2% 62.4%, 52.4% 68.1%, 47.5% 58.3%, 45.2% 34.5%, 27.5% 76.7%, 0.1% 64.9%, 17.9% 100%, 27.6% 76.8%, 76.1% 97.7%, 74.1% 44.1%)">
+		</div>
+	</div>
+</div>

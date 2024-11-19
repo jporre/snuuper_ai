@@ -70,7 +70,7 @@ export const POST: RequestHandler = async (event) => {
     }));
 
     const result = await MongoDBQA.collection('ai_TaskAnswers').bulkWrite(bulkOps);
-    // console.log("🚀 ~ constPOST:RequestHandler= ~ result:", result);
+    console.log("🚀 ~ constPOST:RequestHandler= ~ result:", result);
 
     return new Response();
 };
