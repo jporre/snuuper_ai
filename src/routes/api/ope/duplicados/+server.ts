@@ -27,7 +27,7 @@ export async function POST({ request: req }) {
 
         const resultado = JSON.stringify(groupDuplicados.flat());// Aplanamos el array para evitar anidaciones
         const count = groupDuplicados.flat().length;
-        console.log("🚀 ~ POST ~ count:", count)
+        // console.log("🚀 ~ POST ~ count:", count)
         return new Response(resultado, { status: 200 });
         
     } catch (error) {

@@ -18,7 +18,7 @@ export const load = async (event) => {
 
 export const actions: Actions = {
 	logout: async (event) => {
-		console.log("saliendo");
+		// console.log("saliendo");
 		if (!event.locals.session) {
 			
 			redirect(302, "/");

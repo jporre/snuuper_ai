@@ -97,7 +97,7 @@ export async function getTaskAnswers(taskId: string): Promise<TaskAnswerType[]> 
   const answers = await MongoDBCL.collection('TaskAnswer')
   .aggregate(pipeline)
   .toArray();
-  console.log("🚀 ~ getTaskAnswers ~ :", answers.length);
+  //console.log("🚀 ~ getTaskAnswers ~ :", answers.length);
   if (!answers) return [];
   if (answers.length === 0) return [];
   return JSON.parse(JSON.stringify(answers));

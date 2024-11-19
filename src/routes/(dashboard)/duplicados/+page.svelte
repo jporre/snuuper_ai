@@ -3,7 +3,7 @@
 
     let { data }: { data: PageData} = $props();
     const TaskData = data.td;
-    console.log(TaskData[0]);
+    // console.log(TaskData[0]);
    
 </script>
 {#await data.td}

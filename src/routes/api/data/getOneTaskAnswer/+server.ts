@@ -19,9 +19,9 @@ export const POST: RequestHandler = async (event) => {
      }
 
     const tid = ObjectId.createFromHexString(body.taskId);
-    console.log("🚀 ~ constPOST:RequestHandler= ~ tid:", tid);
+    //console.log("🚀 ~ constPOST:RequestHandler= ~ tid:", tid);
     const taskAnswersList = await getTasksAnswers(body.taskId);
-    console.log("🚀 ~ constPOST:RequestHandler= ~ taskAnswersList:", taskAnswersList)
+    //console.log("🚀 ~ constPOST:RequestHandler= ~ taskAnswersList:", taskAnswersList)
 
   
     

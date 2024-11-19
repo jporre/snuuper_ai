@@ -58,7 +58,7 @@ export const POST: RequestHandler = async (event) => {
             markdownEmbedding: vector_array.data[0].embedding
         };
     }));
-    //console.log("🚀 ~ constPOST:RequestHandler= ~ taskAnswersEmbeddings:", taskAnswersEmbeddings);
+    // console.log("🚀 ~ constPOST:RequestHandler= ~ taskAnswersEmbeddings:", taskAnswersEmbeddings);
     // Insertar en ai_TaskAnswers la lista de taskAnswersEmbeddings usando MongoDBQA
     const InsertRegistros = await MongoDBQA.collection('ai_TaskAnswers').insertMany(taskAnswersEmbeddings);
     const bulkOps = taskAnswersEmbeddings.map((embedding) => ({
@@ -70,7 +70,7 @@ export const POST: RequestHandler = async (event) => {
     }));
 
     const result = await MongoDBQA.collection('ai_TaskAnswers').bulkWrite(bulkOps);
-    console.log("🚀 ~ constPOST:RequestHandler= ~ result:", result);
+    // console.log("🚀 ~ constPOST:RequestHandler= ~ result:", result);
 
     return new Response();
 };

@@ -61,7 +61,7 @@ export const POST: RequestHandler = async (event) => {
         messages: conversationLog,
         "temperature": 0.4
        });
-    console.log(completion.usage?.total_tokens);
+    // console.log(completion.usage?.total_tokens);
     const respuestaAI = completion.choices[0].message.content;
     // ahora necensito actualizar el campo definicion_ejecutiva de la coleccion Task en Mongodb
     const updateTask = await MongoDBCL.collection('Task').updateOne({_id: tid}, {$set: {definicion_ejecutiva: respuestaAI}});

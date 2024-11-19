@@ -25,7 +25,7 @@ export const actions: Actions = {
 			});
 		}
 		const existingUserMongo = await MongoDBCL.collection('User').findOne({ email: email });
-		console.log("🚀 ~ loginWithEmailAndPassword: ~ existingUserMongo:", existingUserMongo)
+		// console.log("🚀 ~ loginWithEmailAndPassword: ~ existingUserMongo:", existingUserMongo)
 		
 		if (!existingUserMongo) {
 			return fail(400, {
@@ -37,11 +37,11 @@ export const actions: Actions = {
 
 		//const validPassword = await argon2id.verify(existingUser.password, password);
 		const validPasswordBcrypt = await bcrypt.verify(existingUserMongo?.password, password);
-		console.log("🚀 ~ loginWithEmailAndPassword: ~ validPasswordBcrypt:", validPasswordBcrypt)
+		// console.log("🚀 ~ loginWithEmailAndPassword: ~ validPasswordBcrypt:", validPasswordBcrypt)
 		
 
 		if (!validPasswordBcrypt) {
-			console.log("Incorrect password");
+			//console.log("Incorrect password");
 			return fail(400, {
 				code: 400,
 				message: "Incorrect username or password"
@@ -49,7 +49,7 @@ export const actions: Actions = {
 		}
 
 		const userId = existingUserMongo._id;
-		console.log("🚀 ~ loginWithEmailAndPassword: ~ userID:", userId)
+		// console.log("🚀 ~ loginWithEmailAndPassword: ~ userID:", userId)
 
 		const session = await lucia.createSession(userId, {});
 		const sessionCookie = lucia.createSessionCookie(session.id);

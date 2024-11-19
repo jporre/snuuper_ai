@@ -63,7 +63,7 @@ export const POST: RequestHandler = async (event) => {
                     }
                     prompt = `Eres un consultor experto en análisis de datos y experiencia de usuario. Estás hablando con ${userData?.personalData.firstname}, que es un cliente de Snuuper. Como consultor, estás autorizado a responder preguntas relacionadas con la tarea ${taskData.title} con descripción ${taskData.definicion_ejecutiva} o temas de snuuper. La tarea tiene pasos y preguntas, ${textTarea}.  Aquí tiene información relevante de respuestas individuales a las preguntas, puedes utilizar la siguiente información: ${ragData}`;
                 });
-                    console.log("🚀 ~ taskSteps.forEach ~ prompt:", prompt)
+                    // console.log("🚀 ~ taskSteps.forEach ~ prompt:", prompt)
             }
         }
     } else {

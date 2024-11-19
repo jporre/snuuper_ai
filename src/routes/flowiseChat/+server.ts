@@ -9,7 +9,7 @@ export const POST: RequestHandler = async (event) => {
     //const msg = typeof mensaje === 'object' ? JSON.stringify(mensaje) : mensaje;
     //console.log(msg);
     const input= mensaje.Conversation[mensaje.Conversation.length-1].content
-    console.log("🚀 ~ constPOST:RequestHandler= ~ input:", input)
+    // console.log("🚀 ~ constPOST:RequestHandler= ~ input:", input)
     const client = new FlowiseClient({ baseUrl: 'https://ai.4c.cl' });
     try {
         // For streaming prediction
@@ -52,6 +52,6 @@ export const POST: RequestHandler = async (event) => {
     //     }
     // );
     // const result = await response.json();
-    // //console.log("🚀 ~ constPOST:RequestHandler= ~ result:", result)
+    // ("🚀 ~ constPOST:RequestHandler= ~ result:", result)
     // return new Response(JSON.stringify(result), { status: 200 });
 };

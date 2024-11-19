@@ -20,7 +20,7 @@ export const POST: RequestHandler = async (event) => {
 
     const tid = ObjectId.createFromHexString(body.taskId);
     const task = await getActivetask(body.taskId);
-    console.log("🚀 ~ constPOST:RequestHandler= ~ task:", task)
+    //console.log("🚀 ~ constPOST:RequestHandler= ~ task:", task)
     if (!task) { error(404, 'Task not found') }
     const taskSteps = await getStepDetails(body.taskId);
     if (!taskSteps) { error(404, 'Task steps not found') }
@@ -131,7 +131,7 @@ ${fileStats.map(file => `- ${file.pregunta}: ${file.stats.total} archivos`).join
         messages: conversationLog,
         "temperature": 0.4
        });
-    console.log(completion.usage?.total_tokens);
+    // console.log(completion.usage?.total_tokens);
     const respuestaAI = completion.choices[0].message.content;
     // ahora necensito actualizar el campo definicion_ejecutiva de la coleccion Task en Mongodb
     const updateTask = await MongoDBCL.collection('Task').updateOne({_id: tid}, {$set: {resumen_ejecutiva: respuestaAI}});
