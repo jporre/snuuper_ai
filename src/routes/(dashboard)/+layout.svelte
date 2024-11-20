@@ -1,6 +1,7 @@
 <script lang="ts">
 	import LogoSnuuperPequeno from '$lib/images/logosnuuper.png?enhanced';
 	import IlustracionSnuuper1 from '$lib/images/ilustracionsnupper1.webp?enhanced';
+	import Escena_vertical from '$lib/images/Snuuper_Escena_Central.png';
 	import type { Snippet } from 'svelte';
 	import type { LayoutData } from './$types';
 	import { marked } from 'marked';
@@ -100,13 +101,13 @@
 <svelte:head>
 	<title>Zona de Cliente</title>
 </svelte:head>
-<div class="max-w-screen" data-theme="emerald">
+<div class="max-w-screen" data-theme="emerald" >
 	<div class="z-40 md:fixed md:inset-y-0 md:min-h-screen lg:z-50 lg:flex lg:w-52 md:w-16 lg:flex-col">
 		<div class="absolute top-0 flex flex-col min-h-full px-6 pb-4 overflow-y-auto bg-gray-900 md:w-full transition transform ease-in-out {MobileMenu ? 'translate-x-0 w-full' : '-translate-x-96'} md:translate-x-0 md:px-4 gap-y-5">
 			<div class="flex items-center h-16 md:h-8 lg:h-16 md:mt-3">
 				<enhanced:img class="w-8 h-8" src={LogoSnuuperPequeno} alt="Snuuper"> </enhanced:img>
 			</div>
-			<nav class="flex flex-col flex-1">
+			<nav class="flex flex-col flex-1 bg-top bg-no-repeat bg-cover bg-blend-multiply" style="background-image: url({Escena_vertical}); background-color: rgba(1, 1, 1, 0.8); background-blend-mode: overlay;">
 				<ul role="list" class="flex flex-col flex-1 gap-y-7">
 					<li>
 						<ul role="list" class="-mx-2 space-y-1">

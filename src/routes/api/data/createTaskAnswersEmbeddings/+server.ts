@@ -27,14 +27,27 @@ export const POST: RequestHandler = async (event) => {
     //console.log("🚀 ~ constPOST:RequestHandler= ~ tid:", tid);
     const taskAnswers = await getTaskAnswers(taskId);
     const taskAnswersEmbeddings = await Promise.all(taskAnswers.map(async (respuesta) => {
-        let markdown = `Esta encuesta se inició en ${respuesta.timestamp.start} y terminó en ${respuesta.timestamp.stop}\n`;
-        if (respuesta.Address !== undefined) {
+        const fecha_respuesta = new Date(respuesta.timestamp.start);
+        const daysOfWeek = ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'];
+        const monthsOfYear = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
+        const dayName = daysOfWeek[fecha_respuesta.getUTCDay()];
+        const monthName = monthsOfYear[fecha_respuesta.getUTCMonth()];
+        const weekNumber = Math.ceil((fecha_respuesta.getUTCDate() - 1) / 7);
+        const hours = fecha_respuesta.getUTCHours().toString().padStart(2, '0');
+        const minutes = fecha_respuesta.getUTCMinutes().toString().padStart(2, '0');
+        const ampm = parseInt(hours) >= 12 ? 'PM' : 'AM';
+        const formattedDate = ` ${dayName}, ${fecha_respuesta.getUTCDate()} de ${monthName} de ${fecha_respuesta.getUTCFullYear()}, a la ${hours}:${minutes} ${ampm}. Es la ${weekNumber}ª semana del año,  en el mes de ${monthName}.`;
+        let markdown = `Esta encuesta se realizó ${formattedDate}\n`; 
+        if (respuesta.Address && respuesta.Address[0]) {
             markdown += `La encuesta fue realizada en *${respuesta.Address[0].nameAddress}* en la dirección: ${respuesta.Address[0].geolocation.physicalAddress},\n`;
         }
         if (respuesta.comment) {
             markdown += `El encuestador agregó el siguiente comentario: ${respuesta.comment}\n`;
         }
         markdown += '\n';
+        if (respuesta.stepAnswerDetails.length === 0) {
+            markdown += 'No se respondió a ninguna pregunta.\n';
+        } else {
         respuesta.stepAnswerDetails.forEach((stepAnswerDetail) => {
             const excludedTypes = ['photo', 'audio_record', 'paint', 'mapp_add_markers', 'rating'];
             if (excludedTypes.includes(stepAnswerDetail.tipo_paso)) {
@@ -49,6 +62,7 @@ export const POST: RequestHandler = async (event) => {
                 markdown += `- Nº ${stepAnswerDetail.orden} de tipo: "${stepAnswerDetail.tipo_paso}" p: ${stepAnswerDetail.texto_pregunta} r: ${stepAnswerDetail.respuesta_texto}\n`;
             }
         });
+    }
         const vector_array = await getVectors(markdown);
         return {
             taskId: tid,
@@ -59,18 +73,18 @@ export const POST: RequestHandler = async (event) => {
         };
     }));
     // console.log("🚀 ~ constPOST:RequestHandler= ~ taskAnswersEmbeddings:", taskAnswersEmbeddings);
-    // Insertar en ai_TaskAnswers la lista de taskAnswersEmbeddings usando MongoDBQA
-    const InsertRegistros = await MongoDBQA.collection('ai_TaskAnswers').insertMany(taskAnswersEmbeddings);
-    const bulkOps = taskAnswersEmbeddings.map((embedding) => ({
-        updateOne: {
-            filter: { taskId: embedding.taskId, taskAnswerId: embedding.taskAnswerId },
-            update: { $set: embedding },
-            upsert: true
-        }
-    }));
+    const bulkOps = taskAnswersEmbeddings.map((embedding) => {
+        const { _id, ...updateData } = embedding;
+        return {
+            updateOne: {
+                filter: { taskId: embedding.taskId, taskAnswerId: embedding.taskAnswerId },
+                update: { $set: updateData },
+                upsert: true
+            }
+        };
+    });
 
     const result = await MongoDBQA.collection('ai_TaskAnswers').bulkWrite(bulkOps);
-    console.log("🚀 ~ constPOST:RequestHandler= ~ result:", result);
 
     return new Response();
 };

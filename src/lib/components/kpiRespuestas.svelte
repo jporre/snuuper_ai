@@ -21,7 +21,79 @@
   const scaleStats = stats.scaleStats;
   const fileStats = stats.fileStats;
 
+  import Chart from 'chart.js/auto';
 
+  onMount(() => {
+    const ctx = document.getElementById('timeDistributionChart').getContext('2d');
+    new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: timeDistribution.map(({ hour }) => `${hour}:00`),
+        datasets: [{
+          label: 'Respuestas por Hora',
+          data: timeDistribution.map(({ count }) => count),
+          borderColor: 'rgba(75, 192, 192, 1)',
+          backgroundColor: 'rgba(75, 192, 192, 0.2)',
+          fill: true,
+          tension: 0.1
+        }]
+      },
+      options: {
+        responsive: true,
+        scales: {
+          x: {
+            title: {
+              display: true,
+              text: 'Hora del Día'
+            }
+          },
+          y: {
+            title: {
+              display: true,
+              text: 'Número de Respuestas'
+            }
+          }
+        }
+      }
+    });
+  });
+
+  onMount(() => {
+    multipleChoiceStats.forEach(({ pregunta, respuestas }) => {
+      const ctx = document.getElementById(`${pregunta.replace(/\s+/g, '-').toLowerCase()}-chart`).getContext('2d');
+      new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: Object.keys(respuestas),
+          datasets: [{
+            label: 'Respuestas',
+            data: Object.values(respuestas),
+            backgroundColor: 'rgba(75, 192, 192, 0.2)',
+            borderColor: 'rgba(75, 192, 192, 1)',
+            borderWidth: 1
+          }]
+        },
+        options: {
+          responsive: true,
+          scales: {
+            x: {
+              title: {
+                display: true,
+                text: 'Opciones'
+              }
+            },
+            y: {
+              title: {
+                display: true,
+                text: 'Número de Respuestas'
+              },
+              beginAtZero: true
+            }
+          }
+        }
+      });
+    });
+  });
 </script>
 
 <!-- KPIs Generales -->
@@ -58,6 +130,11 @@
   </div>
 </div>
 
+<!-- Gráfico de Línea para Distribución por Hora -->
+<div class="p-4 mt-2 bg-white rounded-lg shadow">
+  <h3 class="mb-4 text-lg font-semibold">Distribución por Hora (Gráfico de Línea)</h3>
+  <canvas id="timeDistributionChart"></canvas>
+</div>
 <!-- Distribución por Hora -->
 <div class="p-4 mt-2 bg-white rounded-lg shadow">
   <h3 class="mb-4 text-lg font-semibold">Distribución por Hora</h3>
@@ -73,49 +150,39 @@
   </div>
 </div>
 
+
+
 <!-- Preguntas de Selección Múltiple -->
 <div class="p-4 mt-2 bg-white rounded-lg shadow">
   <h3 class="mb-4 text-lg font-semibold">Preguntas de Selección Múltiple</h3>
   {#each multipleChoiceStats as { pregunta, respuestas }}
-    <div class="mb-6 h-full">
+    <div class="h-full mb-6">
       <h4 class="mb-2 font-medium">{pregunta}</h4>
-      <div class="grid grid-cols-2 gap-2 md:grid-cols-3 lg:grid-cols-4">
-        {#each Object.entries(respuestas) as [answer, count]}
-          <div class="p-2 rounded bg-gray-50">
-            <p class="text-sm">{answer}</p>
-            <p class="font-bold">{count}</p>
-            <div class="w-full h-2 bg-gray-200 rounded-full">
-              <div
-                class="h-2 bg-blue-600 rounded-full"
-                style="width: {(count / totalResponses) * 100}%"
-              ></div>
-            </div>
-          </div>
-        {/each}
-      </div>
+      <canvas id="{pregunta.replace(/\s+/g, '-').toLowerCase()}-chart"></canvas>
     </div>
   {/each}
 </div>
 
-<!-- Preguntas Sí/No -->
+
+<!-- Preguntas Sí/No con Barra de Porcentaje -->
 <div class="p-4 mt-2 bg-white rounded-lg shadow">
-  <h3 class="mb-4 text-lg font-semibold">Preguntas Sí/No</h3>
+  <h3 class="mb-4 text-lg font-semibold">Preguntas Sí/No (Barra de Porcentaje)</h3>
   {#each yesNoStats as { pregunta, stats: answers }}
-    <div class="mb-6 grid grid-cols-2">
+    <div class="mb-6">
       <h4 class="mb-2 font-medium">{pregunta}</h4>
-      <div class="grid grid-cols-2 gap-4 ml-3">
-        <div class="p-1 rounded bg-green-50">
-          <div class="flex items-center justify-between">
-            <span class="font-medium text-green-700">Sí</span>
-            <span class="text-2xl font-bold text-green-700">{answers.yes || 0}</span>
-          </div>
-        </div>
-        <div class="p-1 rounded bg-red-50">
-          <div class="flex items-center justify-between">
-            <span class="font-medium text-red-700">No</span>
-            <span class="text-2xl font-bold text-red-700">{answers.no || 0}</span>
-          </div>
-        </div>
+      <div class="relative w-full h-6 bg-gray-200 rounded-full">
+        <div
+          class="absolute top-0 left-0 h-full bg-green-500 rounded-l-full"
+          style="width: {(answers.yes / (answers.yes + answers.no)) * 100}%"
+        ></div>
+        <div
+          class="absolute top-0 right-0 h-full bg-red-500 rounded-r-full"
+          style="width: {(answers.no / (answers.yes + answers.no)) * 100}%"
+        ></div>
+      </div>
+      <div class="flex justify-between mt-1">
+        <span class="text-green-700">{answers.yes || 0} Sí</span>
+        <span class="text-red-700">{answers.no || 0} No</span>
       </div>
     </div>
   {/each}

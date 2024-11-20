@@ -1,10 +1,10 @@
 import { env } from "$env/dynamic/private";
 import { error, redirect } from '@sveltejs/kit';
 import type { RequestHandler } from "@sveltejs/kit";
-import { getPrompt } from "$lib/prompts";
+import { agente_concerje, agente_tarea, getPrompt } from "$lib/prompts";
 import { MongoDBQA } from '$lib/server/db/mongodbQA';
 import OpenAI from "openai";
-import { getStepDetails, getTask } from "$lib/server/data/tasks";
+import { getStatsText, getStepDetails, getTask, getTaskStats } from "$lib/server/data/tasks";
 import { ObjectId } from "mongodb";
 const openai = new OpenAI({
     apiKey: env.OPENAI_API_KEY ?? '',
@@ -29,27 +29,25 @@ export const POST: RequestHandler = async (event) => {
     }
     const origenConsulta = mensaje.origen || 'default';
     let ragData = ''
-    // Todo COnvertir esta llamada en un tool que se pueda reutilizar y sea llamamdo solamente si se necesita consultra las politicas
+    let getKBData = [];
+    let prompt = '';
     const searchVectorsObj = await getVectors(mensaje.Conversation[mensaje.Conversation.length - 1].content);
     const searchVectors = searchVectorsObj.data[0].embedding;
-    let getKBData = {};
-    let prompt = '';
+
     if (origenConsulta.startsWith('/dh/tareas/')) {
         console.log("estoy en tareas");
-        // tengo que intentar seprar origenConsulta para obtener el id de tarea desde la que se esta consultando
         const origenConsultaArray = origenConsulta.split('/');
         const taskId = origenConsultaArray[origenConsultaArray.length - 1];
-        // ahora valido el id_tarea en forma
         const objectIdPattern = /^[a-f\d]{24}$/i;
         if (objectIdPattern.test(taskId)) {
             const taskData = await getTask(taskId);
             if (taskData) {
+                let agent = await agente_tarea({ origen: origenConsulta, promptName: 'agente_tarea', reemplazos: [{ name: "NOMBRE_USUARIO", value: userData?.personalData.firstname }, {name: "TITULO_TAREA", value: taskData.title},{name:"DEFINICION_EJECUTIVA",value: taskData.definicion_ejecutiva}] });
+                const textStats = await getStatsText(taskId);
                 const taskSteps = await getStepDetails(taskId);
                 getKBData = await getTaskAnswerEmbedingsFromMongo(taskId, searchVectors);
-                //console.log("🚀 ~ constPOST:RequestHandler= ~ getKBData:", getKBData)
-                const resultadosBusqueda = await getKBData.toArray();
+                const resultadosBusqueda = getKBData;
                 if (resultadosBusqueda.length > 0) {
-                    // resultadosBusqueda es un array de objetos json con los resultados de la busqueda, por lo que ahora tenemos que unir los elemntos text de cada objeto en un solo string
                     ragData = resultadosBusqueda.map((element: any) => element.markdown).join(' ');
                 }
                 let textTarea = `Los pasos (preguntas e instrucciones ) de la tarea son:`;
@@ -61,28 +59,20 @@ export const POST: RequestHandler = async (event) => {
                             textTarea += ` ${i + 1}: ${alternative.value}`;
                         });
                     }
-                    prompt = `Eres un consultor experto en análisis de datos y experiencia de usuario. Estás hablando con ${userData?.personalData.firstname}, que es un cliente de Snuuper. Como consultor, estás autorizado a responder preguntas relacionadas con la tarea ${taskData.title} con descripción ${taskData.definicion_ejecutiva} o temas de snuuper. La tarea tiene pasos y preguntas, ${textTarea}.  Aquí tiene información relevante de respuestas individuales a las preguntas, puedes utilizar la siguiente información: ${ragData}`;
+                    prompt = agent + `Las estadisitcas generales, acumuladas de las respuestas son ${textStats} \n La tarea tiene pasos y preguntas, ${textTarea}.  \nEn base a la pregunta del usuario, estas son respuestas que puede considerar relevantes para responder: ${ragData}` ;
                 });
-                    // console.log("🚀 ~ taskSteps.forEach ~ prompt:", prompt)
+                    console.log("🚀 ~ taskSteps.forEach ~ prompt:", prompt)
             }
         }
     } else {
         try {
-            //console.log("🚀 ~ constPOST:RequestHandler= ~ searchVectors:", searchVectors)
-            const resultadosBusqueda = await getKBData.toArray();
-            if (resultadosBusqueda.length > 0) {
-                // resultadosBusqueda es un array de objetos json con los resultados de la busqueda, por lo que ahora tenemos que unir los elemntos text de cada objeto en un solo string
-                ragData = resultadosBusqueda.map((element: any) => element.text).join(' ');
-            }
-            getKBData = await getEmbedingsFromMongo(searchVectors);
-            prompt = getPrompt({ origen: origenConsulta, promptName: "sysP_Generico", reemplazos: [{ name: "NOMBRE_USUARIO", value: userData?.personalData.firstname }, { name: "CONTEXTO", value: ragData }] });
+           // este es el caso por defecto
+            prompt = await agente_concerje({ origen: origenConsulta, promptName: 'agente_concerje', reemplazos: [{ name: "NOMBRE_USUARIO", value: userData?.personalData.firstname }] });
         } catch (e: any) {
             console.error('Error fetching KB data:', e);
             throw error(e.status, e.message);
         }
     }
-
-    
     let mensajesIniciales = [{ "role": `system`, "content": prompt }];
     const conversationLog = [...mensajesIniciales, ...mensaje.Conversation];
     const completionResponse = await openai.chat.completions.create({
@@ -96,7 +86,6 @@ export const POST: RequestHandler = async (event) => {
         'Cache-Control': 'no-cache',
         'Connection': 'keep-alive',
     };
-    // const result = await completion.choices[0].message;
     const stream = new ReadableStream({
         async start(controller) {
             for await (const chunk of completionResponse) {
@@ -113,9 +102,6 @@ async function getVectors(searchString: string) {
             model: "text-embedding-3-small",
             input: searchString
         });
-        // write the search vectors to a file
-        
-        // console.log(searchVectors);
         return searchVectors;
     } catch (e: any) {
         console.error('Error fetching embeddings:', e);
@@ -128,9 +114,9 @@ async function getEmbedingsFromMongo(searchVectors: Array<number>) {
         const pipeline = [
             {
                 $vectorSearch: {
-                    index: "poli_vector", // nombre del indice
-                    path: "embedding", // nombre del campo que contiene los embedings
-                    queryVector: searchVectors, // Texto de busqueda en la forma de vectores
+                    index: "poli_vector",
+                    path: "embedding",
+                    queryVector: searchVectors,
                     numCandidates: 150,
                     limit: 10
                 }
@@ -146,7 +132,9 @@ async function getEmbedingsFromMongo(searchVectors: Array<number>) {
                 }
             }
         ]
-        const resultados = MongoConnect.collection('ai_politicas').aggregate(pipeline);
+        const resultados = await MongoConnect.collection('ai_politicas').aggregate(pipeline).toArray();
+        if (!resultados) return [];
+        if (resultados.length === 0) return [];
         return resultados;
     }
     catch (e: any) {
@@ -159,24 +147,24 @@ async function getTaskAnswerEmbedingsFromMongo(taskId: string, searchVectors: Ar
     try {
         const MongoConnect = MongoDBQA;
         const pipeline = [
-            
-              {
+            {
                 $vectorSearch: {
-                  index: "vector_respuestas", // nombre del indice
-                  path: "markdownEmbedding", // nombre del campo que contiene los embedings
-                  queryVector: searchVectors, // Texto de busqueda en la forma de vectores
-                  numCandidates: 150,
-                  limit: 10
+                    index: "vector_respuestas",
+                    path: "markdownEmbedding",
+                    queryVector: searchVectors,
+                    numCandidates: 150,
+                    limit: 20
                 }
-              },
-              {
+            },
+            {
                 $match: {
-                  taskId: tid
+                    taskId: tid
                 }
-              }
-              
+            }
         ]
-        const resultados = MongoConnect.collection('ai_TaskAnswers').aggregate(pipeline);
+        const resultados = await MongoConnect.collection('ai_TaskAnswers').aggregate(pipeline).toArray();
+        if (!resultados) return [];
+        if (resultados.length === 0) return [];
         return resultados;
     }
     catch (e: any) {

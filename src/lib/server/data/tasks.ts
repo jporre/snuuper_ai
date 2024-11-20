@@ -1,6 +1,8 @@
 import { MongoDBCL } from '$lib/server/db/mongodb';
 import { ObjectId } from 'mongodb';
 import type { viActiveTaskType, stepsType, TaskAnswerType, DashboardStats } from '$lib/server/data/Mongotypes';
+import { error } from '@sveltejs/kit';
+import { MongoDBQA } from '../db/mongodbQA';
 export async function getActivetasks() {
   const task = await MongoDBCL
     .collection('Task')
@@ -576,4 +578,110 @@ export async function getTaskStats(taskId: string): Promise<DashboardStats> {
   const result = await MongoDBCL.collection('TaskAnswer').aggregate(pipeline).toArray();
   const stats = result[0];
   return { estadisticas: stats };
+}
+type FAQDocument = {
+  _id: {
+    $oid: string;
+  };
+  value: {
+    _id: {
+      $oid: string;
+    };
+    question: string;
+    value: string;
+  }[];
+  section: string;
+  createdAt: {
+    $date: string;
+  };
+  updatedAt: {
+    $date: string;
+  };
+  __v: number;
+};
+export async function getFAQ(): Promise<FAQDocument[]> {
+  // get all elements from Faq collection
+  const faq = await MongoDBCL.collection('Faq').find().toArray();
+  if (!faq) return [];
+  if (faq.length === 0) return [];
+  return JSON.parse(JSON.stringify(faq));
+}
+export async function getStatsText(taskId: string): Promise<string> {
+  const responseStats= await getTaskStats(taskId)
+  if (!responseStats) { error(404, 'Task stats not found') }
+
+  // preparamos las estadisticas generales
+const stats = responseStats.estadisticas;
+const basicStats = stats.basicStats;
+const totalResponses = basicStats[0].totalResponses;
+const totalCredits = basicStats[0].totalCredits;
+const totalBonos = basicStats[0].totalBonos;
+const averageCompletionTime = (basicStats[0].avgCompletionTime / 60).toFixed(2);
+const statusDistribution = stats.statusDistribution;
+const timeDistribution = stats.timeDistribution;
+const multipleChoiceStats = stats.multipleChoiceStats;
+const yesNoStats = stats.yesNoStats;
+const priceListStats = stats.priceListStats;
+const scaleStats = stats.scaleStats;
+const fileStats = stats.fileStats;
+
+const textStats = `RESULTADOS ESTADÍSTICOS
+
+KPIs GENERALES:
+- Total de Respuestas: ${totalResponses}
+- Tiempo Promedio de Completación: ${averageCompletionTime} minutos
+- Créditos Totales: ${totalCredits}
+- Bonos Totales: ${totalBonos}
+
+DISTRIBUCIÓN POR ESTADO:
+${statusDistribution.map(status => `- ${status._id}: ${status.count} (${((status.count / totalResponses) * 100).toFixed(2)}%)`).join('\n')}
+
+DISTRIBUCIÓN HORARIA:
+${timeDistribution.map(time => `- ${time.hour}:00 hrs: ${time.count} respuestas`).join('\n')}
+
+PREGUNTAS DE SELECCIÓN MÚLTIPLE:
+${multipleChoiceStats.map(mc => `Pregunta: ${mc.pregunta}\nRespuestas:\n${Object.entries(mc.respuestas).map(([answer, count]) => `- ${answer}: ${count} respuestas (${(count / totalResponses * 100).toFixed(2)}%)`).join('\n')}`).join('\n\n')}
+
+PREGUNTAS SÍ/NO:
+${yesNoStats.map(yn => `Pregunta: ${yn.pregunta}\n- Sí: ${yn.stats.yes || 0}\n- No: ${yn.stats.no || 0}`).join('\n\n')}
+
+ESTADÍSTICAS DE PRECIOS:
+${priceListStats.length > 0 ? priceListStats.map(pl => `Pregunta: ${pl.pregunta}\n${Object.entries(pl.stats).map(([producto, stats]) => `- ${producto}:\n  * Precio Mínimo: ${stats.minimo}\n  * Precio Promedio: ${stats.promedio.toFixed(2)}\n  * Precio Máximo: ${stats.maximo}\n  * Número de Mediciones: ${stats.mediciones}`).join('\n')}`).join('\n\n') : ''}
+
+ESTADÍSTICAS DE ESCALA:
+${scaleStats.length > 0 ? scaleStats.map(scale => `Pregunta: ${scale.pregunta}\nPromedio: ${scale.stats.promedio.toFixed(2)}`).join('\n\n') : ''}
+
+ARCHIVOS SUBIDOS:
+${fileStats.map(file => `- ${file.pregunta}: ${file.stats.total} archivos`).join('\n')}`;
+
+return textStats;
+}
+export async function getTaskAnswerEmbedingsFromMongo(taskId: string) {
+  const tid = ObjectId.createFromHexString(taskId);
+  const pipeline = [
+    {
+      $match: {
+        taskId: tid
+      }
+    },
+    {
+      $project: {
+        _id: 1,
+        taskId: 1,
+        taskAnswerId: 1,
+        markdown: 1,
+        markdownEmbedding: 1
+      }
+    }
+  ];
+  const result = await MongoDBQA.collection('ai_TaskAnswers').aggregate(pipeline).toArray();
+  if (!result) return [];
+  if (result.length === 0) return [];
+  return JSON.parse(JSON.stringify(result));
+}
+export async function getCompanyInfo(companyId:string) {
+  const cid = ObjectId.createFromHexString(companyId);
+  const company = await MongoDBCL.collection('Company').findOne({ _id: cid });
+  if (!company) return [];
+  return JSON.parse(JSON.stringify(company));
 }

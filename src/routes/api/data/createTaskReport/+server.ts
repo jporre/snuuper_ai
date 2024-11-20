@@ -1,4 +1,4 @@
-import { getActivetask, getStepDetails, getTaskStats } from '$lib/server/data/tasks';
+import { getActivetask, getCompanyInfo, getStepDetails, getTaskStats } from '$lib/server/data/tasks';
 import { MongoDBCL } from '$lib/server/db/mongodb';
 import { error, redirect, type RequestHandler } from '@sveltejs/kit';
 import { env } from "$env/dynamic/private";
@@ -26,6 +26,10 @@ export const POST: RequestHandler = async (event) => {
     if (!taskSteps) { error(404, 'Task steps not found') }
     const responseStats= await getTaskStats(body.taskId)
     if (!responseStats) { error(404, 'Task stats not found') }
+    const companyId = task.constraints?.companyId[0].toString() ?? '';
+    const company_info = getCompanyInfo(companyId);
+    if (!company_info) { error(404, 'Company info not found') }
+    // console.log("🚀 ~ constPOST:RequestHandler= ~ company_info:", company_info)
 
 
     // Obtenemos los datos mas relevantes de la tarea para pasarselo a AI.
@@ -122,15 +126,7 @@ ${fileStats.map(file => `- ${file.pregunta}: ${file.stats.total} archivos`).join
     - Adapta tu lenguaje al nivel de comprensión esperado de tu audiencia, evitando jerga técnica innecesaria 
     definicion inicial de la tarea: ${textTarea} su definición ejecutiva es: ${textEspecificcion}`;
     let mensajesIniciales =  [ {  "role": `system`,"name":"openai","content": prompt } ];
-    let mensaje_usuario = [{ "role": `user`,"content": `Por Favor, prepara un Informe ejecutivo de la encuesta, considerando estos resultados ${textStats}. Es importante que el reporte debe iniciar con un breve reseña de la empresa y es importante que incluya conclusiones y análsis sin repetir las estadisticas. La empresa mandante de esta encuesta es Chilexpress S.A. es una empresa chilena de logística fundada en 1989, especializada en servicios de mensajería exprés y entrega de paquetes. Inicialmente, fue una subsidiaria de Telex-Chile, encargada del envío de telegramas. A lo largo de los años, ha ampliado su cobertura a nivel nacional, estableciendo alianzas estratégicas con empresas internacionales como TNT Express y UPS, y ofreciendo servicios de envío de dinero en colaboración con Western Union. 
-WIKIPEDIA
-En términos financieros, Chilexpress ha experimentado un crecimiento significativo, impulsado en gran medida por el auge del comercio electrónico. Aunque la empresa no publica sus estados financieros detallados públicamente, se estima que lidera el mercado chileno en el rubro de reparto de último kilómetro, seguida por Blue Express, Starken y la estatal Correos de Chile. 
-WIKIPEDIA
-En 2023, la empresa anunció cambios en su estructura organizativa para enfrentar la presión competitiva y la desaceleración económica, fusionando roles directivos y estableciendo nuevas gerencias enfocadas en retail, courier y distribución, así como áreas corporativas de soporte. 
-THE CLINIC
-En cuanto a sostenibilidad, Chilexpress ha implementado el programa "El Futuro nos Mueve", logrando una reducción del 58,5% en su huella de carbono por encomienda entregada entre 2013 y 2020, superando la meta inicial del 30%. 
-CHILEXPRESS
-Para obtener información financiera más detallada, se recomienda consultar directamente con la empresa o revisar los reportes disponibles en la Comisión para el Mercado Financiero (CMF) de Chile.  Me interesa que incluyas preguntas y temas para explorar a continuación,  al mirar en detalle las respuestas de este estudio. Redacta un informe final.   ` }];
+    let mensaje_usuario = [{ "role": `user`,"content": `Por Favor, prepara un Informe ejecutivo de la encuesta, considerando estos resultados ${textStats}. Es importante que el reporte debe iniciar con un breve reseña de la empresa y es importante que incluya conclusiones y análsis sin repetir las estadisticas. Esta es la informacion de la empresa mandante. tus análsis deben considerar estos datos para realizar un reporte relevante y útil ${company_info?.company_summary || ''} .` }];
     
     const conversationLog = [...mensajesIniciales, ...mensaje_usuario];
 

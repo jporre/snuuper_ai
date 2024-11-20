@@ -2,9 +2,11 @@
 	import KpiRespuestas from '$lib/components/kpiRespuestas.svelte';
 	import type { PageData } from './$types';
 	import { marked } from 'marked';
+	import Radar from 'lucide-svelte/icons/radar';
 	import RotateCcw from 'lucide-svelte/icons/rotate-ccw';
 	import { getUserState } from '$lib/state.svelte';
 	import { invalidate } from '$app/navigation';
+	import fondo from '$lib/images/ilustracionsnupper1.webp';
 	let { data }: { data: PageData } = $props();
 	let mostrarCompleto = $state(false);
 	function truncarTexto(texto: string, limite: number) {
@@ -57,8 +59,10 @@
 		});
 		if (res.ok) {
 			rotaReport = false;
+			invalidate('app:getTask');
 		} else {
 			rotaReport = false;
+			invalidate('app:getTask');
 		}
 	}
 	let rotaTest = $state(false);
@@ -78,44 +82,56 @@
 		}
 	}
 </script>
+<svelte:head>
+	<title>{data.tarea?.title || ''}</title>
+</svelte:head>
 <div class="w-full">
-	<div class="flex p-1 mx-auto bg-sky-50 border-2 border-sky-900 rounded-lg shadow-md">
+	<div class="flex p-1 mx-auto border-2 rounded-lg shadow-md bg-sky-50 border-sky-900">
 		<div class="flex flex-col w-full m-2 mx-auto">
-			<div role="tablist" class="tabs tabs-lifted">
+			<div class="absolute right-10 w-28">
+				<img src={`https://files.snuuper.com/${data.company_info.companyLogo}`} alt="logo empresa" class="rounded-xl"/>
+			</div>
+			<div role="tablist" class=" tabs tabs-lifted">
 				<!-- Tab controls -->
-				<input type="radio" name="my_tabs_2" role="tab" class="tab" aria-label="Informe" checked />
-				<div role="tabpanel" class="tab-content p-6">
-					<div class="mx-auto max-w-7xl lg:mx-0 bg-white pl-4">
-						<h2 class="text-2xl font-semibold tracking-tight text-gray-900 text-pretty ">Resume Ejecutivo</h2>
-						<button onclick={creaReporte} class="btn btn-sm {rotaReport ? 'animate-ping':'animate-none'}">Crear uno</button>
+				<input type="radio" name="my_tabs_2" role="tab" class="tab" aria-label="Informe" checked  />
+				<div role="tabpanel" class="p-6 tab-content">
+					<div class="max-w-full pl-4 mx-auto bg-right-top bg-no-repeat lg:mx-0 rounded-xl drop-shadow-md shadow-blue-900 ">
+						<div class="flex flex-row justify-between w-full pt-2 pl-2 pr-2 rounded-lg">
+						<h2 class="text-2xl font-semibold tracking-tight text-gray-900 text-pretty ">Resume Ejecutivo: {data.tarea?.title || ''}</h2>
+						<button onclick={creaReporte} class="flex text-white flex-end btn btn-circle btn-sm bg-sky-900"><Radar class="w-6 h-6 {rotaReport ? 'animate-spin':'animate-none'}" /> </button>
+						
+					</div>
 						{#if data.tarea.resumen_ejecutiva == '' || data.tarea.resumen_ejecutiva == null}
-							<p class="mt-6 text-gray-600 text-sm sm:text-md">
+							<p class="mt-6 text-sm text-gray-600 sm:text-md">
 								En este momento no hay un resumen ejecutivo para esta tarea. ¿Deseas crear uno?
 								<button onclick={creaReporte} class="btn btn-sm {rotaReport ? 'animate-ping':'animate-none'}">Crear uno</button>
 							</p>
 						{:else}
-							<p class="p-4 mt-6 text-sm text-gray-900 font-dosis bg-white rounded-md shadow-md sm:text-lg">{@html marked(data.tarea.resumen_ejecutiva ?? '')}</p>
+							<p class="p-4 mt-6 text-sm text-gray-900 bg-white rounded-md shadow-md opacity-90 font-dosis sm:text-lg">{@html marked(data.tarea.resumen_ejecutiva ?? '')}</p>
 						{/if}
 						</div>
 				</div>
 				<input type="radio" name="my_tabs_2" role="tab" class="tab" aria-label="Resultados"  />
-				<div role="tabpanel" class="tab-content p-6">
+				<div role="tabpanel" class="p-6 tab-content">
 					<!-- Contenido del tab Resultados -->
-					<div class="mx-auto max-w-7xl lg:mx-0 bg-white pl-4">
-						<h2 class="text-2xl font-semibold tracking-tight text-gray-900 text-pretty ">Características de la Encuesta</h2>
-						<button onclick={test} class="btn btn-circle btn-sm bg-sky-900 text-white"><RotateCcw class="w-6 h-6 {rotaTest ? 'animate-spin':'animate-none'}" /> </button>
+					<div class="pl-4 mx-auto bg-white max-w-7xl lg:mx-0">
+						<div class="flex flex-row justify-between w-full pt-2 pl-2 pr-2">
+							<h2 class="text-2xl font-semibold tracking-tight text-gray-900 text-pretty ">Características de la Encuesta</h2>
+							<button onclick={test} class="flex text-white flex-end btn btn-circle btn-sm bg-sky-900"><Radar class="w-6 h-6 {rotaTest ? 'animate-spin':'animate-none'}" /> </button>
+						</div>
 						{#if data.tarea.definicion_ejecutiva == '' || data.tarea.definicion_ejecutiva == null}
-							<p class="mt-6 text-gray-600 text-sm sm:text-md">
+							<p class="mt-6 text-sm text-gray-600 sm:text-md">
 								En este momento no hay un resumen ejecutivo para esta tarea. ¿Deseas crear uno?
 								<button onclick={createSummary} class="btn btn-sm {rotaSummary ? 'animate-ping':'animate-none'}">Crear uno</button>
 							</p>
 						{:else}
-							<p class="p-4 mt-6 text-sm text-gray-900 font-dosis bg-white rounded-md shadow-md sm:text-lg">{@html marked(data.tarea.definicion_ejecutiva ?? '')}</p>
+							<p class="p-4 mt-6 text-sm text-gray-900 bg-white rounded-md shadow-md font-dosis sm:text-lg">{@html marked(data.tarea.definicion_ejecutiva ?? '')}</p>
 						{/if}
 						<div class="mt-6">
 							<div class="flex flex-row justify-between pr-3 mb-2">
-							<h2 class="text-2xl font-semibold tracking-tight text-gray-900  text-pretty">Información Obtenida</h2>
-							<button onclick={update} class="btn btn-circle btn-sm bg-sky-900 text-white"><RotateCcw class="w-6 h-6 {rotaDetailes ? 'animate-spin':'animate-none'}" /> </button>
+							<h2 class="text-2xl font-semibold tracking-tight text-gray-900 text-pretty">Información Obtenida</h2>
+							<span class="text-gray-300 text-muted-foreground">{data.empbedings.length}</span>
+							<button onclick={update} class="text-white btn btn-circle btn-sm bg-sky-900"><RotateCcw class="w-6 h-6 {rotaDetailes ? 'animate-spin':'animate-none'}" /> </button>
 							</div>
 							{#await data.respuestas}
 								<p class="mt-6 text-gray-600 text-lg/8 sm:text-base">Cargando...</p>
@@ -127,7 +143,7 @@
 					</div>
 				</div>
 				<input type="radio" name="my_tabs_2" role="tab" class="tab" aria-label="Tarea" />
-				<div role="tabpanel" class="tab-content p-6">
+				<div role="tabpanel" class="p-6 tab-content">
 					<!-- Contenido del tab Tarea -->
 					<div class="mx-auto max-w-7xl lg:mx-0">
 						<h2 class="text-3xl font-semibold tracking-tight text-gray-900 text-pretty sm:text-xl">{data.tarea.title}</h2>
