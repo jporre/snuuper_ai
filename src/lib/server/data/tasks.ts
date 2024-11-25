@@ -80,6 +80,9 @@ export async function getTaskAnswers(taskId: string): Promise<TaskAnswerType[]> 
       }
     },
     {
+      $limit: 50000
+    },
+    {
       $lookup: {
         as: "Address",
         from: "Address",

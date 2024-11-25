@@ -12,7 +12,7 @@
   const totalResponses = basicStats[0].totalResponses;
   const totalCredits = basicStats[0].totalCredits;
   const totalBonos = basicStats[0].totalBonos;
-  const averageCompletionTime = (basicStats[0].avgCompletionTime / 60).toFixed(2);
+  const averageCompletionTime = (basicStats[0].avgCompletionTime ).toFixed(2);
   const statusDistribution = stats.statusDistribution;
   const timeDistribution = stats.timeDistribution;
   const multipleChoiceStats = stats.multipleChoiceStats;
