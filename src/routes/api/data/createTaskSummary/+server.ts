@@ -1,5 +1,7 @@
-import { getActivetask, getStepDetails } from '$lib/server/data/tasks';
+import { getActivetask, getStepDetails, getTask } from '$lib/server/data/tasks';
 import { MongoDBCL } from '$lib/server/db/mongodb';
+import { MongoDBQA } from '$lib/server/db/mongodbQA';
+import { MongoDBMX } from '$lib/server/db/mongodbMX';
 import { error, redirect, type RequestHandler } from '@sveltejs/kit';
 import { env } from "$env/dynamic/private";
 import { ObjectId } from 'mongodb';
@@ -7,7 +9,7 @@ import OpenAI from "openai";
 const openai = new OpenAI({
     apiKey: env.OPENAI_API_KEY ?? '',
 });
-
+const MongoConn = MongoDBMX;
 export const POST: RequestHandler = async (event) => {
     const body = await event.request.json();
     // const userData = event.locals.user;
@@ -19,7 +21,7 @@ export const POST: RequestHandler = async (event) => {
     if (!body.taskId) { error(400, 'No taskId provided') }
 
     const tid = ObjectId.createFromHexString(body.taskId);
-    const task = await getActivetask(body.taskId);
+    const task = await getTask(body.taskId);
     if (!task) { error(404, 'Task not found') }
     const taskSteps = await getStepDetails(body.taskId);
     if (!taskSteps) { error(404, 'Task steps not found') }
@@ -64,7 +66,7 @@ export const POST: RequestHandler = async (event) => {
     // console.log(completion.usage?.total_tokens);
     const respuestaAI = completion.choices[0].message.content;
     // ahora necensito actualizar el campo definicion_ejecutiva de la coleccion Task en Mongodb
-    const updateTask = await MongoDBCL.collection('Task').updateOne({_id: tid}, {$set: {definicion_ejecutiva: respuestaAI}});
+    const updateTask = await MongoConn.collection('Task').updateOne({_id: tid}, {$set: {definicion_ejecutiva: respuestaAI}});
 
 
 

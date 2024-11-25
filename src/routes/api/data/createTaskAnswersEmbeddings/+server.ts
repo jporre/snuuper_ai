@@ -1,15 +1,16 @@
 import type { RequestHandler } from './$types';
 import { env } from "$env/dynamic/private";
 import { MongoDBCL } from '$lib/server/db/mongodb';
+import { MongoDBQA } from '$lib/server/db/mongodbQA';
+import { MongoDBMX } from '$lib/server/db/mongodbMX';
 import { ObjectId } from 'mongodb';
 import { redirect, error } from '@sveltejs/kit';
 import { getTaskAnswers } from '$lib/server/data/tasks';
-import { MongoDBQA } from '$lib/server/db/mongodbQA';
 import OpenAI from "openai";
 const openai = new OpenAI({
     apiKey: env.OPENAI_API_KEY ?? '',
 });
-
+const MongoConn = MongoDBQA;
 export const POST: RequestHandler = async (event) => {
     if (!event.locals.user) {
         return redirect(302, "/login");
@@ -25,7 +26,8 @@ export const POST: RequestHandler = async (event) => {
 
     const tid = ObjectId.createFromHexString(body.taskId);
     //console.log("🚀 ~ constPOST:RequestHandler= ~ tid:", tid);
-    const taskAnswers = await getTaskAnswers(taskId);
+    let taskAnswers = await getTaskAnswers(taskId);
+    taskAnswers = taskAnswers.slice(0, 10);
     const taskAnswersEmbeddings = await Promise.all(taskAnswers.map(async (respuesta) => {
         const fecha_respuesta = new Date(respuesta.timestamp.start);
         const daysOfWeek = ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'];
@@ -37,7 +39,7 @@ export const POST: RequestHandler = async (event) => {
         const minutes = fecha_respuesta.getUTCMinutes().toString().padStart(2, '0');
         const ampm = parseInt(hours) >= 12 ? 'PM' : 'AM';
         const formattedDate = ` ${dayName}, ${fecha_respuesta.getUTCDate()} de ${monthName} de ${fecha_respuesta.getUTCFullYear()}, a la ${hours}:${minutes} ${ampm}. Es la ${weekNumber}ª semana del año,  en el mes de ${monthName}.`;
-        let markdown = `Esta encuesta se realizó ${formattedDate}\n`; 
+        let markdown = `Esta encuesta se realizó ${formattedDate}\n`;
         if (respuesta.Address && respuesta.Address[0]) {
             markdown += `La encuesta fue realizada en *${respuesta.Address[0].nameAddress}* en la dirección: ${respuesta.Address[0].geolocation.physicalAddress},\n`;
         }
@@ -48,25 +50,25 @@ export const POST: RequestHandler = async (event) => {
         if (respuesta.stepAnswerDetails.length === 0) {
             markdown += 'No se respondió a ninguna pregunta.\n';
         } else {
-        respuesta.stepAnswerDetails.forEach((stepAnswerDetail) => {
-            const excludedTypes = ['photo', 'audio_record', 'paint', 'mapp_add_markers', 'rating'];
-            if (excludedTypes.includes(stepAnswerDetail.tipo_paso)) {
-                return;
-            }
-            if (Array.isArray(stepAnswerDetail.respuesta_texto)) {
-                markdown += `- Nº ${stepAnswerDetail.orden} de tipo: "${stepAnswerDetail.tipo_paso}" p: ${stepAnswerDetail.texto_pregunta} r:\n`;
-                stepAnswerDetail.respuesta_texto.forEach((opcionsSeleccionadas) => {
-                    markdown += `  - ${opcionsSeleccionadas?.value || opcionsSeleccionadas}\n`;
-                });
-            } else {
-                markdown += `- Nº ${stepAnswerDetail.orden} de tipo: "${stepAnswerDetail.tipo_paso}" p: ${stepAnswerDetail.texto_pregunta} r: ${stepAnswerDetail.respuesta_texto}\n`;
-            }
-        });
-    }
+            respuesta.stepAnswerDetails.forEach((stepAnswerDetail) => {
+                const excludedTypes = ['photo', 'audio_record', 'paint', 'mapp_add_markers', 'rating'];
+                if (excludedTypes.includes(stepAnswerDetail.tipo_paso)) {
+                    return;
+                }
+                if (Array.isArray(stepAnswerDetail.respuesta_texto)) {
+                    markdown += `- Nº ${stepAnswerDetail.orden} de tipo: "${stepAnswerDetail.tipo_paso}" p: ${stepAnswerDetail.texto_pregunta} r:\n`;
+                    stepAnswerDetail.respuesta_texto.forEach((opcionsSeleccionadas) => {
+                        markdown += `  - ${(opcionsSeleccionadas as any)?.value || opcionsSeleccionadas}\n`;
+                    });
+                } else {
+                    markdown += `- Nº ${stepAnswerDetail.orden} de tipo: "${stepAnswerDetail.tipo_paso}" p: ${stepAnswerDetail.texto_pregunta} r: ${stepAnswerDetail.respuesta_texto}\n`;
+                }
+            });
+        }
         const vector_array = await getVectors(markdown);
         return {
             taskId: tid,
-            taskAnswerId: ObjectId.createFromHexString(respuesta._id),
+            taskAnswerId: new ObjectId(respuesta._id),
             taskAnswers: respuesta,
             markdown: markdown,
             markdownEmbedding: vector_array.data[0].embedding
@@ -74,17 +76,17 @@ export const POST: RequestHandler = async (event) => {
     }));
     // console.log("🚀 ~ constPOST:RequestHandler= ~ taskAnswersEmbeddings:", taskAnswersEmbeddings);
     const bulkOps = taskAnswersEmbeddings.map((embedding) => {
-        const { _id, ...updateData } = embedding;
+        const { taskId, taskAnswerId, taskAnswers, markdown, markdownEmbedding } = embedding;
         return {
             updateOne: {
                 filter: { taskId: embedding.taskId, taskAnswerId: embedding.taskAnswerId },
-                update: { $set: updateData },
+                update: { $set: embedding },
                 upsert: true
             }
         };
     });
 
-    const result = await MongoDBQA.collection('ai_TaskAnswers').bulkWrite(bulkOps);
+    await MongoConn.collection('ai_TaskAnswers').bulkWrite(bulkOps);
 
     return new Response();
 };
@@ -95,7 +97,7 @@ async function getVectors(searchString: string) {
             model: "text-embedding-3-small",
             input: searchString
         });
-        console.log(searchVectors);
+        // console.log(searchVectors);
         return searchVectors;
     } catch (e: any) {
         console.error('Error fetching embeddings:', e);

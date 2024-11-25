@@ -1,10 +1,14 @@
 import { MongoDBCL } from '$lib/server/db/mongodb';
+import { MongoDBQA } from '$lib/server/db/mongodbQA';
+import { MongoDBMX } from '$lib/server/db/mongodbMX';
 import { ObjectId } from 'mongodb';
 import type { viActiveTaskType, stepsType, TaskAnswerType, DashboardStats } from '$lib/server/data/Mongotypes';
 import { error } from '@sveltejs/kit';
-import { MongoDBQA } from '../db/mongodbQA';
+
+const MongoConn = MongoDBMX;
+
 export async function getActivetasks() {
-  const task = await MongoDBCL
+  const task = await MongoConn
     .collection('Task')
     .aggregate([{
       $match: { 'constraints.status': 'active', 'subtype': 'paid' }
@@ -43,7 +47,7 @@ export async function getActivetasks() {
 }
 export async function getActivetask(taskId: string): Promise<viActiveTaskType> {
   const tid = ObjectId.createFromHexString(taskId);
-  const task = await MongoDBCL
+  const task = await MongoConn
     .collection('vi_ActiveTask').findOne({ _id: tid });
   let tarea = JSON.parse(JSON.stringify(task));
   // console.log("🚀 ~ getActivetasks ~ lista_tareas:", lista_tareas)
@@ -51,7 +55,7 @@ export async function getActivetask(taskId: string): Promise<viActiveTaskType> {
 }
 export async function getTask(taskId: string): Promise<viActiveTaskType> {
   const tid = ObjectId.createFromHexString(taskId);
-  const task = await MongoDBCL
+  const task = await MongoConn
     .collection('Task').findOne({ _id: tid });
   let tarea = JSON.parse(JSON.stringify(task));
   // console.log("🚀 ~ getActivetasks ~ lista_tareas:", lista_tareas)
@@ -59,7 +63,7 @@ export async function getTask(taskId: string): Promise<viActiveTaskType> {
 }
 export async function getStepDetails(taskId: string): Promise<stepsType[]> {
   const tid = ObjectId.createFromHexString(taskId);
-  const steps = await MongoDBCL.collection('Step')
+  const steps = await MongoConn.collection('Step')
     .find({ taskId: tid })
     .toArray();
   if (!steps) return [];
@@ -96,7 +100,7 @@ export async function getTaskAnswers(taskId: string): Promise<TaskAnswerType[]> 
       }
     }
   ]
-  const answers = await MongoDBCL.collection('TaskAnswer')
+  const answers = await MongoConn.collection('TaskAnswer')
   .aggregate(pipeline)
   .toArray();
   //console.log("🚀 ~ getTaskAnswers ~ :", answers.length);
@@ -106,7 +110,7 @@ export async function getTaskAnswers(taskId: string): Promise<TaskAnswerType[]> 
 }
 export async function getTasksAnswers(taskId: string): Promise<TaskAnswerType[]> {
   const tid = ObjectId.createFromHexString(taskId);
-  const answers = await MongoDBCL.collection('TaskAnswer')
+  const answers = await MongoConn.collection('TaskAnswer')
     .findOne({ taskId: tid });
   if (!answers) return [];
   return JSON.parse(JSON.stringify(answers));
@@ -575,7 +579,7 @@ export async function getTaskStats(taskId: string): Promise<DashboardStats> {
       }
     }
   ];
-  const result = await MongoDBCL.collection('TaskAnswer').aggregate(pipeline).toArray();
+  const result = await MongoConn.collection('TaskAnswer').aggregate(pipeline).toArray();
   const stats = result[0];
   return { estadisticas: stats };
 }
@@ -601,7 +605,7 @@ type FAQDocument = {
 };
 export async function getFAQ(): Promise<FAQDocument[]> {
   // get all elements from Faq collection
-  const faq = await MongoDBCL.collection('Faq').find().toArray();
+  const faq = await MongoConn.collection('Faq').find().toArray();
   if (!faq) return [];
   if (faq.length === 0) return [];
   return JSON.parse(JSON.stringify(faq));
@@ -681,7 +685,7 @@ export async function getTaskAnswerEmbedingsFromMongo(taskId: string) {
 }
 export async function getCompanyInfo(companyId:string) {
   const cid = ObjectId.createFromHexString(companyId);
-  const company = await MongoDBCL.collection('Company').findOne({ _id: cid });
+  const company = await MongoConn.collection('Company').findOne({ _id: cid });
   if (!company) return [];
   return JSON.parse(JSON.stringify(company));
 }

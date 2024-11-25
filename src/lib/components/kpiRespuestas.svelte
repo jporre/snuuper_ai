@@ -16,6 +16,7 @@
   const statusDistribution = stats.statusDistribution;
   const timeDistribution = stats.timeDistribution;
   const multipleChoiceStats = stats.multipleChoiceStats;
+  const SelectOneChoiceStats = stats.SelectOneChoiceStats;
   const yesNoStats = stats.yesNoStats;
   const priceListStats = stats.priceListStats;
   const scaleStats = stats.scaleStats;
@@ -94,6 +95,56 @@
       });
     });
   });
+
+  onMount(() => {
+    SelectOneChoiceStats.forEach(({ pregunta, stats }) => {
+      const ctx = document.getElementById(`${pregunta.replace(/\s+/g, '-').toLowerCase()}-pie-chart`).getContext('2d');
+      new Chart(ctx, {
+        type: 'pie',
+        data: {
+          labels: Object.keys(stats),
+          datasets: [{
+            data: Object.values(stats),
+            backgroundColor: [
+              'rgba(255, 99, 132, 0.2)',
+              'rgba(54, 162, 235, 0.2)',
+              'rgba(255, 206, 86, 0.2)',
+              'rgba(75, 192, 192, 0.2)',
+              'rgba(153, 102, 255, 0.2)',
+              'rgba(255, 159, 64, 0.2)'
+            ],
+            borderColor: [
+              'rgba(255, 99, 132, 1)',
+              'rgba(54, 162, 235, 1)',
+              'rgba(255, 206, 86, 1)',
+              'rgba(75, 192, 192, 1)',
+              'rgba(153, 102, 255, 1)',
+              'rgba(255, 159, 64, 1)'
+            ],
+            borderWidth: 1
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: {
+              position: 'top',
+            },
+            tooltip: {
+              callbacks: {
+                label: function(tooltipItem) {
+                  const total = tooltipItem.dataset.data.reduce((acc, val) => acc + val, 0);
+                  const value = tooltipItem.raw;
+                  const percentage = ((value / total) * 100).toFixed(2);
+                  return `${tooltipItem.label}: ${value} (${percentage}%)`;
+                }
+              }
+            }
+          }
+        }
+      });
+    });
+  });
 </script>
 
 <!-- KPIs Generales -->
@@ -163,6 +214,18 @@
   {/each}
 </div>
 
+<!-- Preguntas de Selección Única -->
+<div class="p-4 mt-2 bg-white rounded-lg shadow">
+  <h3 class="mb-4 text-lg font-semibold">Preguntas de Selección Única</h3>
+  <div class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-2">
+    {#each SelectOneChoiceStats as { pregunta, stats }}
+      <div class="mb-6 max-h-96 ">
+        <h4 class="mb-2 font-medium">{pregunta}</h4>
+        <canvas id="{pregunta.replace(/\s+/g, '-').toLowerCase()}-pie-chart"></canvas>
+      </div>
+    {/each}
+  </div>
+</div>
 
 <!-- Preguntas Sí/No con Barra de Porcentaje -->
 <div class="p-4 mt-2 bg-white rounded-lg shadow">

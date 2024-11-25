@@ -1,4 +1,6 @@
 import { MongoDBCL } from '$lib/server/db/mongodb'; 
+import { MongoDBQA } from '$lib/server/db/mongodbQA';
+import { MongoDBMX } from '$lib/server/db/mongodbMX';
 
 import { ObjectId } from 'mongodb';
 
@@ -7,8 +9,8 @@ export async function POST({ request: req }) {
         const params = await req.json();
 
         // Conexión a la colección Task _id: new ObjectId('66fd34542901830086cb168b'),
-        const MongoConnect = MongoDBCL;
-        const tasks = await MongoConnect.collection('Task')
+        const MongoConn = MongoDBCL;
+        const tasks = await MongoConn.collection('Task')
             .find({ 'constraints.status': 'active',  subtype: 'paid' })
             .project({ _id: 1 })
             .toArray();
@@ -21,7 +23,7 @@ export async function POST({ request: req }) {
         const groupDuplicados = await Promise.all(
             tasks.map(async (task) => {
                 const taskAnswerIdStr = task._id.toString();
-                return await getDuplicados(taskAnswerIdStr, MongoConnect);
+                return await getDuplicados(taskAnswerIdStr, MongoConn);
             })
         );
 
@@ -37,10 +39,10 @@ export async function POST({ request: req }) {
 }
 
 // Función para obtener duplicados
-async function getDuplicados(taskId: string, MongoConnect) {
+async function getDuplicados(taskId: string, MongoConn) {
     try {
         const tid = new ObjectId(taskId);
-        const TaskAnswer = await MongoConnect.collection('TaskAnswer')
+        const TaskAnswer = await MongoConn.collection('TaskAnswer')
         .aggregate([
             {
                 '$match': {
