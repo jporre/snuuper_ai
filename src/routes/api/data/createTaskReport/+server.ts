@@ -29,7 +29,7 @@ export const POST: RequestHandler = async (event) => {
     const responseStats= await getTaskStats(body.taskId)
     if (!responseStats) { error(404, 'Task stats not found') }
     const companyId = task.constraints?.companyId[0].toString() ?? '';
-    const company_info = getCompanyInfo(companyId);
+    const company_info = await getCompanyInfo(companyId);
     if (!company_info) { error(404, 'Company info not found') }
     // console.log("🚀 ~ constPOST:RequestHandler= ~ company_info:", company_info)
 
@@ -52,7 +52,7 @@ export const POST: RequestHandler = async (event) => {
     // Ahora le agrego las preguntasy/o pasos de la tarea
     textTarea += `Los pasos (preguntas e instrucciones ) de la tarea son:`;
     taskSteps.forEach((step) => {
-        textTarea += ` Numero: ${step.correlativeNumber + 1} de tipo ${step.type} con descripción ${step.instruction}`;
+        textTarea += ` Numero: ${step.correlativeNumber + 1} de tipo ${step.type} con descripción ${step.instruction[0].data}`;
         if (step.alternatives && step.alternatives.length > 0) {
             textTarea += ` y con las siguientes alternativas:`;
             step.alternatives.forEach((alternative, i) => {
@@ -68,10 +68,11 @@ const basicStats = stats.basicStats;
 const totalResponses = basicStats[0].totalResponses;
 const totalCredits = basicStats[0].totalCredits;
 const totalBonos = basicStats[0].totalBonos;
-const averageCompletionTime = (basicStats[0].avgCompletionTime / 60).toFixed(2);
+const averageCompletionTime = (basicStats[0].avgCompletionTime).toFixed(2);
 const statusDistribution = stats.statusDistribution;
 const timeDistribution = stats.timeDistribution;
 const multipleChoiceStats = stats.multipleChoiceStats;
+const SelectOneChoiceStats = stats.SelectOneChoiceStats;
 const yesNoStats = stats.yesNoStats;
 const priceListStats = stats.priceListStats;
 const scaleStats = stats.scaleStats;
@@ -85,14 +86,14 @@ KPIs GENERALES:
 - Créditos Totales: ${totalCredits}
 - Bonos Totales: ${totalBonos}
 
-DISTRIBUCIÓN POR ESTADO:
-${statusDistribution.map(status => `- ${status._id}: ${status.count} (${((status.count / totalResponses) * 100).toFixed(2)}%)`).join('\n')}
-
 DISTRIBUCIÓN HORARIA:
 ${timeDistribution.map(time => `- ${time.hour}:00 hrs: ${time.count} respuestas`).join('\n')}
 
 PREGUNTAS DE SELECCIÓN MÚLTIPLE:
 ${multipleChoiceStats.map(mc => `Pregunta: ${mc.pregunta}\nRespuestas:\n${Object.entries(mc.respuestas).map(([answer, count]) => `- ${answer}: ${count} respuestas (${(count / totalResponses * 100).toFixed(2)}%)`).join('\n')}`).join('\n\n')}
+
+PREGUNTAS DE SELECCIÓN ÚNICA:
+${SelectOneChoiceStats.map(mc => `Pregunta: ${mc.pregunta}\nRespuestas:\n${Object.entries(mc.stats).map(([answer, count]) => `- ${answer}: ${count} respuestas (${(count / totalResponses * 100).toFixed(2)}%)`).join('\n')}`).join('\n\n')}
 
 PREGUNTAS SÍ/NO:
 ${yesNoStats.map(yn => `Pregunta: ${yn.pregunta}\n- Sí: ${yn.stats.yes || 0}\n- No: ${yn.stats.no || 0}`).join('\n\n')}
@@ -105,7 +106,7 @@ ${scaleStats.length > 0 ? scaleStats.map(scale => `Pregunta: ${scale.pregunta}\n
 
 ARCHIVOS SUBIDOS:
 ${fileStats.map(file => `- ${file.pregunta}: ${file.stats.total} archivos`).join('\n')}`;
-
+//console.log(textStats);
 
     // Ahora busco respuestas con OpenAI. 
     let prompt = `Eres un analista de datos experto en experiencia de usuarios y puntos de venta, especializado en el diseño e implementación de encuestas de "Cliente Incógnito".Tu tarea es analizar diseños de encuestas, resultados de encuestas y y proporcionar informes detallados, resúmenes ejecutivos con sugerencias de mejora.Para eso se te proporcionara informacion respecto al instrumento utlizado para levantar informacion, su definición inicial, sus preguntas y opciones. Se te proporcionará información de los resultados generales de la encuesta y alguna informacion de la empresa que pidió realizar la encuesta.  Recuerda que debes revisar cuidadosamente el diseño de la encuesta. Identifica los objetivos principales, la estructura de las preguntas y las áreas de enfoque. Directrices de lenguaje y tono:    - Utiliza un lenguaje coloquial y cercano, vitando ser demasiado formal o informal    - Sé amable pero conciso en tus explicaciones    - Adapta tu lenguaje al nivel de comprensión esperado de tu audiencia, evitando jerga técnica innecesaria. 
@@ -131,6 +132,7 @@ ${fileStats.map(file => `- ${file.pregunta}: ${file.stats.total} archivos`).join
     let mensaje_usuario = [{ "role": `user`,"content": `Por Favor, prepara un Informe ejecutivo de la encuesta, considerando estos resultados ${textStats}. Es importante que el reporte debe iniciar con un breve reseña de la empresa y es importante que incluya conclusiones y análsis sin repetir las estadisticas. Esta es la informacion de la empresa mandante. tus análsis deben considerar estos datos para realizar un reporte relevante y útil ${company_info?.company_summary || ''} .` }];
     
     const conversationLog = [...mensajesIniciales, ...mensaje_usuario];
+    //console.log("Enviado a ChatGPT:", conversationLog)
 
     const completion = await openai.chat.completions.create({
         model: "gpt-4o-mini",
