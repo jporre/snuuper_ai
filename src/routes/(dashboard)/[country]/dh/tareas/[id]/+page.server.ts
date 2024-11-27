@@ -12,23 +12,24 @@ export const load = (async (event) => {
    if (!objectIdPattern.test(taskId)) {
       error(404, "TaskID no es Valido");
    }
-   const taskData = await getTask(taskId);
+   const country = event.locals.country[0];
+   const taskData = await getTask(taskId, country);
    event.depends('app:getTask');
    if (!taskData) {
       error(404, "Tarea no encontrada");
    }
-   const emb = await getTaskAnswerEmbedingsFromMongo(taskId)
+   //const emb = await getTaskAnswerEmbedingsFromMongo(taskId)
    const companyId = taskData.constraints?.companyId[0]?.toString() ?? '';
-    const company_info = await getCompanyInfo(companyId);
-    if (!company_info) { error(404, 'Company info not found') }
+  //  const company_info = await getCompanyInfo(companyId);
+  //  if (!company_info) { error(404, 'Company info not found') }
 
 
    return {
       tarea : taskData,
-      pasos: getStepDetails(taskId),
-      respuestas: getTaskStats(taskId),
+      pasos: getStepDetails(taskId, country),
+      respuestas: getTaskStats(taskId, country),
       taskId: taskId,
-      empbedings: emb,
-      company_info: company_info
+      country: country,
+      company_info: getCompanyInfo(companyId, country)
    };
 }) satisfies PageServerLoad;

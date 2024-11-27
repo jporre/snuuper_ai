@@ -9,7 +9,7 @@ import OpenAI from "openai";
 const openai = new OpenAI({
     apiKey: env.OPENAI_API_KEY ?? '',
 });
-const MongoConn = MongoDBMX;
+let MongoConn = MongoDBMX;
 export const POST: RequestHandler = async (event) => {
     const body = await event.request.json();
     // const userData = event.locals.user;
@@ -19,11 +19,13 @@ export const POST: RequestHandler = async (event) => {
     // }
     if (!body) { error(400, 'No request data') }
     if (!body.taskId) { error(400, 'No taskId provided') }
+    const country = body.country;
+        if(country === 'MX') { MongoConn = MongoDBMX;  } else  { MongoConn = MongoDBCL; }
 
     const tid = ObjectId.createFromHexString(body.taskId);
-    const task = await getTask(body.taskId);
+    const task = await getTask(body.taskId, country);
     if (!task) { error(404, 'Task not found') }
-    const taskSteps = await getStepDetails(body.taskId);
+    const taskSteps = await getStepDetails(body.taskId, country);
     if (!taskSteps) { error(404, 'Task steps not found') }
     // Obtenemos los datos mas relevantes de la tarea para pasarselo a AI.
     let textTarea = `la tarea ${task.title} de tipo ${task.type} con descripción ${task.description} y con un tiempo de finalización de ${task.constraints.completionTime} minutos`;

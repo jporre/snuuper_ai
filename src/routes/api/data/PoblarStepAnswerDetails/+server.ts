@@ -3,7 +3,7 @@ import { MongoDBQA } from '$lib/server/db/mongodbQA';
 import { MongoDBMX } from '$lib/server/db/mongodbMX';
 import { ObjectId } from 'mongodb'
 
-const MongoConn = MongoDBMX;
+let MongoConn = MongoDBCL;
 
 export async function POST({ request }) {
     try {
@@ -13,6 +13,8 @@ export async function POST({ request }) {
         }
         
         const taskId = params.taskId;
+        const country = params.country;
+        if(country === 'MX') { MongoConn = MongoDBMX;  } else  { MongoConn = MongoDBCL; }
         const tid = ObjectId.createFromHexString(taskId);
         const TaskAnswer = await MongoConn.collection('TaskAnswer')
             .find({ taskId: tid })

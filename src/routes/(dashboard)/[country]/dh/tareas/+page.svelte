@@ -91,7 +91,7 @@
 				<Input placeholder="Filtrar el Listado de Tareas Activas" class="pl-8 rounded-xl" bind:value={searchTerm} />
 				<BorderBeam size={250} duration={12} />
 			</div>
-			<div class="flex space-x-2 mt-2">
+			<div class="flex mt-2 space-x-2">
                 <select bind:value={selectedSubtype} class="select select-bordered">
                     <option value="">Filtrar por Subtipo</option>
                     {#each uniqueSubtypes as subtype}
@@ -118,22 +118,22 @@
 			<div>Cargando las tareas...</div>
 		{:then tareas}
 			{#each getPaginatedTareas(tareas) as tarea, i}
-				<div class="card shadow-xl border border-blue-600 hover:bg-slate-100 p-2">
+				<div class="p-2 border border-blue-600 shadow-xl card hover:bg-slate-100">
 					<div class="card-body">
-						<div class="card-title flex flex-row items-center justify-between pb-2 space-y-0 font-poppins">
+						<div class="flex flex-row items-center justify-between pb-2 space-y-0 card-title font-poppins">
 							<span class="text-lg">{tarea.title}</span>
 							{#if tarea.companyDetails[0]?.name}
-								<span class="badge bg-sky-900 px-3 text-white truncate text-sm py-1">{tarea.companyDetails[0]?.name}</span>
+								<span class="px-3 py-1 text-sm text-white truncate badge bg-sky-900">{tarea.companyDetails[0]?.name}</span>
 							{:else}
-								<Building class="w-6 h-6 text-white bg-sky-900 rounded-full p-1" />
+								<Building class="w-6 h-6 p-1 text-white rounded-full bg-sky-900" />
 							{/if}
 						</div>
 						<p>{@html mostrarCompleto ? tarea.description : truncarTexto(tarea.description, 200)}</p>
 					</div>
-					<div class="card-actions justify-between font-mono text-xs text-muted-foreground px-2">
+					<div class="justify-between px-2 font-mono text-xs card-actions text-muted-foreground">
 						<Time timestamp={tarea.createdAt} format="dddd @ h:mm A · MMMM D, YYYY"></Time>
-						<a href="/dh/tareas/{tarea._id}">
-							<CircleArrowOutUpRight class="w-6 h-6 p-1 text-white bg-sky-900 rounded-full hover:bg-green-200 hover:text-sky-900" />
+						<a href="tareas/{tarea._id}">
+							<CircleArrowOutUpRight class="w-6 h-6 p-1 text-white rounded-full bg-sky-900 hover:bg-green-200 hover:text-sky-900" />
 						</a>
 					</div>
 				</div>

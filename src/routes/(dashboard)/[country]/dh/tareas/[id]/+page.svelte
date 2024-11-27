@@ -4,9 +4,7 @@
 	import { marked } from 'marked';
 	import Radar from 'lucide-svelte/icons/radar';
 	import RotateCcw from 'lucide-svelte/icons/rotate-ccw';
-	import { getUserState } from '$lib/state.svelte';
 	import { invalidate } from '$app/navigation';
-	import fondo from '$lib/images/ilustracionsnupper1.webp';
 	let { data }: { data: PageData } = $props();
 	let mostrarCompleto = $state(false);
 	function truncarTexto(texto: string, limite: number) {
@@ -18,7 +16,7 @@
 		rotaDetailes = true;
 		const res = await fetch(`/api/data/PoblarStepAnswerDetails`, {
 			method: 'POST',
-			body: JSON.stringify({ taskId: data.taskId }),
+			body: JSON.stringify({ taskId: data.taskId, country: data.country }),
 			headers: {
 				'Content-Type': 'application/json'
 			}
@@ -35,7 +33,7 @@
 		rotaSummary = true;
 		const res = await fetch(`/api/data/createTaskSummary`, {
 			method: 'POST',
-			body: JSON.stringify({ taskId: data.taskId }),
+			body: JSON.stringify({ taskId: data.taskId, country: data.country }),
 			headers: {
 				'Content-Type': 'application/json'
 			}
@@ -52,7 +50,7 @@
 		//const res = await fetch(`/api/data/createTaskAnswersEmbeddings`, {
 			const res = await fetch(`/api/data/createTaskReport`, {
 			method: 'POST',
-			body: JSON.stringify({ taskId: data.taskId }),
+			body: JSON.stringify({ taskId: data.taskId, country: data.country }),
 			headers: {
 				'Content-Type': 'application/json'
 			}
@@ -70,7 +68,7 @@
 		rotaTest = true;
 		const res = await fetch(`/api/data/createTaskAnswersEmbeddings`, {
 			method: 'POST',
-			body: JSON.stringify({ taskId: data.taskId }),
+			body: JSON.stringify({ taskId: data.taskId, country: data.country }),
 			headers: {
 				'Content-Type': 'application/json'
 			}
@@ -89,7 +87,11 @@
 	<div class="flex p-1 mx-auto border-2 rounded-lg shadow-md bg-sky-50 border-sky-900">
 		<div class="flex flex-col w-full m-2 mx-auto">
 			<div class="absolute right-10 w-28">
-				<img src={`https://files.snuuper.com/${data.company_info.companyLogo}`} alt="logo empresa" class="rounded-xl"/>
+				{#await data.company_info}
+					<p class="text-gray-600 text-lg/8 sm:text-base">Cargando...</p>
+				{:then company_info}
+					<img src={`https://files.snuuper.com/${company_info.companyLogo}`} alt="logo empresa" class="rounded-xl"/>
+				{/await}
 			</div>
 			<div role="tablist" class=" tabs tabs-lifted">
 				<!-- Tab controls -->
@@ -114,8 +116,8 @@
 				<input type="radio" name="my_tabs_2" role="tab" class="tab" aria-label="Resultados"  />
 				<div role="tabpanel" class="p-6 tab-content">
 					<!-- Contenido del tab Resultados -->
-					<div class="pl-4 mx-auto bg-white max-w-7xl lg:mx-0">
-						<div class="flex flex-row justify-between w-full pt-2 pl-2 pr-2">
+					<div class="max-w-full pl-4 mx-auto bg-white lg:mx-0">
+						<div class="flex flex-row justify-between w-10/12 pt-2 pl-2 pr-2">
 							<h2 class="text-2xl font-semibold tracking-tight text-gray-900 text-pretty ">Características de la Encuesta</h2>
 							<button onclick={test} class="flex text-white flex-end btn btn-circle btn-sm bg-sky-900"><Radar class="w-6 h-6 {rotaTest ? 'animate-spin':'animate-none'}" /> </button>
 						</div>
@@ -130,13 +132,11 @@
 						<div class="mt-6">
 							<div class="flex flex-row justify-between pr-3 mb-2">
 							<h2 class="text-2xl font-semibold tracking-tight text-gray-900 text-pretty">Información Obtenida</h2>
-							<span class="text-gray-300 text-muted-foreground">{data.empbedings.length}</span>
 							<button onclick={update} class="text-white btn btn-circle btn-sm bg-sky-900"><RotateCcw class="w-6 h-6 {rotaDetailes ? 'animate-spin':'animate-none'}" /> </button>
 							</div>
 							{#await data.respuestas}
 								<p class="mt-6 text-gray-600 text-lg/8 sm:text-base">Cargando...</p>
 							{:then respuestas}
-								
 								<KpiRespuestas taskAnswers={respuestas} />
 							{/await}
 						</div>

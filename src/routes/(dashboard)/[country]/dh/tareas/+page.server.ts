@@ -8,7 +8,8 @@ export const load = (async (event) => {
 	}
   // let tarea = await getActivetasks();
   // console.log("🚀 ~ load ~ tarea:", tarea)
+   const country = event.locals.country[0];
    return {
-      tareas : await getActivetasks()
+      tareas : await getActivetasks(country)
    };
 }) satisfies PageServerLoad;

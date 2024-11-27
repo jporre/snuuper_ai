@@ -5,13 +5,20 @@ import { ObjectId } from 'mongodb';
 import type { viActiveTaskType, stepsType, TaskAnswerType, DashboardStats } from '$lib/server/data/Mongotypes';
 import { error } from '@sveltejs/kit';
 
-const MongoConn = MongoDBMX;
+let MongoConn = MongoDBCL;
 
-export async function getActivetasks() {
+
+export async function getActivetasks(country:string) {
+  if(country === 'MX') { MongoConn = MongoDBMX;  } else  { MongoConn = MongoDBCL; }
   const task = await MongoConn
     .collection('Task')
     .aggregate([{
-      $match: { 'constraints.status': 'active', 'subtype': 'paid' }
+      $match: { $or: [
+        {
+          "constraints.status": "active"},{
+          _id: new ObjectId("668eba07805cdf072a05ac1c")
+        }
+      ]}
     },
     {
       $lookup: {
@@ -45,7 +52,8 @@ export async function getActivetasks() {
   // console.log("🚀 ~ getActivetasks ~ lista_tareas:", lista_tareas)
   return lista_tareas;
 }
-export async function getActivetask(taskId: string): Promise<viActiveTaskType> {
+export async function getActivetask(taskId: string, country:string): Promise<viActiveTaskType> {
+  if(country === 'MX') { MongoConn = MongoDBMX;  } else  { MongoConn = MongoDBCL; }
   const tid = ObjectId.createFromHexString(taskId);
   const task = await MongoConn
     .collection('vi_ActiveTask').findOne({ _id: tid });
@@ -53,7 +61,8 @@ export async function getActivetask(taskId: string): Promise<viActiveTaskType> {
   // console.log("🚀 ~ getActivetasks ~ lista_tareas:", lista_tareas)
   return tarea;
 }
-export async function getTask(taskId: string): Promise<viActiveTaskType> {
+export async function getTask(taskId: string, country:string): Promise<viActiveTaskType> {
+  if(country === 'MX') { MongoConn = MongoDBMX;  } else  { MongoConn = MongoDBCL; }
   const tid = ObjectId.createFromHexString(taskId);
   const task = await MongoConn
     .collection('Task').findOne({ _id: tid });
@@ -61,7 +70,8 @@ export async function getTask(taskId: string): Promise<viActiveTaskType> {
   // console.log("🚀 ~ getActivetasks ~ lista_tareas:", lista_tareas)
   return tarea;
 }
-export async function getStepDetails(taskId: string): Promise<stepsType[]> {
+export async function getStepDetails(taskId: string, country:string): Promise<stepsType[]> {
+  if(country === 'MX') { MongoConn = MongoDBMX;  } else  { MongoConn = MongoDBCL; }
   const tid = ObjectId.createFromHexString(taskId);
   const steps = await MongoConn.collection('Step')
     .find({ taskId: tid })
@@ -71,7 +81,8 @@ export async function getStepDetails(taskId: string): Promise<stepsType[]> {
   steps.sort((a, b) => a.correlativeNumber - b.correlativeNumber);
   return JSON.parse(JSON.stringify(steps));
 }
-export async function getTaskAnswers(taskId: string): Promise<TaskAnswerType[]> {
+export async function getTaskAnswers(taskId: string, country:string): Promise<TaskAnswerType[]> {
+  if(country === 'MX') { MongoConn = MongoDBMX;  } else  { MongoConn = MongoDBCL; }
   const tid = ObjectId.createFromHexString(taskId);
   const pipeline = [
     {
@@ -111,14 +122,16 @@ export async function getTaskAnswers(taskId: string): Promise<TaskAnswerType[]> 
   if (answers.length === 0) return [];
   return JSON.parse(JSON.stringify(answers));
 }
-export async function getTasksAnswers(taskId: string): Promise<TaskAnswerType[]> {
+export async function getTasksAnswers(taskId: string, country:string): Promise<TaskAnswerType[]> {
+  if(country === 'MX') { MongoConn = MongoDBMX;  } else  { MongoConn = MongoDBCL; }
   const tid = ObjectId.createFromHexString(taskId);
   const answers = await MongoConn.collection('TaskAnswer')
     .findOne({ taskId: tid });
   if (!answers) return [];
   return JSON.parse(JSON.stringify(answers));
 }
-export async function getTaskStats(taskId: string): Promise<DashboardStats> {
+export async function getTaskStats(taskId: string, country:string): Promise<DashboardStats> {
+  if(country === 'MX') { MongoConn = MongoDBMX;  } else  { MongoConn = MongoDBCL; }
   const tid = ObjectId.createFromHexString(taskId);
   const pipeline = [
     {
@@ -606,15 +619,16 @@ type FAQDocument = {
   };
   __v: number;
 };
-export async function getFAQ(): Promise<FAQDocument[]> {
-  // get all elements from Faq collection
+export async function getFAQ(country:string): Promise<FAQDocument[]> {
+  if(country === 'MX') { MongoConn = MongoDBMX;  } else  { MongoConn = MongoDBCL; }
   const faq = await MongoConn.collection('Faq').find().toArray();
   if (!faq) return [];
   if (faq.length === 0) return [];
   return JSON.parse(JSON.stringify(faq));
 }
-export async function getStatsText(taskId: string): Promise<string> {
-  const responseStats= await getTaskStats(taskId)
+export async function getStatsText(taskId: string, country:string): Promise<string> {
+  if(country === 'MX') { MongoConn = MongoDBMX;  } else  { MongoConn = MongoDBCL; }
+  const responseStats= await getTaskStats(taskId, country)
   if (!responseStats) { error(404, 'Task stats not found') }
 
   // preparamos las estadisticas generales
@@ -686,7 +700,8 @@ export async function getTaskAnswerEmbedingsFromMongo(taskId: string) {
   if (result.length === 0) return [];
   return JSON.parse(JSON.stringify(result));
 }
-export async function getCompanyInfo(companyId:string) {
+export async function getCompanyInfo(companyId:string, country:string) {
+  if(country === 'MX') { MongoConn = MongoDBMX;  } else  { MongoConn = MongoDBCL; }
   const cid = ObjectId.createFromHexString(companyId);
   const company = await MongoConn.collection('Company').findOne({ _id: cid });
   if (!company) return [];

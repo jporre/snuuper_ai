@@ -59,7 +59,7 @@ export const POST: RequestHandler = async (event) => {
                             textTarea += ` ${i + 1}: ${alternative.value}`;
                         });
                     }
-                    prompt = agent + `Las estadisitcas generales, acumuladas de las respuestas son ${textStats} \n La tarea tiene pasos y preguntas, ${textTarea}.  \nEn base a la pregunta del usuario, estas son respuestas que puede considerar relevantes para responder: ${ragData}` ;
+                    prompt = agent + `Las estadisticas generales, acumuladas de las respuestas son ${textStats} \n La tarea tiene pasos y preguntas, ${textTarea}.  \nEn base a la pregunta del usuario, estas son respuestas que puede considerar relevantes para responder: ${ragData}` ;
                 });
                     console.log("🚀 ~ taskSteps.forEach ~ prompt:", prompt)
             }

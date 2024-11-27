@@ -94,6 +94,7 @@ export type viActiveTaskType = {
   lastStep: LastStep;
   photo: string;
   stepAlertMessage: string;
+  resumen_ejecutiva: string;
   autoMessage: AutoMessage;
   definicion_ejecutiva: string;
   addressObj: Address[];

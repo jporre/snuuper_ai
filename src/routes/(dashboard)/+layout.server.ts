@@ -3,10 +3,11 @@ import type { LayoutServerLoad } from './$types';
 
 export const load = (async (event) => {
     if (!event.locals.user) {
-
         return redirect(302, "/login");
     }
-
+    //console.log(event.locals);
+    const countryFromURI = event.params.country || 'JP';
+    event.locals.country = [countryFromURI];
     return {
         userData: { 
             firstname: event.locals.user.personalData.firstname, 
@@ -20,6 +21,7 @@ export const load = (async (event) => {
             status: event.locals.user.accountData.status,
             companyId: event.locals.user.accountData.companyId?.toString() || '',
             isCompanyAdmin: event.locals.user.accountData.isCompanyAdmin,
+            country: event.locals.country
         }
     };
 }) satisfies LayoutServerLoad;

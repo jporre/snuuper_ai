@@ -168,7 +168,7 @@
 </div>
 
 <!-- Distribución por Estado -->
-<div class="p-4 mt-2 bg-white rounded-lg shadow">
+<!-- <div class="p-4 mt-2 bg-white rounded-lg shadow">
   <h3 class="mb-4 text-lg font-semibold">Distribución por Estado</h3>
   <div class="grid grid-cols-2 gap-4 md:grid-cols-4">
     {#each statusDistribution as { _id: status, count }}
@@ -179,7 +179,7 @@
       </div>
     {/each}
   </div>
-</div>
+</div> -->
 
 <!-- Gráfico de Línea para Distribución por Hora -->
 <div class="p-4 mt-2 bg-white rounded-lg shadow">

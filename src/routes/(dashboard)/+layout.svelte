@@ -1,59 +1,35 @@
 <script lang="ts">
 	import LogoSnuuperPequeno from '$lib/images/logosnuuper.png?enhanced';
-	import IlustracionSnuuper1 from '$lib/images/ilustracionsnupper1.webp?enhanced';
 	import Escena_vertical from '$lib/images/Snuuper_Escena_Central.png';
-	import type { Snippet } from 'svelte';
-	import type { LayoutData } from './$types';
-	import { marked } from 'marked';
-	let MobileMenu = $state(false);
-	let { data, children }: { data: LayoutData; children: Snippet } = $props();
-	type ConversationType = { role: string; content: string }[];
 	import Chasing from '$lib/spinners/Chasing.svelte';
-	import { setUserState } from '$lib/state.svelte';
-	const user = setUserState(data.userData);
 	import DefaultAvatar from '$lib/images/PinMapaSnuuperAzul.png';
+	import { marked } from 'marked';
 	import { SSE } from 'sse.js';
 	import { page } from '$app/stores';
+	import type { Snippet } from 'svelte';
+	import type { LayoutData } from './$types';
+	type ConversationType = { role: string; content: string }[];
+	import { setUserState } from '$lib/state.svelte';
+	let { data, children }: { data: LayoutData; children: Snippet } = $props();
+	const user = setUserState(data.userData);
+	let MobileMenu = $state(false);
 	let userPhoto = $state('https://files.snuuper.com/' + user.picture);
-	if (user.picture == '') {
-		userPhoto = DefaultAvatar;
-	}
-	if(user.picture.startsWith('https')){
-		userPhoto = user.picture;
-	}
 	let searchText = $state('');
 	let Conversation: ConversationType = $state([]);
 	let chatDisplay = $state(false);
 	let ShowLoader = $state(false);
-	async function handleSearch_bk() {
-		chatDisplay = true;
-		ShowLoader = true;
-		let addToConversation = { role: 'user', content: searchText };
-		Conversation = [...Conversation, addToConversation];
-		const res = await fetch('./openai', {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json'
-			},
-			body: JSON.stringify({ Conversation })
-		});
-		const data = await res.json();
-		addToConversation = { role: 'assistant', content: data.content };
-		Conversation = [...Conversation, addToConversation];
-		searchText = '';
-		scrollToBottom();
-		ShowLoader = false;
-	}
 	let scrollToDiv: HTMLDivElement;
-	function scrollToBottom() {
-		setTimeout(function () {
-			scrollToDiv.scrollIntoView({ behavior: 'smooth', block: 'end', inline: 'nearest' });
-		}, 100);
-	}
 	let query = $state('');
 	let answer = $state('');
+	let userD = data.userData;
+	
+	if (user.picture == '') {
+		userPhoto = DefaultAvatar;
+	}
+	if (user.picture.startsWith('https')) {
+		userPhoto = user.picture;
+	}
 	const handleSearch = async () => {
-		console.log("hola");
 		chatDisplay = true;
 		ShowLoader = true;
 		let addToConversation = { role: 'user', content: searchText };
@@ -69,13 +45,11 @@
 		Conversation = [...Conversation, { role: 'assistant', content: '' }];
 		eventSource.addEventListener('error', handleError);
 		eventSource.addEventListener('message', (e) => {
-			// console.log(e)
 			scrollToBottom();
 			try {
 				ShowLoader = false;
 				const data = JSON.parse(e.data);
 				if (data.choices[0].finish_reason === 'stop') {
-					// End of Stream
 					answer = '';
 					return;
 				}
@@ -96,16 +70,21 @@
 		answer = '';
 		console.error(err);
 	}
+	function scrollToBottom() {
+		setTimeout(function () {
+			scrollToDiv.scrollIntoView({ behavior: 'smooth', block: 'end', inline: 'nearest' });
+		}, 100);
+	}
 </script>
 
 <svelte:head>
 	<title>Zona de Cliente</title>
 </svelte:head>
-<div class="max-w-screen" data-theme="emerald" >
+<div class="max-w-screen" data-theme="emerald">
 	<div class="z-40 md:fixed md:inset-y-0 md:min-h-screen lg:z-50 lg:flex lg:w-52 md:w-16 lg:flex-col">
 		<div class="absolute top-0 flex flex-col min-h-full px-6 pb-4 overflow-y-auto bg-gray-900 md:w-full transition transform ease-in-out {MobileMenu ? 'translate-x-0 w-full' : '-translate-x-96'} md:translate-x-0 md:px-4 gap-y-5">
 			<div class="flex items-center h-16 md:h-8 lg:h-16 md:mt-3">
-				<enhanced:img class="w-8 h-8" src={LogoSnuuperPequeno} alt="Snuuper"> </enhanced:img>
+				<enhanced:img class="w-8 h-8" src={LogoSnuuperPequeno} alt="Snuuper"></enhanced:img>
 			</div>
 			<nav class="flex flex-col flex-1 bg-top bg-no-repeat bg-cover bg-blend-multiply" style="background-image: url({Escena_vertical}); background-color: rgba(1, 1, 1, 0.8); background-blend-mode: overlay;">
 				<ul role="list" class="flex flex-col flex-1 gap-y-7">
@@ -117,15 +96,17 @@
 									<svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon">
 										<path stroke-linecap="round" stroke-linejoin="round" d="m2.25 12 8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
 									</svg>
-									<span class="md:hidden lg:inline"> Home </span>
+									<span class="md:hidden lg:inline">Home</span>
 								</a>
 								<a href="/duplicados" class="flex p-2 text-sm font-semibold leading-6 text-white bg-gray-800 rounded-md group gap-x-3">
 									<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
-										<path stroke-linecap="round" stroke-linejoin="round" d="M15.75 17.25v3.375c0 .621-.504 1.125-1.125 1.125h-9.75a1.125 1.125 0 0 1-1.125-1.125V7.875c0-.621.504-1.125 1.125-1.125H6.75a9.06 9.06 0 0 1 1.5.124m7.5 10.376h3.375c.621 0 1.125-.504 1.125-1.125V11.25c0-4.46-3.243-8.161-7.5-8.876a9.06 9.06 0 0 0-1.5-.124H9.375c-.621 0-1.125.504-1.125 1.125v3.5m7.5 10.375H9.375a1.125 1.125 0 0 1-1.125-1.125v-9.25m12 6.625v-1.875a3.375 3.375 0 0 0-3.375-3.375h-1.5a1.125 1.125 0 0 1-1.125-1.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H9.75" />
-									  </svg>									  
-									<span class="md:hidden lg:inline"> Duplicados </span>
+										<path
+											stroke-linecap="round"
+											stroke-linejoin="round"
+											d="M15.75 17.25v3.375c0 .621-.504 1.125-1.125 1.125h-9.75a1.125 1.125 0 0 1-1.125-1.125V7.875c0-.621.504-1.125 1.125-1.125H6.75a9.06 9.06 0 0 1 1.5.124m7.5 10.376h3.375c.621 0 1.125-.504 1.125-1.125V11.25c0-4.46-3.243-8.161-7.5-8.876a9.06 9.06 0 0 0-1.5-.124H9.375c-.621 0-1.125.504-1.125 1.125v3.5m7.5 10.375H9.375a1.125 1.125 0 0 1-1.125-1.125v-9.25m12 6.625v-1.875a3.375 3.375 0 0 0-3.375-3.375h-1.5a1.125 1.125 0 0 1-1.125-1.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H9.75" />
+									</svg>
+									<span class="md:hidden lg:inline">Duplicados</span>
 								</a>
-								
 							</li>
 						</ul>
 					</li>
@@ -140,8 +121,7 @@
 				class="-m-2.5 p-2.5 text-gray-700 md:hidden"
 				onclick={() => {
 					MobileMenu = !MobileMenu;
-				}}
-			>
+				}}>
 				<span class="sr-only">Open sidebar</span>
 				<svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon">
 					<path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
@@ -163,8 +143,7 @@
 						class="-m-2.5 p-2.5 text-gray-400 hover:text-gray-500"
 						onclick={() => {
 							chatDisplay = !chatDisplay;
-						}}
-					>
+						}}>
 						<span class="sr-only">View notifications</span>
 						<svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon">
 							<path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0" />
@@ -176,26 +155,19 @@
 					<div class="flex justify-end flex-1 px-2">
 						<div class="dropdown dropdown-end">
 							<div tabindex="0" role="button" class="btn btn-ghost btn-circle avatar">
-							  <div class="w-10 rounded-full">
-								<img
-								  alt="Foto del Usuario"
-								  src="{userPhoto}" />
-							  </div>
+								<div class="w-10 rounded-full">
+									<img alt="Foto del Usuario" src={userPhoto} />
+								</div>
 							</div>
-							<ul
-							  
-							  class="menu menu-sm dropdown-content bg-base-100 rounded-box z-[1] mt-3 w-52 p-2 shadow">
-							  <li>
-								<a href="/" class="justify-between">
-								  Perfil
-								</a>
-							  </li>
-							  
-							  <li><a href="/logout">Salir</a></li>
+							<ul class="menu menu-sm dropdown-content bg-base-100 rounded-box z-[1] mt-3 w-52 p-2 shadow">
+								<li>
+									<a href="/" class="justify-between">Perfil</a>
+								</li>
+
+								<li><a href="/logout">Salir</a></li>
 							</ul>
-						  </div>
-					  </div>
-					
+						</div>
+					</div>
 				</div>
 			</div>
 		</div>
@@ -213,8 +185,7 @@
 							onclick={() => {
 								chatDisplay = !chatDisplay;
 							}}
-							class="text-gray-400 bg-white rounded-md hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-						>
+							class="text-gray-400 bg-white rounded-md hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
 							<span class="sr-only">Cerrar</span>
 							<svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon">
 								<path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />

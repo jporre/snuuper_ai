@@ -26,6 +26,7 @@ export const authorization: Handle = async ({ event, resolve }) => {
 	if (!sessionId) {
 		event.locals.user = null;
 		event.locals.session = null;
+		event.locals.country = [];
 		return resolve(event);
 	}
 	const { session, user } = await lucia.validateSession(sessionId);
@@ -47,6 +48,8 @@ export const authorization: Handle = async ({ event, resolve }) => {
 	}
 	event.locals.user = user;
 	event.locals.session = session;
+	event.locals.country = ['CL'];
+	
     
 	return resolve(event);
 };
