@@ -10,6 +10,7 @@
 	import type { LayoutData } from './$types';
 	type ConversationType = { role: string; content: string }[];
 	import { setUserState } from '$lib/state.svelte';
+	import { Cl, Mx, Pe, Ar } from 'svelte-flags';
 	let { data, children }: { data: LayoutData; children: Snippet } = $props();
 	const user = setUserState(data.userData);
 	let MobileMenu = $state(false);
@@ -22,6 +23,9 @@
 	let query = $state('');
 	let answer = $state('');
 	let userD = data.userData;
+	let country = userD.country[0] || 'CL';
+
+
 	
 	if (user.picture == '') {
 		userPhoto = DefaultAvatar;
@@ -75,6 +79,11 @@
 			scrollToDiv.scrollIntoView({ behavior: 'smooth', block: 'end', inline: 'nearest' });
 		}, 100);
 	}
+	function changeCountry(newCountry: string) {
+								const url = new URL(window.location.href);
+								url.pathname = url.pathname.replace(country, newCountry);
+								window.location.href = url.toString();
+							}
 </script>
 
 <svelte:head>
@@ -92,13 +101,13 @@
 						<ul role="list" class="-mx-2 space-y-1">
 							<li>
 								<!-- Current: "bg-gray-800 text-white", Default: "text-gray-400 hover:text-white hover:bg-gray-800" -->
-								<a href="/dh/tareas" class="flex p-2 text-sm font-semibold leading-6 text-white bg-gray-800 rounded-md group gap-x-3">
+								<a href="/{country}/dh/tareas" class="flex p-2 text-sm font-semibold leading-6 text-white bg-gray-800 rounded-md group gap-x-3">
 									<svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon">
 										<path stroke-linecap="round" stroke-linejoin="round" d="m2.25 12 8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
 									</svg>
 									<span class="md:hidden lg:inline">Home</span>
 								</a>
-								<a href="/duplicados" class="flex p-2 text-sm font-semibold leading-6 text-white bg-gray-800 rounded-md group gap-x-3">
+								<a href="/{country}/duplicados" class="flex p-2 text-sm font-semibold leading-6 text-white bg-gray-800 rounded-md group gap-x-3">
 									<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
 										<path
 											stroke-linecap="round"
@@ -153,6 +162,23 @@
 					<div class="hidden lg:block lg:h-6 lg:w-px lg:bg-gray-900/10" aria-hidden="true"></div>
 					<!-- Profile dropdown -->
 					<div class="flex justify-end flex-1 px-2">
+						
+						<div class="dropdown dropdown-end">
+							<div tabindex="0" role="button" class="btn btn-ghost btn-circle">
+								{#if country === 'CL'}<Cl />{/if}
+								{#if country === 'MX'}<Mx />{/if}
+								{#if country === 'PE'}<Pe />{/if}
+								{#if country === 'AR'}<Ar />{/if}
+							</div>
+							<ul class="menu menu-sm dropdown-content bg-base-100 rounded-box z-[1] mt-3 w-52 p-2 shadow">
+								<li><button onclick={() => changeCountry('CL')}><Cl /> Chile</button></li>
+								<li><button onclick={() => changeCountry('MX')}><Mx /> Mexico</button></li>
+								<li><button onclick={() => changeCountry('PE')}><Pe /> Peru</button></li>
+								<li><button onclick={() => changeCountry('AR')}><Ar /> Argentina</button></li>
+							</ul>
+						</div>
+
+						
 						<div class="dropdown dropdown-end">
 							<div tabindex="0" role="button" class="btn btn-ghost btn-circle avatar">
 								<div class="w-10 rounded-full">

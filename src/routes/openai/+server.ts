@@ -34,7 +34,7 @@ export const POST: RequestHandler = async (event) => {
     const searchVectorsObj = await getVectors(mensaje.Conversation[mensaje.Conversation.length - 1].content);
     const searchVectors = searchVectorsObj.data[0].embedding;
 
-    if (origenConsulta.startsWith('/dh/tareas/')) {
+    if (origenConsulta.match(/^.*\/dh\/tareas\//)) {
         console.log("estoy en tareas");
         const origenConsultaArray = origenConsulta.split('/');
         const taskId = origenConsultaArray[origenConsultaArray.length - 1];
