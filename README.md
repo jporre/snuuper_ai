@@ -24,9 +24,6 @@ A partir del contenido de `package.json`, esta aplicación llamada "snuuper-inte
    - `drizzle-kit`, `drizzle-orm`, `drizzle-zod`: Drizzle ORM se encarga de la conexión y administración de bases de datos, facilitando migraciones, consultas, y tipado.
    - `mongodb`, `postgres`: Conectores para manejar datos en MongoDB y PostgreSQL, indicando que la app probablemente interactúa con estas bases de datos.
 
-### 5. **Soporte de i18n**
-   - `@inlang/paraglide-sveltekit`: Manejo de internacionalización, indicando que la app podría tener soporte multilingüe.
-
 ### 6. **Desarrollo, Testing y Estándares**
    - `prettier`, `eslint`, `typescript`: Configuraciones de linting y formateo, además del tipado estático para TypeScript.
    - `svelte-check`, `typescript-eslint`: Herramientas para garantizar calidad y consistencia en el código TypeScript.

@@ -50,7 +50,6 @@
 	"dependencies": {
 		"@fontsource-variable/dosis": "^5.1.0",
 		"@fontsource/poppins": "^5.1.0",
-		"@inlang/paraglide-sveltekit": "^0.12.1",
 		"@lucia-auth/adapter-mongodb": "^1.0.3",
 		"@sveltejs/adapter-node": "^5.2.9",
 		"ai": "^4.0.9",
