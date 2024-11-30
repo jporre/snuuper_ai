@@ -57,3 +57,4 @@ git add -A && git commit -m "$summary" && git push
 # Consideraciones para actualizar los paquetes de node
 para saber que se debe actualizar puedes correr npx ncu
 para actualizar los paquetes sin mayor cambio (estos son cambio en el tercer digito de la version semantica), puedes correr npx ncu -u -t patch 
+para actualizar los paquetes con cambio en la version menor (segundo digito de la version semantica), puedes correr npx ncu -u -t minor
