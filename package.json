@@ -52,8 +52,6 @@
 		"@fontsource/poppins": "^5.1.0",
 		"@inlang/paraglide-sveltekit": "^0.12.1",
 		"@lucia-auth/adapter-mongodb": "^1.0.3",
-		"@supabase/realtime-js": "^2.10.9",
-		"@supabase/supabase-js": "^2.46.2",
 		"@sveltejs/adapter-node": "^5.2.9",
 		"ai": "^4.0.9",
 		"chart.js": "^4.4.6",
