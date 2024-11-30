@@ -2,6 +2,7 @@ import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 import { cubicOut } from "svelte/easing";
 import type { TransitionConfig } from "svelte/transition";
+import type Time from "svelte-time/Time.svelte";
 
 export function cn(...inputs: ClassValue[]) {
 	return twMerge(clsx(inputs));
@@ -60,3 +61,15 @@ export const flyAndScale = (
 		easing: cubicOut
 	};
 };
+
+export function format_Unix_Time(unix_time: number) {
+    const date = new Date(unix_time * 1000);
+    const year = date.getFullYear();
+    const month = ("0" + (date.getMonth() + 1)).slice(-2);
+    const day = ("0" + date.getDate()).slice(-2);
+    const hours = date.getHours();
+    const minutes = "0" + date.getMinutes();
+    const seconds = "0" + date.getSeconds();
+    const formattedTime = year + '/'+ month + '/' + day + '/ ' + hours + ':' + minutes.slice(-2) + ':' + seconds.slice(-2);
+    return formattedTime;
+  }

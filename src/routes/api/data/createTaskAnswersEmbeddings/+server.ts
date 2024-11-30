@@ -19,7 +19,8 @@ export const POST: RequestHandler = async (event) => {
     const taskId = body.taskId;
     if (!/^[a-f\d]{24}$/i.test(taskId)) throw error(404, "TaskID no es Valido");
     const tid = ObjectId.createFromHexString(taskId);
-    let taskAnswers = await getTaskAnswers(taskId);
+    const country = body.country ?? 'CL';
+    let taskAnswers = await getTaskAnswers(taskId, country);
     // Procesar en chunks de 10
     const chunks = [];
     for (let i = 0; i < taskAnswers.length; i += CHUNK_SIZE) {
