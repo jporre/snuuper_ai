@@ -1,4 +1,3 @@
-import { i18n } from "$lib/i18n";
 import { lucia } from "$lib/server/db/auth";
 import { redirect, type Handle } from "@sveltejs/kit";
 import { sequence } from "@sveltejs/kit/hooks";
@@ -57,7 +56,7 @@ export const authorization: Handle = async ({ event, resolve }) => {
 export const validateSession: Handle = async ({ event, resolve }) => {
     const session = event.locals.session;
     const pathname = event.url.pathname;
-    if(!session && pathname.startsWith('/dh')) {
+    if(!session && pathname.match(/^.*\/dh\//)) {
         throw redirect(303, '/login/google');
     }
 	if(session && pathname.startsWith('/rt')) {
@@ -74,5 +73,4 @@ export const validateSession: Handle = async ({ event, resolve }) => {
 };
 
 const originalHandle = sequence(authorization, validateSession, addSecurityHeaders);
-const handleParaglide: Handle = i18n.handle();
-export const handle = sequence(originalHandle, handleParaglide);
+export const handle = sequence(originalHandle);

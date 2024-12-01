@@ -8,6 +8,7 @@ export const load = (async (event) => {
     //console.log(event.locals);
     const countryFromURI = event.params.country || 'JP';
     event.locals.country = [countryFromURI];
+    const countryCode = event.locals.country[0];
     return {
         userData: { 
             firstname: event.locals.user.personalData.firstname, 
@@ -22,6 +23,7 @@ export const load = (async (event) => {
             companyId: event.locals.user.accountData.companyId?.toString() || '',
             isCompanyAdmin: event.locals.user.accountData.isCompanyAdmin,
             country: event.locals.country
-        }
+        },
+        country: countryCode
     };
 }) satisfies LayoutServerLoad;

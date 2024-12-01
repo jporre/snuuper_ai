@@ -2,14 +2,16 @@ import { MongoDBCL } from '$lib/server/db/mongodb';
 import { MongoDBQA } from '$lib/server/db/mongodbQA';
 import { MongoDBMX } from '$lib/server/db/mongodbMX';
 
-import { ObjectId } from 'mongodb';
+import { MongoClient, ObjectId } from 'mongodb';
+let MongoConn = MongoDBCL;
 
 export async function POST({ request: req }) {
     try {
         const params = await req.json();
+        const country = params.country;
 
         // Conexión a la colección Task _id: new ObjectId('66fd34542901830086cb168b'),
-        const MongoConn = MongoDBCL;
+        if(country === 'MX') { MongoConn = MongoDBMX;  } else  { MongoConn = MongoDBCL; }
         const tasks = await MongoConn.collection('Task')
             .find({ 'constraints.status': 'active',  subtype: 'paid' })
             .project({ _id: 1 })
@@ -39,7 +41,7 @@ export async function POST({ request: req }) {
 }
 
 // Función para obtener duplicados
-async function getDuplicados(taskId: string, MongoConn) {
+async function getDuplicados(taskId: string, MongoConn: any) {
     try {
         const tid = new ObjectId(taskId);
         const TaskAnswer = await MongoConn.collection('TaskAnswer')

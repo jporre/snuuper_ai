@@ -1,10 +1,9 @@
 <script lang="ts">
-	import GridPattern from '$lib/components/GridPattern.svelte';
+
 	import LogoManager from '$lib/images/managerlogo.png?enhanced';
-	import { onMount } from 'svelte';
+
 	import fondo from '$lib/images/ilustracionsnupper1.webp';
 
-	onMount(() => {});
 </script>
 
 <div class="flex min-w-full m-2 md:float-right md:min-w-10">

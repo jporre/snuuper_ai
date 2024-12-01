@@ -11,6 +11,7 @@
 	type ConversationType = { role: string; content: string }[];
 	import { setUserState } from '$lib/state.svelte';
 	import { Cl, Mx, Pe, Ar } from 'svelte-flags';
+	import { invalidateAll } from '$app/navigation';
 	let { data, children }: { data: LayoutData; children: Snippet } = $props();
 	const user = setUserState(data.userData);
 	let MobileMenu = $state(false);
@@ -24,6 +25,7 @@
 	let answer = $state('');
 	let userD = data.userData;
 	let country = userD.country[0] || 'CL';
+	console.log("🚀 ~ country:", country)
 
 
 	
@@ -79,11 +81,18 @@
 			scrollToDiv.scrollIntoView({ behavior: 'smooth', block: 'end', inline: 'nearest' });
 		}, 100);
 	}
-	function changeCountry(newCountry: string) {
-								const url = new URL(window.location.href);
-								url.pathname = url.pathname.replace(country, newCountry);
-								window.location.href = url.toString();
-							}
+	async function changeCountry(newCountry: string) {
+		ShowLoader = true;
+		Conversation = [];
+		searchText = '';
+		query = '';
+		answer = '';
+		const url = new URL(window.location.href);
+		url.pathname = url.pathname.replace(country, newCountry);
+		window.location.href = url.toString();
+		await invalidateAll();
+		ShowLoader = false;
+	}
 </script>
 
 <svelte:head>

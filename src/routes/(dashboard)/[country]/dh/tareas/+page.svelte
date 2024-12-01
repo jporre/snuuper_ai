@@ -9,6 +9,7 @@
 	import Time, { dayjs } from 'svelte-time';
 	import 'dayjs/locale/es';
 	import { onMount } from 'svelte';
+
 	dayjs.locale('es');
 	let { data }: { data: PageData } = $props();
 	let tareas = data.tareas;
@@ -34,39 +35,50 @@
 		// Reset página cuando cambia el término de búsqueda
 		if (searchTerm) currentPage = 1;
 	});
-	function extractUniqueFilters(tareas) {
-        const subtypes = new Set();
-        const modes = new Set();
-        const companies = new Set();
-
-        tareas.forEach(tarea => {
-            if (tarea.subtype) subtypes.add(tarea.subtype);
-            if (tarea.mode) modes.add(tarea.mode);
-            if (tarea.companyDetails[0]?.name) companies.add(tarea.companyDetails[0].name);
-        });
-
-        uniqueSubtypes = Array.from(subtypes);
-        uniqueModes = Array.from(modes);
-        uniqueCompanies = Array.from(companies);
-    }
+	onMount(() => {
+		
+	//	extractUniqueFilters(tareas);
+		
+		
+	});
+	$effect(() =>{
+		extractUniqueFilters(tareas);
+	});
+	async  function extractUniqueFilters(tareas) {
+		const tt = await tareas;
+		const subtypes = new Set();
+		const modes = new Set();
+		const companies = new Set();
+		
+		tt.forEach(tarea => {
+			if (tarea.subtype) subtypes.add(tarea.subtype);
+			if (tarea.mode) modes.add(tarea.mode);
+			if (tarea.companyDetails[0]?.name) companies.add(tarea.companyDetails[0].name);
+		});
+		
+		uniqueSubtypes = Array.from(subtypes);
+		uniqueModes = Array.from(modes);
+		uniqueCompanies = Array.from(companies);
+	}
+	
 	function filterTareas(tareas) {
-        if (!tareas) return [];
-        const normalizeText = (text: string) =>
-            text
-                .normalize('NFD')
-                .replace(/[\u0300-\u036f]/g, '')
-                .toLowerCase();
-        const search = normalizeText(searchTerm);
-        return tareas.filter(tarea => {
-            const matchesSearchTerm = normalizeText(tarea.title).includes(search) ||
-                normalizeText(tarea.description).includes(search);
-            const matchesSubtype = selectedSubtype ? tarea.subtype === selectedSubtype : true;
-            const matchesMode = selectedMode ? tarea.mode === selectedMode : true;
-            const matchesCompany = selectedCompany ? tarea.companyDetails[0]?.name === selectedCompany : true;
-
-            return matchesSearchTerm && matchesSubtype && matchesMode && matchesCompany;
-        });
-    }
+		if (!tareas) return [];
+		const normalizeText = (text: string) =>
+		text
+		.normalize('NFD')
+		.replace(/[\u0300-\u036f]/g, '')
+		.toLowerCase();
+		const search = normalizeText(searchTerm);
+		return tareas.filter(tarea => {
+			const matchesSearchTerm = normalizeText(tarea.title).includes(search) ||
+			normalizeText(tarea.description).includes(search);
+			const matchesSubtype = selectedSubtype ? tarea.subtype === selectedSubtype : true;
+			const matchesMode = selectedMode ? tarea.mode === selectedMode : true;
+			const matchesCompany = selectedCompany ? tarea.companyDetails[0]?.name === selectedCompany : true;
+			
+			return matchesSearchTerm && matchesSubtype && matchesMode && matchesCompany;
+		});
+	}
 	// Función para paginar resultados
 	function getPaginatedTareas(tareas) {
 		if (!tareas) return [];
@@ -78,12 +90,13 @@
 		itemsPerPage = parseInt(event.target.value);
 		currentPage = 1; // Reset a primera página cuando cambia items por página
 	}
-	 
-		extractUniqueFilters(tareas);
 		
 
 </script>
 <div class="min-w-full min-h-screen space-y-2 columns-1">
+	{#await data.tareas}
+			<div>Cargando las tareas...</div>
+		{:then tareas}
 	<div class="bg-background/95 supports-[backdrop-filter]:bg-background/60 p-2 backdrop-blur">
 		<form>
 			<div class="relative drop-shadow-md shadow-blue-800">
@@ -114,9 +127,7 @@
 		</form>
 	</div>
 	<div class="grid min-w-full grid-cols-1 gap-1 p-1 md:grid-cols-2 lg:grid-cols-3">
-		{#await data.tareas}
-			<div>Cargando las tareas...</div>
-		{:then tareas}
+		
 			{#each getPaginatedTareas(tareas) as tarea, i}
 				<div class="p-2 border border-blue-600 shadow-xl card hover:bg-slate-100">
 					<div class="card-body">
@@ -160,8 +171,8 @@
 					</div>
 				{/if}
 			</div>
+		</div>
 		{:catch error}
 			<p>{error.message}</p>
 		{/await}
-	</div>
 </div>

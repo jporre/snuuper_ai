@@ -12,7 +12,7 @@ export const load = (async (event) => {
    if (!objectIdPattern.test(taskId)) {
       error(404, "TaskID no es Valido");
    }
-   const country = event.locals.country[0];
+   const country = event.params.country; //event.locals.country[0];
    const taskData = await getTask(taskId, country);
    event.depends('app:getTask');
    if (!taskData) {
@@ -20,6 +20,9 @@ export const load = (async (event) => {
    }
    //const emb = await getTaskAnswerEmbedingsFromMongo(taskId)
    const companyId = taskData.constraints?.companyId[0]?.toString() ?? '';
+   if (!objectIdPattern.test(taskId)) {
+      error(404, "TaskID no es Valido");
+   }
   //  const company_info = await getCompanyInfo(companyId);
   //  if (!company_info) { error(404, 'Company info not found') }
 
@@ -33,3 +36,4 @@ export const load = (async (event) => {
       company_info: getCompanyInfo(companyId, country)
    };
 }) satisfies PageServerLoad;
+  

@@ -6,10 +6,8 @@ export const load = (async (event) => {
     if (!event.locals.user) {
 		return redirect(302, "/login/google");
 	}
-  // let tarea = await getActivetasks();
-  // console.log("🚀 ~ load ~ tarea:", tarea)
-   const country = event.locals.country[0];
+   const country = event.params.country; 
    return {
-      tareas : await getActivetasks(country)
+      tareas : getActivetasks(country)
    };
 }) satisfies PageServerLoad;
