@@ -8,7 +8,7 @@ import { error } from '@sveltejs/kit';
 let MongoConn = MongoDBCL;
 
 
-export async function getActivetasks(country:string) {
+export async function getActivetasks(country:string) : Promise<viActiveTaskType[]> {
   if(country === 'MX') { MongoConn = MongoDBMX;  } else  { MongoConn = MongoDBCL; }
   const task = await MongoConn
     .collection('Task')

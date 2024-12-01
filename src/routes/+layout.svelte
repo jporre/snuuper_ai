@@ -3,7 +3,9 @@
 	import '../app.css';
 	let { children } : { children: Snippet } = $props();
 	import { env } from '$env/dynamic/public';
-	let title : string= env.PUBLIC_SITE_DESCRIPTION || 'Sitio en Desarrollo'
+	let title : string= env.PUBLIC_SITE_DESCRIPTION || 'Sitio en Desarrollo';
+
+	
 </script>
 <svelte:head>
 	<title>{env.PUBLIC_SITE_DESCRIPTION}</title>
@@ -45,4 +47,6 @@
 <div class="w-auto max-w-dvw">
 	{@render children?.()}
 </div>
+<style>
+</style>
 

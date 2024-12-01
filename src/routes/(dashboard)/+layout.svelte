@@ -11,7 +11,8 @@
 	type ConversationType = { role: string; content: string }[];
 	import { setUserState } from '$lib/state.svelte';
 	import { Cl, Mx, Pe, Ar } from 'svelte-flags';
-	import { invalidateAll } from '$app/navigation';
+	import { invalidateAll, onNavigate } from '$app/navigation';
+	import { fade, fly } from 'svelte/transition';
 	let { data, children }: { data: LayoutData; children: Snippet } = $props();
 	const user = setUserState(data.userData);
 	let MobileMenu = $state(false);
@@ -25,7 +26,18 @@
 	let answer = $state('');
 	let userD = data.userData;
 	let country = userD.country[0] || 'CL';
-	console.log("🚀 ~ country:", country)
+	
+	onNavigate((navigation) => {
+		if(document.startViewTransition) {
+		return new Promise((resolve) => {
+			document.startViewTransition &&
+			document.startViewTransition(async () => {
+				resolve();
+				await navigation.complete
+			});
+		});
+	}
+	})
 
 
 	
@@ -278,7 +290,7 @@
 </div>
 <!-- en chat -->
 <div class="z-20 min-h-screen py-3 lg:pl-52 md:pl-16 bg-slate-50">
-	<div class="z-40 min-h-full px-4 sm:px-6 lg:px-2">
+	<div class="z-40 min-h-full px-4 sm:px-6 lg:px-2" id="contenedor-de-tarea">
 		{@render children?.()}
 	</div>
 	<!-- div class="absolute top-0 z-0 flex flex-col w-screen h-screen"><enhanced:img src={IlustracionSnuuper1} class="object-cover object-center w-full min-h-screen grow opacity-15" alt="fondo-ilustrado"></enhanced:img></!-->
@@ -299,4 +311,22 @@
 		background-color: #cbd5e1;
 		border-radius: 3px;
 	}
+
+	@keyframes fade-out{
+		to {
+			opacity: 0;
+		}
+	}
+
+	@keyframes slide-from-right {
+		from {
+			transform: translateX(100%) scale(1.15);
+	box-shadow: var(--shadow-elevation-high);
+		}
+		
+	}
+	:contenedor-de-tarea::view-transition-old(root){
+		animation:  500ms ease-out both fade-out;
+	}
+	
 </style>

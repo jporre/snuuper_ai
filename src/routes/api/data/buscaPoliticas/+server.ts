@@ -66,11 +66,7 @@ async function getEmbedingsFromMongo(searchVectors: Array<number>) {
             }
           ]
         const resultados =  MongoConnect.collection('ai_politicas').aggregate(pipeline);  
-        
-        
-
         return resultados;
-
     } 
     catch (e: any) {
         console.error('Error fetching KB data:', e);
