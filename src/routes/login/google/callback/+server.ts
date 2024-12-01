@@ -44,7 +44,7 @@ export async function GET(event: RequestEvent): Promise<Response> {
             ...sessionCookie.attributes
         });
         event.locals.country = ['CL'];
-        redirect(302, '/');
+        redirect(302, '/CL/dh/tareas');
     } else if (existingUserMX && !existingUserCL) {
         const userId = existingUserMX._id;
         const session = await lucia.createSession(userId, {});
@@ -54,7 +54,7 @@ export async function GET(event: RequestEvent): Promise<Response> {
             ...sessionCookie.attributes
         });
         event.locals.country = ['MX'];
-        redirect(302, '/');
+        redirect(302, '/MX/dh/tareas');
     } else if (existingUserCL && existingUserMX) {
         const userId = existingUserCL._id;
         const session = await lucia.createSession(userId, {});
@@ -64,7 +64,7 @@ export async function GET(event: RequestEvent): Promise<Response> {
             ...sessionCookie.attributes
         });
         event.locals.country = ['CL', 'MX'];
-        redirect(302, '/');
+        redirect(302, '/CL/dh/tareas');
     } else {
         if (event.locals.session) {
             await lucia.invalidateSession(event.locals.session.id);

@@ -28,6 +28,7 @@ export const POST: RequestHandler = async (event) => {
         error(e.status, e.error.message)
     }
     const origenConsulta = mensaje.origen || 'default';
+    const country = mensaje.country;
     let ragData = ''
     let getKBData = [];
     let prompt = '';
@@ -40,12 +41,12 @@ export const POST: RequestHandler = async (event) => {
         const taskId = origenConsultaArray[origenConsultaArray.length - 1];
         const objectIdPattern = /^[a-f\d]{24}$/i;
         if (objectIdPattern.test(taskId)) {
-            const taskData = await getTask(taskId);
+            const taskData = await getTask(taskId, country);
             if (taskData) {
                 let agent = await agente_tarea({ origen: origenConsulta, promptName: 'agente_tarea', reemplazos: [{ name: "NOMBRE_USUARIO", value: userData?.personalData.firstname }, {name: "TITULO_TAREA", value: taskData.title},{name:"DEFINICION_EJECUTIVA",value: taskData.definicion_ejecutiva}] });
-                const textStats = await getStatsText(taskId);
-                const taskSteps = await getStepDetails(taskId);
-                getKBData = await getTaskAnswerEmbedingsFromMongo(taskId, searchVectors);
+                const textStats = await getStatsText(taskId, country);
+                const taskSteps = await getStepDetails(taskId, country);
+                getKBData = await getTaskAnswerEmbedingsFromMongo(taskId, searchVectors, country);
                 const resultadosBusqueda = getKBData;
                 if (resultadosBusqueda.length > 0) {
                     ragData = resultadosBusqueda.map((element: any) => element.markdown).join(' ');
@@ -142,7 +143,7 @@ async function getEmbedingsFromMongo(searchVectors: Array<number>) {
         throw error(e.status, e.message);
     }
 }
-async function getTaskAnswerEmbedingsFromMongo(taskId: string, searchVectors: Array<number>) {
+async function getTaskAnswerEmbedingsFromMongo(taskId: string, searchVectors: Array<number>, country: string) {
     const tid = ObjectId.createFromHexString(taskId);
     try {
         const MongoConnect = MongoDBQA;

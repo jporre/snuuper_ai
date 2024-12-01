@@ -25,7 +25,7 @@
 	let query = $state('');
 	let answer = $state('');
 	let userD = data.userData;
-	let country = userD.country[0] || 'CL';
+	let country = data.country;
 	
 	onNavigate((navigation) => {
 		if(document.startViewTransition) {
@@ -57,7 +57,7 @@
 			headers: {
 				'Content-Type': 'application/json'
 			},
-			payload: JSON.stringify({ Conversation, origen: origen })
+			payload: JSON.stringify({ Conversation, origen: origen, country: country })
 		});
 		query = '';
 		Conversation = [...Conversation, { role: 'assistant', content: '' }];
@@ -100,7 +100,7 @@
 		query = '';
 		answer = '';
 		const url = new URL(window.location.href);
-		url.pathname = url.pathname.replace(country, newCountry);
+		url.pathname = `/${newCountry}/dh/tareas`; //url.pathname.replace(country, newCountry);
 		window.location.href = url.toString();
 		await invalidateAll();
 		ShowLoader = false;
