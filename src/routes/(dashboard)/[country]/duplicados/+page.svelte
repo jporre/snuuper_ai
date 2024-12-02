@@ -2,8 +2,8 @@
 	import type { PageData } from "./$types";
 
     let { data }: { data: PageData} = $props();
-    const TaskData = data.td;
-    // console.log(TaskData[0]);
+    const TaskData =  data.td;
+   
    
 </script>
 {#await data.td}

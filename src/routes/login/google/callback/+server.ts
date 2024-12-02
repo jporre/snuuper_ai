@@ -28,8 +28,8 @@ export async function GET(event: RequestEvent): Promise<Response> {
         }
     });
     const googleUser: GoogleUser = await googleUserResponse.json();
-    const existingUserCL = await MongoDBCL.collection('User').findOne({ email: googleUser.email });
-    const existingUserMX = await MongoDBMX.collection('User').findOne({ email: googleUser.email });
+    const existingUserCL = await MongoDBCL.collection('User').findOne({ email: googleUser.email, 'accountData.role':'admin' });
+    const existingUserMX = await MongoDBMX.collection('User').findOne({ email: googleUser.email, 'accountData.role':'admin' });
     // El usuario podría existir en cualquiera de las dos bases de datos
     // Si existe en CL y no existe en MX se crea la sesión en CL y se declara event.locals.country como un array con un elemento CL
     // Si existe en MX y no existe en CL se crea la sesión en MX y se declara event.locals.country como un array con un elemento MX

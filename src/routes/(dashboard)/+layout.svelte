@@ -165,7 +165,7 @@
 					<svg class="absolute inset-y-0 w-5 h-full text-gray-400 pointer-events-none left-1" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true" data-slot="icon">
 						<path fill-rule="evenodd" d="M9 3.5a5.5 5.5 0 1 0 0 11 5.5 5.5 0 0 0 0-11ZM2 9a7 7 0 1 1 12.452 4.391l3.328 3.329a.75.75 0 1 1-1.06 1.06l-3.329-3.328A7 7 0 0 1 2 9Z" clip-rule="evenodd" />
 					</svg>
-					<input id="search-field" class="block w-full h-full py-0 pl-8 pr-0 text-gray-900 border-0 rounded-xl placeholder:text-gray-400 focus:ring-1 sm:text-sm" placeholder="Buscar..." type="search" name="search" autocomplete="off" bind:value={searchText} onchange={handleSearch} />
+					<input id="search-field" class="block w-full h-full py-0 pl-8 pr-0 text-gray-900 border-0 rounded-xl placeholder:text-gray-400 focus:ring-1 sm:text-sm" placeholder="Escribe aquí para conversar con tus datos !" type="search" name="search" autocomplete="off" bind:value={searchText} onchange={handleSearch} />
 				</div>
 				<div class="flex items-center gap-x-4 lg:gap-x-6">
 					<button

@@ -8,17 +8,14 @@ import { error } from '@sveltejs/kit';
 let MongoConn = MongoDBCL;
 
 
-export async function getActivetasks(country:string) : Promise<viActiveTaskType[]> {
-  if(country === 'MX') { MongoConn = MongoDBMX;  } else  { MongoConn = MongoDBCL; }
+export async function getActivetasks(country: string): Promise<viActiveTaskType[]> {
+  if (country === 'MX') { MongoConn = MongoDBMX; } else { MongoConn = MongoDBCL; }
   const task = await MongoConn
     .collection('Task')
     .aggregate([{
-      $match: { $or: [
-        {
-          "constraints.status": "active"},{
-          _id: new ObjectId("668eba07805cdf072a05ac1c")
-        }
-      ]}
+      $match: {
+        "constraints.status": "active"
+      }
     },
     {
       $lookup: {
@@ -52,8 +49,8 @@ export async function getActivetasks(country:string) : Promise<viActiveTaskType[
   // console.log("🚀 ~ getActivetasks ~ lista_tareas:", lista_tareas)
   return lista_tareas;
 }
-export async function getActivetask(taskId: string, country:string): Promise<viActiveTaskType> {
-  if(country === 'MX') { MongoConn = MongoDBMX;  } else  { MongoConn = MongoDBCL; }
+export async function getActivetask(taskId: string, country: string): Promise<viActiveTaskType> {
+  if (country === 'MX') { MongoConn = MongoDBMX; } else { MongoConn = MongoDBCL; }
   const tid = ObjectId.createFromHexString(taskId);
   const task = await MongoConn
     .collection('vi_ActiveTask').findOne({ _id: tid });
@@ -61,8 +58,8 @@ export async function getActivetask(taskId: string, country:string): Promise<viA
   // console.log("🚀 ~ getActivetasks ~ lista_tareas:", lista_tareas)
   return tarea;
 }
-export async function getTask(taskId: string, country:string): Promise<viActiveTaskType> {
-  if(country === 'MX') { MongoConn = MongoDBMX;  } else  { MongoConn = MongoDBCL; }
+export async function getTask(taskId: string, country: string): Promise<viActiveTaskType> {
+  if (country === 'MX') { MongoConn = MongoDBMX; } else { MongoConn = MongoDBCL; }
   const tid = ObjectId.createFromHexString(taskId);
   const task = await MongoConn
     .collection('Task').findOne({ _id: tid });
@@ -70,8 +67,8 @@ export async function getTask(taskId: string, country:string): Promise<viActiveT
   // console.log("🚀 ~ getActivetasks ~ lista_tareas:", lista_tareas)
   return tarea;
 }
-export async function getStepDetails(taskId: string, country:string): Promise<stepsType[]> {
-  if(country === 'MX') { MongoConn = MongoDBMX;  } else  { MongoConn = MongoDBCL; }
+export async function getStepDetails(taskId: string, country: string): Promise<stepsType[]> {
+  if (country === 'MX') { MongoConn = MongoDBMX; } else { MongoConn = MongoDBCL; }
   const tid = ObjectId.createFromHexString(taskId);
   const steps = await MongoConn.collection('Step')
     .find({ taskId: tid })
@@ -81,8 +78,8 @@ export async function getStepDetails(taskId: string, country:string): Promise<st
   steps.sort((a, b) => a.correlativeNumber - b.correlativeNumber);
   return JSON.parse(JSON.stringify(steps));
 }
-export async function getTaskAnswers(taskId: string, country:string): Promise<TaskAnswerType[]> {
-  if(country === 'MX') { MongoConn = MongoDBMX;  } else  { MongoConn = MongoDBCL; }
+export async function getTaskAnswers(taskId: string, country: string): Promise<TaskAnswerType[]> {
+  if (country === 'MX') { MongoConn = MongoDBMX; } else { MongoConn = MongoDBCL; }
   const tid = ObjectId.createFromHexString(taskId);
   const pipeline = [
     {
@@ -115,23 +112,23 @@ export async function getTaskAnswers(taskId: string, country:string): Promise<Ta
     }
   ]
   const answers = await MongoConn.collection('TaskAnswer')
-  .aggregate(pipeline)
-  .toArray();
+    .aggregate(pipeline)
+    .toArray();
   //console.log("🚀 ~ getTaskAnswers ~ :", answers.length);
   if (!answers) return [];
   if (answers.length === 0) return [];
   return JSON.parse(JSON.stringify(answers));
 }
-export async function getTasksAnswers(taskId: string, country:string): Promise<TaskAnswerType[]> {
-  if(country === 'MX') { MongoConn = MongoDBMX;  } else  { MongoConn = MongoDBCL; }
+export async function getTasksAnswers(taskId: string, country: string): Promise<TaskAnswerType[]> {
+  if (country === 'MX') { MongoConn = MongoDBMX; } else { MongoConn = MongoDBCL; }
   const tid = ObjectId.createFromHexString(taskId);
   const answers = await MongoConn.collection('TaskAnswer')
     .findOne({ taskId: tid });
   if (!answers) return [];
   return JSON.parse(JSON.stringify(answers));
 }
-export async function getTaskStats(taskId: string, country:string): Promise<DashboardStats> {
-  if(country === 'MX') { MongoConn = MongoDBMX;  } else  { MongoConn = MongoDBCL; }
+export async function getTaskStats(taskId: string, country: string): Promise<DashboardStats> {
+  if (country === 'MX') { MongoConn = MongoDBMX; } else { MongoConn = MongoDBCL; }
   const tid = ObjectId.createFromHexString(taskId);
   const pipeline = [
     {
@@ -619,34 +616,34 @@ type FAQDocument = {
   };
   __v: number;
 };
-export async function getFAQ(country:string): Promise<FAQDocument[]> {
-  if(country === 'MX') { MongoConn = MongoDBMX;  } else  { MongoConn = MongoDBCL; }
+export async function getFAQ(country: string): Promise<FAQDocument[]> {
+  if (country === 'MX') { MongoConn = MongoDBMX; } else { MongoConn = MongoDBCL; }
   const faq = await MongoConn.collection('Faq').find().toArray();
   if (!faq) return [];
   if (faq.length === 0) return [];
   return JSON.parse(JSON.stringify(faq));
 }
-export async function getStatsText(taskId: string, country:string): Promise<string> {
-  if(country === 'MX') { MongoConn = MongoDBMX;  } else  { MongoConn = MongoDBCL; }
-  const responseStats= await getTaskStats(taskId, country)
+export async function getStatsText(taskId: string, country: string): Promise<string> {
+  if (country === 'MX') { MongoConn = MongoDBMX; } else { MongoConn = MongoDBCL; }
+  const responseStats = await getTaskStats(taskId, country)
   if (!responseStats) { error(404, 'Task stats not found') }
 
   // preparamos las estadisticas generales
-const stats = responseStats.estadisticas;
-const basicStats = stats.basicStats;
-const totalResponses = basicStats[0].totalResponses;
-const totalCredits = basicStats[0].totalCredits;
-const totalBonos = basicStats[0].totalBonos;
-const averageCompletionTime = (basicStats[0].avgCompletionTime / 60).toFixed(2);
-const statusDistribution = stats.statusDistribution;
-const timeDistribution = stats.timeDistribution;
-const multipleChoiceStats = stats.multipleChoiceStats;
-const yesNoStats = stats.yesNoStats;
-const priceListStats = stats.priceListStats;
-const scaleStats = stats.scaleStats;
-const fileStats = stats.fileStats;
+  const stats = responseStats.estadisticas;
+  const basicStats = stats.basicStats;
+  const totalResponses = basicStats[0].totalResponses;
+  const totalCredits = basicStats[0].totalCredits;
+  const totalBonos = basicStats[0].totalBonos;
+  const averageCompletionTime = (basicStats[0].avgCompletionTime / 60).toFixed(2);
+  const statusDistribution = stats.statusDistribution;
+  const timeDistribution = stats.timeDistribution;
+  const multipleChoiceStats = stats.multipleChoiceStats;
+  const yesNoStats = stats.yesNoStats;
+  const priceListStats = stats.priceListStats;
+  const scaleStats = stats.scaleStats;
+  const fileStats = stats.fileStats;
 
-const textStats = `RESULTADOS ESTADÍSTICOS
+  const textStats = `RESULTADOS ESTADÍSTICOS
 
 KPIs GENERALES:
 - Total de Respuestas: ${totalResponses}
@@ -675,7 +672,7 @@ ${scaleStats.length > 0 ? scaleStats.map(scale => `Pregunta: ${scale.pregunta}\n
 ARCHIVOS SUBIDOS:
 ${fileStats.map(file => `- ${file.pregunta}: ${file.stats.total} archivos`).join('\n')}`;
 
-return textStats;
+  return textStats;
 }
 export async function getTaskAnswerEmbedingsFromMongo(taskId: string) {
   const tid = ObjectId.createFromHexString(taskId);
@@ -700,10 +697,109 @@ export async function getTaskAnswerEmbedingsFromMongo(taskId: string) {
   if (result.length === 0) return [];
   return JSON.parse(JSON.stringify(result));
 }
-export async function getCompanyInfo(companyId:string, country:string) {
-  if(country === 'MX') { MongoConn = MongoDBMX;  } else  { MongoConn = MongoDBCL; }
+export async function getCompanyInfo(companyId: string, country: string) {
+  if (country === 'MX') { MongoConn = MongoDBMX; } else { MongoConn = MongoDBCL; }
   const cid = ObjectId.createFromHexString(companyId);
   const company = await MongoConn.collection('Company').findOne({ _id: cid });
   if (!company) return [];
   return JSON.parse(JSON.stringify(company));
+}
+export async function getDuplicados(taskId: string, MongoConn: any) {
+  try {
+    const tid = new ObjectId(taskId);
+    const TaskAnswer = await MongoConn.collection('TaskAnswer')
+      .aggregate([
+        {
+          '$match': {
+            'taskId': tid,
+            'status': { '$in': ['approved', 'approved_recurrent', 'pending', 'pending_recurrent'] }
+          }
+        },
+        {
+          '$lookup': {
+            'from': 'User',  // Nombre de la colección de usuarios
+            'localField': 'userId',
+            'foreignField': '_id',
+            'as': 'userDetails'
+          }
+        },
+        {
+          '$unwind': '$userDetails'
+        },
+        // {
+        //     '$match': {
+        //         'userDetails.accountData.role': 'user'  // Filtra solo usuarios con el rol 'user'
+        //     }
+        // },
+        {
+          '$group': {
+            '_id': {
+              'taskId': '$taskId',
+              'addressId': '$addressId',
+              'userId': '$userId',
+              'timestampStart': '$timestamp.start'
+            },
+            'count': { '$sum': 1 },
+            'userDetails': {
+              '$first': {
+                'userId': '$userId',
+                'userEmail': '$userDetails.email',
+                'firstName': '$userDetails.personalData.firstname',
+                'lastName': '$userDetails.personalData.lastname',
+                'role': '$userDetails.accountData.role',
+                'status': '$status'
+              }
+            },
+            'documents': {
+              '$push': {
+                'TaskAnswerId': '$_id',
+                'status': '$status',
+                'timestampStart': { '$getField': { 'field': 'start', 'input': '$timestamp' } },
+                'timestampStop': { '$getField': { 'field': 'stop', 'input': '$timestamp' } }
+              }
+            }
+          }
+        },
+        {
+          '$match': {
+            'count': { '$gt': 1 }
+          }
+        },
+        {
+          '$project': {
+            '_id': 0,
+            'groupKey': '$_id',
+            'count': 1,
+            'userDetails': 1,
+            'documents': 1
+          }
+        },
+        {
+          '$sort': { 'count': -1 }
+        }
+      ])
+      .toArray();
+
+
+    if (!TaskAnswer || TaskAnswer.length === 0) {
+      return []; // Retorna un array vacío si no hay duplicados
+    }
+
+    // Mapear resultados a detalle duplicado
+    return TaskAnswer.map(taskAnswer => ({
+      taskId: taskAnswer.groupKey.taskId,
+      addressId: taskAnswer.groupKey.addressId,
+      userId: taskAnswer.userDetails.userId,
+      userName: `${taskAnswer.userDetails.firstName} ${taskAnswer.userDetails.lastName}`,
+      userRole: taskAnswer.userDetails.role,
+      userEmail: taskAnswer.userDetails.userEmail,
+      timestampStart: taskAnswer.groupKey.timestampStart,
+      count: taskAnswer.count,
+      documents: taskAnswer.documents
+    }));
+
+  } catch (error) {
+    console.error("Error en getDuplicados:", error);
+    throw new Error("Error al obtener duplicados"); // Lanzar error para manejo en la función principal
+  }
 }
