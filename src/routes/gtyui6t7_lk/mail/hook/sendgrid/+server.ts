@@ -1,16 +1,18 @@
 import { checkConnection, knex_pg } from "$lib/server/db/knex_pg";
 import { format_Unix_Time } from '$lib/utils';
 import type { RequestHandler } from "@sveltejs/kit";
+
 type SendGridEvent = {
     id_envio: string;
     event: string;
     timestamp: number;
     [key: string]: any;
 };
-export const POST: RequestHandler = async ({ request }) => {
+export const POST: RequestHandler = async (event) => {
     try {
-        const reqpre = await request.json();
-        // console.log("🚀 ~ POST ~ reqpre:", reqpre)
+        
+        const reqpre = await event.request.json();
+        
         const isValidConnection = await checkConnection();
 	if (!isValidConnection) {
 		return new Response('No se puede conectar a la base de datos', { status: 500 });
@@ -106,3 +108,7 @@ export const POST: RequestHandler = async ({ request }) => {
         });
     }
 }
+
+function convertPublicKeyToECDSA(publicKey) {
+    return PublicKey.fromPem(publicKey);
+  }
