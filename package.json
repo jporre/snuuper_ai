@@ -64,7 +64,6 @@
 		"pg": "^8.13.1",
 		"postgres": "^3.4.5",
 		"sse.js": "^2.5.0",
-		"starkbank-ecdsa": "^1.1.5",
 		"svelte-motion": "^0.12.2",
 		"zod": "^3.23.8"
 	}
