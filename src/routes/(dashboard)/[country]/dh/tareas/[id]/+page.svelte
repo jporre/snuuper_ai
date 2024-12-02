@@ -14,7 +14,7 @@
 	let rotaDetailes = $state(false);
 	async function update() {
 		rotaDetailes = true;
-		const res = await fetch(`/api/data/PoblarStepAnswerDetails`, {
+		const res = await fetch(`/gtyui6t7_lk/data/PoblarStepAnswerDetails`, {
 			method: 'POST',
 			body: JSON.stringify({ taskId: data.taskId, country: data.country }),
 			headers: {
@@ -31,7 +31,7 @@
 	let rotaSummary = $state(false);
 	async function createSummary() {
 		rotaSummary = true;
-		const res = await fetch(`/api/data/createTaskSummary`, {
+		const res = await fetch(`/gtyui6t7_lk/data/createTaskSummary`, {
 			method: 'POST',
 			body: JSON.stringify({ taskId: data.taskId, country: data.country }),
 			headers: {
@@ -47,8 +47,8 @@
 	let rotaReport = $state(false);
 	async function creaReporte() {
 		rotaReport = true;
-		//const res = await fetch(`/api/data/createTaskAnswersEmbeddings`, {
-			const res = await fetch(`/api/data/createTaskReport`, {
+		//const res = await fetch(`/gtyui6t7_lk/data/createTaskAnswersEmbeddings`, {
+			const res = await fetch(`/gtyui6t7_lk/data/createTaskReport`, {
 			method: 'POST',
 			body: JSON.stringify({ taskId: data.taskId, country: data.country }),
 			headers: {
@@ -66,7 +66,7 @@
 	let rotaTest = $state(false);
 	async function test() {
 		rotaTest = true;
-		const res = await fetch(`/api/data/createTaskAnswersEmbeddings`, {
+		const res = await fetch(`/gtyui6t7_lk/data/createTaskAnswersEmbeddings`, {
 			method: 'POST',
 			body: JSON.stringify({ taskId: data.taskId, country: data.country }),
 			headers: {

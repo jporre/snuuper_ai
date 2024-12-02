@@ -97,6 +97,6 @@ Performance Optimization
 Data Fetching and API Routes
 - Use load functions for server-side data fetching.
 - Implement proper error handling for data fetching operations.
-- Create API routes in the src/routes/api/ directory.
+- Create API routes in the src/routes/gtyui6t7_lk/ directory.
 - Implement proper request handling and response formatting in API routes.
 - Use SvelteKit's hooks for global API middleware.
