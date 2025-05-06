@@ -5,10 +5,12 @@
 	import Search from 'lucide-svelte/icons/search';
 	import Building from 'lucide-svelte/icons/building';
 	import CircleArrowOutUpRight from 'lucide-svelte/icons/circle-arrow-out-up-right';
+	import Ellipsis from 'lucide-svelte/icons/ellipsis';
 	import Input from '$lib/components/ui/input/input.svelte';
 	import Time, { dayjs } from 'svelte-time';
 	import 'dayjs/locale/es';
 	import { onMount } from 'svelte';
+	import { marked } from 'marked';
 
 	dayjs.locale('es');
 	let { data }: { data: PageData } = $props();
@@ -139,7 +141,15 @@
 								<Building class="w-6 h-6 p-1 text-white rounded-full bg-sky-900" />
 							{/if}
 						</div>
-						<p>{@html mostrarCompleto ? tarea.description : truncarTexto(tarea.description, 200)}</p>
+						{#if tarea.definicion_ejecutiva}
+							<p>{@html mostrarCompleto ? marked(tarea.definicion_ejecutiva) : truncarTexto(marked(tarea.definicion_ejecutiva), 200)}
+								<Ellipsis onclick={() => (mostrarCompleto = !mostrarCompleto)} class="w-6 h-6 p-1 text-white rounded-full bg-sky-900" /></p>
+							{:else}
+							<p>{@html mostrarCompleto ? tarea.description : truncarTexto(tarea.description, 200)}
+								<Ellipsis onclick={() => (mostrarCompleto = !mostrarCompleto)} class="w-6 h-6 p-1 text-white rounded-full bg-sky-900" />
+							</p>
+							{/if}
+						
 					</div>
 					<div class="justify-between px-2 font-mono text-xs card-actions text-muted-foreground">
 						<Time timestamp={tarea.createdAt} format="dddd @ h:mm A · MMMM D, YYYY"></Time>

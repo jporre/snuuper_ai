@@ -81,9 +81,9 @@ export async function POST({ request }) {
                     // case 'price_offer':
                     //     respuesta_texto = [respuesta_cruda];
                     //     break;
-                    // case 'free_question':
-                    //     respuesta_texto = [respuesta_cruda];
-                    //     break;
+                    case 'free_question':
+                        respuesta_texto = [respuesta_cruda];
+                        break;
                     case 'yes_no':
                     case 'mult_one':
                         const selectedOption = alternativas.find((alt) => alt.value === respuesta_cruda || alt._id.toString() === respuesta_cruda);

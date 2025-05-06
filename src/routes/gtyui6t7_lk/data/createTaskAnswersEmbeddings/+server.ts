@@ -11,7 +11,7 @@ const openai = new OpenAI({
     apiKey: env.OPENAI_API_KEY ?? '',
 });
 const MongoConn = MongoDBQA;
-const CHUNK_SIZE = 100;
+const CHUNK_SIZE = 10;
 export const POST: RequestHandler = async (event) => {
     if (!event.locals.user) return redirect(302, "/login");
     const body = await event.request.json();

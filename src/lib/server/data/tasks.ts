@@ -30,6 +30,7 @@ export async function getActivetasks(country: string): Promise<viActiveTaskType[
         _id: 1,
         title: 1,
         description: 1,
+        definicion_ejecutiva: 1,
         type: 1,
         subtype: 1,
         mode: 1,

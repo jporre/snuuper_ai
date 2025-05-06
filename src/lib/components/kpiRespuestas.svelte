@@ -36,6 +36,7 @@
           borderColor: 'rgba(75, 192, 192, 1)',
           backgroundColor: 'rgba(75, 192, 192, 0.2)',
           fill: true,
+          height: 200,
           tension: 0.1
         }]
       },

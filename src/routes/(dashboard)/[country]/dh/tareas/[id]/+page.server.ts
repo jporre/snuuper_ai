@@ -1,6 +1,6 @@
 import { error, redirect } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
-import { getTask, getStepDetails, getTaskStats, getTaskAnswerEmbedingsFromMongo, getCompanyInfo } from '$lib/server/data/tasks';
+import { getTask, getStepDetails, getTaskStats, getTaskAnswerEmbedingsFromMongo, getCompanyInfo, getTaskAnswers } from '$lib/server/data/tasks';
 
 export const load = (async (event) => {
     if (!event.locals.user) {
@@ -33,7 +33,8 @@ export const load = (async (event) => {
       respuestas: getTaskStats(taskId, country),
       taskId: taskId,
       country: country,
-      company_info: getCompanyInfo(companyId, country)
+      company_info: getCompanyInfo(companyId, country),
+      taskAnswers: getTaskAnswers(taskId, country)
    };
 }) satisfies PageServerLoad;
   
