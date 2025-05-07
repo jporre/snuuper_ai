@@ -1,0 +1,21 @@
+{
+    "fileManagement": "Gestión de Archivos",
+    "uploadDescription": "Sube, gestiona y organiza tus archivos en la nube con almacenamiento seguro y fácil acceso",
+    "uploadConfiguration": "Configuración de Carga",
+    "storageProvider": "Proveedor de Almacenamiento",
+    "googleStorage": "Almacenamiento de Google Cloud",
+    "s3Compatible": "Compatible con S3",
+    "bucketName": "Nombre del Bucket",
+    "bucketNamePlaceholder": "Ingresa el nombre del bucket",
+    "allowMultipleFiles": "Permitir Múltiples Archivos",
+    "maxFileSize": "Tamaño máximo de archivo",
+    "uploadFiles": "Subir Archivos",
+    "uploadedFiles": "Archivos Subidos",
+    "fileCountSingular": "1 archivo",
+    "fileCountPlural": "{count} archivos",
+    "view": "Ver",
+    "delete": "Eliminar",
+    "viewFile": "Ver {filename}",
+    "deleteFile": "Eliminar {filename}",
+    "hash": "Hash"
+  }

@@ -62,12 +62,12 @@ export const POST: RequestHandler = async (event) => {
     const textEspecificcion = task.definicion_ejecutiva || '';
 
 // preparamos las estadisticas generales
-const stats = responseStats.estadisticas;
+const stats = responseStats;
 const basicStats = stats.basicStats;
-const totalResponses = basicStats[0].totalResponses;
-const totalCredits = basicStats[0].totalCredits;
-const totalBonos = basicStats[0].totalBonos;
-const averageCompletionTime = (basicStats[0].avgCompletionTime).toFixed(2);
+const totalResponses = basicStats.totalResponses;
+const totalCredits = basicStats.totalCredits;
+const totalBonos = basicStats.totalBonos;
+const averageCompletionTime = (basicStats.avgCompletionTime).toFixed(2);
 const statusDistribution = stats.statusDistribution;
 const timeDistribution = stats.timeDistribution;
 const multipleChoiceStats = stats.multipleChoiceStats;
@@ -133,7 +133,7 @@ ${fileStats.map(file => `- ${file.pregunta}: ${file.stats.total} archivos`).join
     const conversationLog = [...mensajesIniciales, ...mensaje_usuario];
     //console.log("Enviado a ChatGPT:", conversationLog)
 
-    const completion = await openai.chat.completions.create({
+    const completion  = await openai.chat.completions.create({
         model: "gpt-4o-mini",
         messages: conversationLog,
         "temperature": 0.4

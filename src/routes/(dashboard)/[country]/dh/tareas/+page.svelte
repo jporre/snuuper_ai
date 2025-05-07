@@ -8,7 +8,7 @@
 	import Ellipsis from 'lucide-svelte/icons/ellipsis';
 	import Input from '$lib/components/ui/input/input.svelte';
 	import Time, { dayjs } from 'svelte-time';
-	import 'dayjs/locale/es';
+	//import 'dayjs/locale/es';
 	import { onMount } from 'svelte';
 	import { marked } from 'marked';
 

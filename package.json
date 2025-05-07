@@ -19,6 +19,8 @@
 		"@sveltejs/vite-plugin-svelte": "^5.0.3",
 		"@tailwindcss/forms": "^0.5.10",
 		"@tailwindcss/typography": "^0.5.16",
+		"@testing-library/jest-dom": "^6.6.3",
+		"@testing-library/svelte": "^5.2.7",
 		"@types/eslint": "^9.6.1",
 		"@types/node": "^22.15.14",
 		"arctic": "^3.6.0",
@@ -30,6 +32,7 @@
 		"eslint-config-prettier": "^10.1.2",
 		"eslint-plugin-svelte": "^3.5.1",
 		"globals": "^16.0.0",
+		"jsdom": "^26.1.0",
 		"lucia": "^3.2.2",
 		"lucide-svelte": "^0.507.0",
 		"prettier": "^3.5.3",
@@ -50,8 +53,10 @@
 	"dependencies": {
 		"@fontsource-variable/dosis": "^5.2.5",
 		"@fontsource/poppins": "^5.2.6",
+		"@inlang/paraglide-js": "^2.0.12",
 		"@lucia-auth/adapter-mongodb": "^1.0.3",
 		"@sveltejs/adapter-node": "^5.2.12",
+		"@tailwindcss/vite": "^4.1.5",
 		"ai": "^4.3.13",
 		"chart.js": "^4.4.9",
 		"flowise-sdk": "^1.0.9",
@@ -67,5 +72,10 @@
 		"svelte-motion": "^0.12.2",
 		"turndown": "^7.2.0",
 		"zod": "^3.24.4"
+	},
+	"pnpm": {
+		"onlyBuiltDependencies": [
+			"esbuild"
+		]
 	}
 }

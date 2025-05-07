@@ -1,26 +1,48 @@
 {
-	"useTabs": true,
+	"arrowParens": "avoid",
+	"bracketSpacing": true,
+	"svelteBracketNewLine": false,
+	"objectWrap": "collapse",
+	"htmlWhitespaceSensitivity": "css",
+	"insertPragma": false,
+	"jsxBracketSameLine": true,
+	"jsxSingleQuote": true,
+	"printWidth": 300,
+	"proseWrap": "always",
+	"quoteProps": "as-needed",
+	"requirePragma": false,
+	"semi": false,
 	"singleQuote": true,
-	"trailingComma": "none",
-	"printWidth": 400,
-	"bracketSameLine": true,
-	"singleAttributePerLine": false,
-	"htmlWhitespaceSensitivity": "ignore",
-	"plugins": [
-		"prettier-plugin-svelte",
-		"prettier-plugin-tailwindcss"
-	],
+	"tabWidth": 2,
+	"trailingComma": "all",
+	"useTabs": false,
+	"plugins": ["prettier-plugin-svelte", "prettier-plugin-tailwindcss"],
+	"chained_call_rule": "as-needed",
+	"breakChains": false,
 	"overrides": [
-		{
-			"files": "*.svelte",
-			"options": {
-				"parser": "svelte",
-				"svelteSortOrder": "options-scripts-markup-styles",
-				"svelteStrictMode": false,
-				"svelteBracketNewLine": false,
-				"svelteIndentScriptAndStyle": true,
-				"svelteAllowShorthand": true
-			}
+	  {
+		"files": "*.svelte",
+		"options": {
+		  "parser": "svelte"
 		}
+	  },
+	  {
+		"files": ["*.ts", "*.js"],
+		"options": {
+		  "bracketSpacing": false,
+		  "breakBeforeElse": false,
+		  "flattenTernaries": true,
+		  "printWidth": 300,
+		  "breakChains": false
+		}
+	  },
+	  {
+		"files": ["**/zod-schema.ts", "**/*.schema.ts", "**/*+page.server.ts"],
+		"options": {
+		  "printWidth": 300,
+		  "bracketSpacing": false,
+		  "breakChains": false
+		}
+	  }
 	]
-}
+  }

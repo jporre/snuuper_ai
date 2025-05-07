@@ -1,0 +1,23 @@
+{
+  "$schema": "https://inlang.com/schema/inlang-message-format",
+  "example_message": "Hello world {username}",
+  "fileManagement": "File Management",
+  "uploadDescription": "Upload, manage and organize your files in the cloud with secure storage and easy access",
+  "uploadConfiguration": "Upload Configuration",
+  "storageProvider": "Storage Provider",
+  "googleStorage": "Google Cloud Storage",
+  "s3Compatible": "S3 Compatible",
+  "bucketName": "Bucket Name",
+  "bucketNamePlaceholder": "Enter bucket name",
+  "allowMultipleFiles": "Allow Multiple Files",
+  "maxFileSize": "Max file size",
+  "uploadFiles": "Upload Files",
+  "uploadedFiles": "Uploaded Files",
+  "fileCountSingular": "1 file",
+  "fileCountPlural": "{count} files",
+  "view": "View",
+  "delete": "Delete",
+  "viewFile": "View {filename}",
+  "deleteFile": "Delete {filename}",
+  "hash": "Hash"
+}

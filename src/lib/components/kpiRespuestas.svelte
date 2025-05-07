@@ -1,18 +1,18 @@
 <script lang="ts">
-  import type { DashboardStats } from '$lib/server/data/tasks';
-  import { onMount } from 'svelte';
+  import type { DashboardStats } from '$lib/server/data/Mongotypes'
+  import { onMount } from 'svelte'
 
   let { taskAnswers } : { taskAnswers : DashboardStats } = $props();
   //console.log("🚀 ~ taskAnswers:", taskAnswers);
+ 
 
-  const stats = taskAnswers.estadisticas;
+  const stats = taskAnswers;
 //  console.log("🚀 ~ stats:", stats)
-
   const basicStats = stats.basicStats;
-  const totalResponses = basicStats[0].totalResponses;
-  const totalCredits = basicStats[0].totalCredits;
-  const totalBonos = basicStats[0].totalBonos;
-  const averageCompletionTime = (basicStats[0].avgCompletionTime ).toFixed(2);
+  const totalResponses = basicStats.totalResponses;
+  const totalCredits = basicStats.totalCredits;
+  const totalBonos = basicStats.totalBonos;
+  const averageCompletionTime = 0; //basicStats.avgCompletionTime ?? (basicStats.avgCompletionTime).toFixed(2);
   const statusDistribution = stats.statusDistribution;
   const timeDistribution = stats.timeDistribution;
   const multipleChoiceStats = stats.multipleChoiceStats;
@@ -22,85 +22,101 @@
   const scaleStats = stats.scaleStats;
   const fileStats = stats.fileStats;
 
-  import Chart from 'chart.js/auto';
+  import Chart from 'chart.js/auto'
+
 
   onMount(() => {
-    const ctx = document.getElementById('timeDistributionChart').getContext('2d');
-    new Chart(ctx, {
-      type: 'line',
-      data: {
-        labels: timeDistribution.map(({ hour }) => `${hour}:00`),
-        datasets: [{
-          label: 'Respuestas por Hora',
-          data: timeDistribution.map(({ count }) => count),
-          borderColor: 'rgba(75, 192, 192, 1)',
-          backgroundColor: 'rgba(75, 192, 192, 0.2)',
-          fill: true,
-          height: 200,
-          tension: 0.1
-        }]
-      },
-      options: {
-        responsive: true,
-        scales: {
-          x: {
-            title: {
-              display: true,
-              text: 'Hora del Día'
-            }
+    const canvasElement = document.getElementById('timeDistributionChart') as HTMLCanvasElement | null;
+    if (canvasElement) {
+      const ctx = canvasElement.getContext('2d');
+      if (ctx) {
+        new Chart(ctx, {
+          type: 'line',
+          data: {
+            labels: timeDistribution.map(({ hour }) => `${hour}:00`),
+            datasets: [{
+              label: 'Respuestas por Hora',
+              data: timeDistribution.map(({ count }) => count),
+              borderColor: 'rgba(75, 192, 192, 1)',
+              backgroundColor: 'rgba(75, 192, 192, 0.2)',
+              fill: true,
+              height: 200,
+              tension: 0.1
+            }]
           },
-          y: {
-            title: {
-              display: true,
-              text: 'Número de Respuestas'
+          options: {
+            responsive: true,
+            scales: {
+              x: {
+                title: {
+                  display: true,
+                  text: 'Hora del Día'
+                }
+              },
+              y: {
+                title: {
+                  display: true,
+                  text: 'Número de Respuestas'
+                }
+              }
             }
           }
+        });
+      }
+    }
+  });
+
+  onMount(() => {
+    multipleChoiceStats.forEach(({ pregunta, respuestas }) => {
+      const canvasId = `${pregunta.replace(/\s+/g, '-').toLowerCase()}-chart`;
+      const canvasElement = document.getElementById(canvasId) as HTMLCanvasElement | null;
+      if (canvasElement) {
+        const ctx = canvasElement.getContext('2d');
+        if (ctx) {
+          new Chart(ctx, {
+            type: 'bar',
+            data: {
+              labels: Object.keys(respuestas),
+              datasets: [{
+                label: 'Respuestas',
+                data: Object.values(respuestas),
+                backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                borderColor: 'rgba(75, 192, 192, 1)',
+                borderWidth: 1
+              }]
+            },
+            options: {
+              responsive: true,
+              scales: {
+                x: {
+                  title: {
+                    display: true,
+                    text: 'Opciones'
+                  }
+                },
+                y: {
+                  title: {
+                    display: true,
+                    text: 'Número de Respuestas'
+                  },
+                  beginAtZero: true
+                }
+              }
+            }
+          });
         }
       }
     });
   });
 
   onMount(() => {
-    multipleChoiceStats.forEach(({ pregunta, respuestas }) => {
-      const ctx = document.getElementById(`${pregunta.replace(/\s+/g, '-').toLowerCase()}-chart`).getContext('2d');
-      new Chart(ctx, {
-        type: 'bar',
-        data: {
-          labels: Object.keys(respuestas),
-          datasets: [{
-            label: 'Respuestas',
-            data: Object.values(respuestas),
-            backgroundColor: 'rgba(75, 192, 192, 0.2)',
-            borderColor: 'rgba(75, 192, 192, 1)',
-            borderWidth: 1
-          }]
-        },
-        options: {
-          responsive: true,
-          scales: {
-            x: {
-              title: {
-                display: true,
-                text: 'Opciones'
-              }
-            },
-            y: {
-              title: {
-                display: true,
-                text: 'Número de Respuestas'
-              },
-              beginAtZero: true
-            }
-          }
-        }
-      });
-    });
-  });
-
-  onMount(() => {
-    SelectOneChoiceStats.forEach(({ pregunta, stats }) => {
-      const ctx = document.getElementById(`${pregunta.replace(/\s+/g, '-').toLowerCase()}-pie-chart`).getContext('2d');
-      new Chart(ctx, {
+    SelectOneChoiceStats.forEach(({ pregunta, stats: choiceStats }) => { // Renombrado 'stats' a 'choiceStats' para evitar conflicto con la variable 'stats' externa
+      const canvasId = `${pregunta.replace(/\s+/g, '-').toLowerCase()}-pie-chart`;
+      const canvasElement = document.getElementById(canvasId) as HTMLCanvasElement | null;
+      if (canvasElement) {
+        const ctx = canvasElement.getContext('2d');
+        if (ctx) {
+          new Chart(ctx, {
         type: 'pie',
         data: {
           labels: Object.keys(stats),
@@ -135,7 +151,7 @@
               callbacks: {
                 label: function(tooltipItem) {
                   const total = tooltipItem.dataset.data.reduce((acc, val) => acc + val, 0);
-                  const value = tooltipItem.raw;
+                  const value : number = Number(tooltipItem.raw);
                   const percentage = ((value / total) * 100).toFixed(2);
                   return `${tooltipItem.label}: ${value} (${percentage}%)`;
                 }
@@ -144,6 +160,8 @@
           }
         }
       });
+    }
+  }
     });
   });
 </script>

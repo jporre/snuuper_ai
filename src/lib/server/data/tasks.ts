@@ -1,15 +1,74 @@
 import { MongoDBCL } from '$lib/server/db/mongodb';
 import { MongoDBQA } from '$lib/server/db/mongodbQA';
 import { MongoDBMX } from '$lib/server/db/mongodbMX';
-import { ObjectId } from 'mongodb';
+import { ObjectId, type Db } from 'mongodb';
 import type { viActiveTaskType, stepsType, TaskAnswerType, DashboardStats } from '$lib/server/data/Mongotypes';
 import { error } from '@sveltejs/kit';
 
-let MongoConn = MongoDBCL;
+let MongoConn: Db = MongoDBQA;
 
+type FAQDocument = {
+  _id: {
+    $oid: string;
+  };
+  value: {
+    _id: {
+      $oid: string;
+    };
+    question: string;
+    value: string;
+  }[];
+  section: string;
+  createdAt: {
+    $date: string;
+  };
+  updatedAt: {
+    $date: string;
+  };
+  __v: number;
+};
+interface DuplicadoAggregationResult {
+  groupKey: {
+    taskId: ObjectId;
+    addressId: ObjectId;
+    userId: ObjectId;
+    timestampStart: Date;
+  };
+  count: number;
+  userDetails: {
+    userId: ObjectId;
+    userEmail: string;
+    firstName: string;
+    lastName: string;
+    role: string;
+    status: string; // Este es el status de TaskAnswer, agrupado
+  };
+  documents: {
+    TaskAnswerId: ObjectId;
+    status: string;
+    timestampStart: Date;
+    timestampStop: Date;
+  }[];
+}
+export interface DuplicadoDetalle {
+  taskId: ObjectId;
+  addressId: ObjectId;
+  userId: ObjectId;
+  userName: string;
+  userRole: string;
+  userEmail: string;
+  timestampStart: Date;
+  count: number;
+  documents: {
+    TaskAnswerId: ObjectId;
+    status: string;
+    timestampStart: Date;
+    timestampStop: Date;
+  }[];
+}
 
 export async function getActivetasks(country: string): Promise<viActiveTaskType[]> {
-  if (country === 'MX') { MongoConn = MongoDBMX; } else { MongoConn = MongoDBCL; }
+  //if (country === 'MX') { MongoConn = MongoDBMX; } else { MongoConn = MongoDBCL; }
   const task = await MongoConn
     .collection('Task')
     .aggregate([{
@@ -51,7 +110,7 @@ export async function getActivetasks(country: string): Promise<viActiveTaskType[
   return lista_tareas;
 }
 export async function getActivetask(taskId: string, country: string): Promise<viActiveTaskType> {
-  if (country === 'MX') { MongoConn = MongoDBMX; } else { MongoConn = MongoDBCL; }
+ // if (country === 'MX') { MongoConn = MongoDBMX; } else { MongoConn = MongoDBCL; }
   const tid = ObjectId.createFromHexString(taskId);
   const task = await MongoConn
     .collection('vi_ActiveTask').findOne({ _id: tid });
@@ -60,7 +119,8 @@ export async function getActivetask(taskId: string, country: string): Promise<vi
   return tarea;
 }
 export async function getTask(taskId: string, country: string): Promise<viActiveTaskType> {
-  if (country === 'MX') { MongoConn = MongoDBMX; } else { MongoConn = MongoDBCL; }
+  console.log("🚀 ~ getTask ~ taskId:", taskId)
+  // { MongoConn = MongoDBMX; } else { MongoConn = MongoDBCL; }
   const tid = ObjectId.createFromHexString(taskId);
   const task = await MongoConn
     .collection('Task').findOne({ _id: tid });
@@ -69,7 +129,7 @@ export async function getTask(taskId: string, country: string): Promise<viActive
   return tarea;
 }
 export async function getStepDetails(taskId: string, country: string): Promise<stepsType[]> {
-  if (country === 'MX') { MongoConn = MongoDBMX; } else { MongoConn = MongoDBCL; }
+  // if (country === 'MX') { MongoConn = MongoDBMX; } else { MongoConn = MongoDBCL; }
   const tid = ObjectId.createFromHexString(taskId);
   const steps = await MongoConn.collection('Step')
     .find({ taskId: tid })
@@ -80,7 +140,7 @@ export async function getStepDetails(taskId: string, country: string): Promise<s
   return JSON.parse(JSON.stringify(steps));
 }
 export async function getTaskAnswers(taskId: string, country: string): Promise<TaskAnswerType[]> {
-  if (country === 'MX') { MongoConn = MongoDBMX; } else { MongoConn = MongoDBCL; }
+  // if (country === 'MX') { MongoConn = MongoDBMX; } else { MongoConn = MongoDBCL; }
   const tid = ObjectId.createFromHexString(taskId);
   const pipeline = [
     {
@@ -121,7 +181,7 @@ export async function getTaskAnswers(taskId: string, country: string): Promise<T
   return JSON.parse(JSON.stringify(answers));
 }
 export async function getTasksAnswers(taskId: string, country: string): Promise<TaskAnswerType[]> {
-  if (country === 'MX') { MongoConn = MongoDBMX; } else { MongoConn = MongoDBCL; }
+  // if (country === 'MX') { MongoConn = MongoDBMX; } else { MongoConn = MongoDBCL; }
   const tid = ObjectId.createFromHexString(taskId);
   const answers = await MongoConn.collection('TaskAnswer')
     .findOne({ taskId: tid });
@@ -129,7 +189,7 @@ export async function getTasksAnswers(taskId: string, country: string): Promise<
   return JSON.parse(JSON.stringify(answers));
 }
 export async function getTaskStats(taskId: string, country: string): Promise<DashboardStats> {
-  if (country === 'MX') { MongoConn = MongoDBMX; } else { MongoConn = MongoDBCL; }
+ // if (country === 'MX') { MongoConn = MongoDBMX; } else { MongoConn = MongoDBCL; }
   const tid = ObjectId.createFromHexString(taskId);
   const pipeline = [
     {
@@ -593,49 +653,30 @@ export async function getTaskStats(taskId: string, country: string): Promise<Das
       }
     }
   ];
-  const result = await MongoConn.collection('TaskAnswer').aggregate(pipeline).toArray();
-  const stats = result[0];
-  return { estadisticas: stats };
+  const result = await MongoConn.collection('TaskAnswer').aggregate<DashboardStats>(pipeline).toArray();
+  const stats : DashboardStats = result[0];
+  return stats ;
 }
-type FAQDocument = {
-  _id: {
-    $oid: string;
-  };
-  value: {
-    _id: {
-      $oid: string;
-    };
-    question: string;
-    value: string;
-  }[];
-  section: string;
-  createdAt: {
-    $date: string;
-  };
-  updatedAt: {
-    $date: string;
-  };
-  __v: number;
-};
+
 export async function getFAQ(country: string): Promise<FAQDocument[]> {
-  if (country === 'MX') { MongoConn = MongoDBMX; } else { MongoConn = MongoDBCL; }
+//  if (country === 'MX') { MongoConn = MongoDBMX; } else { MongoConn = MongoDBCL; }
   const faq = await MongoConn.collection('Faq').find().toArray();
   if (!faq) return [];
   if (faq.length === 0) return [];
   return JSON.parse(JSON.stringify(faq));
 }
 export async function getStatsText(taskId: string, country: string): Promise<string> {
-  if (country === 'MX') { MongoConn = MongoDBMX; } else { MongoConn = MongoDBCL; }
+//  if (country === 'MX') { MongoConn = MongoDBMX; } else { MongoConn = MongoDBCL; }
   const responseStats = await getTaskStats(taskId, country)
   if (!responseStats) { error(404, 'Task stats not found') }
 
   // preparamos las estadisticas generales
-  const stats = responseStats.estadisticas;
+  const stats = responseStats;
   const basicStats = stats.basicStats;
-  const totalResponses = basicStats[0].totalResponses;
-  const totalCredits = basicStats[0].totalCredits;
-  const totalBonos = basicStats[0].totalBonos;
-  const averageCompletionTime = (basicStats[0].avgCompletionTime / 60).toFixed(2);
+  const totalResponses = basicStats.totalResponses;
+  const totalCredits = basicStats.totalCredits;
+  const totalBonos = basicStats.totalBonos;
+  const averageCompletionTime = (basicStats.avgCompletionTime / 60).toFixed(2);
   const statusDistribution = stats.statusDistribution;
   const timeDistribution = stats.timeDistribution;
   const multipleChoiceStats = stats.multipleChoiceStats;
@@ -699,17 +740,32 @@ export async function getTaskAnswerEmbedingsFromMongo(taskId: string) {
   return JSON.parse(JSON.stringify(result));
 }
 export async function getCompanyInfo(companyId: string, country: string) {
-  if (country === 'MX') { MongoConn = MongoDBMX; } else { MongoConn = MongoDBCL; }
+  console.log("🚀 ~ getCompanyInfo ~ companyId input:", companyId); // Log the input
+
+  // Validate companyId: must be a 24-character hex string
+  if (!companyId || typeof companyId !== 'string' || !/^[0-9a-fA-F]{24}$/.test(companyId)) {
+    console.error(`Invalid companyId format: "${companyId}". Must be a 24-character hex string.`);
+    // Decide how to handle: throw an error, or return null/empty array as per your logic
+    // Throwing an error might be more appropriate to signal a bad request or data issue.
+    error(400, `Invalid company ID format: ${companyId}`); 
+    // او return null; si prefiere manejarlo así y su tipo de retorno lo permite
+  }
+
+  // if (country === 'MX') { MongoConn = MongoDBMX; } else { MongoConn = MongoDBCL; }
   const cid = ObjectId.createFromHexString(companyId);
   const company = await MongoConn.collection('Company').findOne({ _id: cid });
-  if (!company) return [];
+  
+  if (!company) {
+    // Consider returning null or a more specific error if a company is expected
+    return null; // O throw error(404, 'Company not found');
+  }
   return JSON.parse(JSON.stringify(company));
 }
-export async function getDuplicados(taskId: string, MongoConn: any) {
+export async function getDuplicados(taskId: string, currentMongoConn: Db): Promise<DuplicadoDetalle[]> {
   try {
     const tid = new ObjectId(taskId);
-    const TaskAnswer = await MongoConn.collection('TaskAnswer')
-      .aggregate([
+    const taskAnswersAggregation = await currentMongoConn.collection('TaskAnswer')
+      .aggregate<DuplicadoAggregationResult>([
         {
           '$match': {
             'taskId': tid,
@@ -718,7 +774,7 @@ export async function getDuplicados(taskId: string, MongoConn: any) {
         },
         {
           '$lookup': {
-            'from': 'User',  // Nombre de la colección de usuarios
+            'from': 'User',
             'localField': 'userId',
             'foreignField': '_id',
             'as': 'userDetails'
@@ -727,11 +783,6 @@ export async function getDuplicados(taskId: string, MongoConn: any) {
         {
           '$unwind': '$userDetails'
         },
-        // {
-        //     '$match': {
-        //         'userDetails.accountData.role': 'user'  // Filtra solo usuarios con el rol 'user'
-        //     }
-        // },
         {
           '$group': {
             '_id': {
@@ -748,7 +799,7 @@ export async function getDuplicados(taskId: string, MongoConn: any) {
                 'firstName': '$userDetails.personalData.firstname',
                 'lastName': '$userDetails.personalData.lastname',
                 'role': '$userDetails.accountData.role',
-                'status': '$status'
+                'status': '$status' // El status de la TaskAnswer agrupada
               }
             },
             'documents': {
@@ -782,15 +833,15 @@ export async function getDuplicados(taskId: string, MongoConn: any) {
       .toArray();
 
 
-    if (!TaskAnswer || TaskAnswer.length === 0) {
-      return []; // Retorna un array vacío si no hay duplicados
+    if (!taskAnswersAggregation || taskAnswersAggregation.length === 0) {
+      return [];
     }
 
-    // Mapear resultados a detalle duplicado
-    return TaskAnswer.map(taskAnswer => ({
+    // Ahora taskAnswer dentro del map estará correctamente tipado como DuplicadoAggregationResult
+    return taskAnswersAggregation.map((taskAnswer): DuplicadoDetalle => ({
       taskId: taskAnswer.groupKey.taskId,
       addressId: taskAnswer.groupKey.addressId,
-      userId: taskAnswer.userDetails.userId,
+      userId: taskAnswer.userDetails.userId, // Corregido para tomar de userDetails consistentemente
       userName: `${taskAnswer.userDetails.firstName} ${taskAnswer.userDetails.lastName}`,
       userRole: taskAnswer.userDetails.role,
       userEmail: taskAnswer.userDetails.userEmail,
@@ -799,8 +850,12 @@ export async function getDuplicados(taskId: string, MongoConn: any) {
       documents: taskAnswer.documents
     }));
 
-  } catch (error) {
-    console.error("Error en getDuplicados:", error);
-    throw new Error("Error al obtener duplicados"); // Lanzar error para manejo en la función principal
+  } catch (err) { // Cambiado 'error' a 'err' para evitar conflicto con el 'error' de SvelteKit si se usa en el mismo alcance
+    console.error("Error en getDuplicados:", err);
+    // Considerar si relanzar el error original o uno nuevo más específico
+    if (err instanceof Error) {
+        throw new Error(`Error al obtener duplicados: ${err.message}`);
+    }
+    throw new Error("Error desconocido al obtener duplicados");
   }
 }

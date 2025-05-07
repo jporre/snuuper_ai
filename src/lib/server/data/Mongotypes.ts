@@ -402,4 +402,9 @@ export type DashboardStats = {
     hour: number;
     count: number;
   }>;
+  SelectOneChoiceStats: Array<{
+    pregunta: string;
+    stats: Record<string, number>;
+  }>;
 };
+
