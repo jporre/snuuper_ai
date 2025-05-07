@@ -334,12 +334,12 @@ type DateObject = {
 type Area = { _id: ObjectId; name: string };
 
 export type DashboardStats = {
-  basicStats: {
+  basicStats: [{
     totalResponses: number;
     totalCredits: number;
     totalBonos: number;
     avgCompletionTime: number;
-  };
+  }];
   statusDistribution: Array<{ _id: string; count: number }>;
   yesNoStats: Array<{
     pregunta: string;

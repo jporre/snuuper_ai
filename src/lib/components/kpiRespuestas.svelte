@@ -7,8 +7,8 @@
  
 
   const stats = taskAnswers;
-//  console.log("🚀 ~ stats:", stats)
-  const basicStats = stats.basicStats;
+  console.log("🚀 ~ stats:", stats)
+  const basicStats = stats.basicStats[0];
   const totalResponses = basicStats.totalResponses;
   const totalCredits = basicStats.totalCredits;
   const totalBonos = basicStats.totalBonos;
@@ -22,7 +22,7 @@
   const scaleStats = stats.scaleStats;
   const fileStats = stats.fileStats;
 
-  import Chart from 'chart.js/auto'
+import Chart from 'chart.js/auto'; 
 
 
   onMount(() => {
@@ -204,19 +204,19 @@
 <div class="grid grid-cols-2 gap-1 md:grid-cols-3 lg:grid-cols-4">
   <div class="p-4 bg-white dark:bg-slate-800 rounded-lg shadow dark:shadow-slate-700">
     <h3 class="mb-2 text-lg font-semibold text-gray-700 dark:text-slate-300">Respuestas Totales</h3>
-    <p class="text-3xl font-bold text-blue-600 dark:text-sky-400">{totalResponses}</p>
+    <p class="text-3xl font-bold text-blue-600 dark:text-sky-400">{basicStats?.totalResponses || 0}</p>
   </div>
   <div class="p-4 bg-white dark:bg-slate-800 rounded-lg shadow dark:shadow-slate-700">
     <h3 class="mb-2 text-lg font-semibold text-gray-700 dark:text-slate-300">Tiempo Promedio</h3>
-    <p class="text-3xl font-bold text-green-600 dark:text-emerald-400">{averageCompletionTime} min</p>
+    <p class="text-3xl font-bold text-green-600 dark:text-emerald-400">{basicStats?.avgCompletionTime?.toFixed(2) || 0} min</p>
   </div>
   <div class="p-4 bg-white dark:bg-slate-800 rounded-lg shadow dark:shadow-slate-700">
     <h3 class="mb-2 text-lg font-semibold text-gray-700 dark:text-slate-300">Créditos Totales</h3>
-    <p class="text-3xl font-bold text-purple-600 dark:text-violet-400">${totalCredits}</p>
+    <p class="text-3xl font-bold text-purple-600 dark:text-violet-400">${basicStats?.totalCredits || 0}</p>
   </div>
   <div class="p-4 bg-white dark:bg-slate-800 rounded-lg shadow dark:shadow-slate-700">
     <h3 class="mb-2 text-lg font-semibold text-gray-700 dark:text-slate-300">Bonos Totales</h3>
-    <p class="text-3xl font-bold text-yellow-600 dark:text-amber-400">${totalBonos}</p>
+    <p class="text-3xl font-bold text-yellow-600 dark:text-amber-400">${basicStats?.totalBonos || 0}</p>
   </div>
 </div>
 

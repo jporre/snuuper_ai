@@ -5,7 +5,7 @@ import { ObjectId, type Db } from 'mongodb';
 import type { viActiveTaskType, stepsType, TaskAnswerType, DashboardStats } from '$lib/server/data/Mongotypes';
 import { error } from '@sveltejs/kit';
 
-let MongoConn: Db = MongoDBQA;
+let MongoConn: Db = MongoDBCL;
 
 type FAQDocument = {
   _id: {
