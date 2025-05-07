@@ -8,6 +8,6 @@ export const load = (async (event) => {
 	}
    const country = event.params.country; 
    return {
-      tareas : getActivetasks(country)
+      tareas :  getActivetasks(country)
    };
 }) satisfies PageServerLoad;
