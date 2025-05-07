@@ -72,6 +72,9 @@ importers:
         specifier: ^3.24.4
         version: 3.24.4
     devDependencies:
+      '@lucide/svelte':
+        specifier: ^0.507.0
+        version: 0.507.0(svelte@5.28.2)
       '@sveltejs/enhanced-img':
         specifier: ^0.5.0
         version: 0.5.0(@sveltejs/vite-plugin-svelte@5.0.3(svelte@5.28.2)(vite@6.3.5(@types/node@22.15.14)(jiti@2.4.2)(lightningcss@1.29.2)))(rollup@4.40.2)(svelte@5.28.2)(vite@6.3.5(@types/node@22.15.14)(jiti@2.4.2)(lightningcss@1.29.2))
@@ -747,6 +750,11 @@ packages:
     peerDependencies:
       lucia: 3.x
       mongodb: 4.x || 6.x
+
+  '@lucide/svelte@0.507.0':
+    resolution: {integrity: sha512-kXIg/2IHEo1bAwZG94fjA9O6+E3Sv5aQrW2yyPf4JvCYIUIF8DGLIQI4vfjoUyNq2dEX4cI33pZarzGOHr0npg==}
+    peerDependencies:
+      svelte: ^5
 
   '@mixmark-io/domino@2.2.0':
     resolution: {integrity: sha512-Y28PR25bHXUg88kCV7nivXrP2Nj2RueZ3/l/jdx6J9f8J4nsEGcgX0Qe6lt7Pa+J79+kPiJU3LguR6O/6zrLOw==}
@@ -3825,6 +3833,10 @@ snapshots:
     dependencies:
       lucia: 3.2.2
       mongodb: 6.16.0
+
+  '@lucide/svelte@0.507.0(svelte@5.28.2)':
+    dependencies:
+      svelte: 5.28.2
 
   '@mixmark-io/domino@2.2.0': {}
 

@@ -13,6 +13,7 @@
     import { onMount } from 'svelte';
     import { marked } from 'marked';
   import { ChevronLastIcon, ChevronRightCircle, ChevronRightCircleIcon } from 'lucide-svelte'
+  import Button from '$lib/components/ui/button/button.svelte'
 
     dayjs.locale('es');
     let { data }: { data: PageData } = $props();
@@ -126,6 +127,10 @@
                         <option value={company}>{company}</option>
                     {/each}
                 </select>
+                <Button class="btn btn-primary" type="button" href="/{data.country}/dh/tareas/{searchTerm}">
+                    Director a Tarea
+                    <CircleArrowOutUpRight class="w-4 h-4 p-1 mx-2 text-white rounded-full bg-sky-900 dark:bg-sky-700 hover:bg-green-500 dark:hover:bg-green-600 hover:text-sky-900 dark:hover:text-white" />
+                </Button>
             </div>
         </form>
     </div>

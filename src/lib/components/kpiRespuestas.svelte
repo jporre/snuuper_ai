@@ -24,10 +24,46 @@
 
 import Chart from 'chart.js/auto'; 
 
+// onMount(() => {
+//     const ctx = document.getElementById('timeDistributionChart').getContext('2d');
+//     new Chart(ctx, {
+//       type: 'line',
+//       data: {
+//         labels: timeDistribution.map(({ hour }) => `${hour}:00`),
+//         datasets: [{
+//           label: 'Respuestas por Hora',
+//           data: timeDistribution.map(({ count }) => count),
+//           borderColor: 'rgba(75, 192, 192, 1)',
+//           backgroundColor: 'rgba(75, 192, 192, 0.2)',
+//           fill: true,
+//           height: 200,
+//           tension: 0.1
+//         }]
+//       },
+//       options: {
+//         responsive: true,
+//         scales: {
+//           x: {
+//             title: {
+//               display: true,
+//               text: 'Hora del Día'
+//             }
+//           },
+//           y: {
+//             title: {
+//               display: true,
+//               text: 'Número de Respuestas'
+//             }
+//           }
+//         }
+//       }
+//     });
+//   });
 
   onMount(() => {
     const canvasElement = document.getElementById('timeDistributionChart') as HTMLCanvasElement | null;
     if (canvasElement) {
+      console.log("hola")
       const ctx = canvasElement.getContext('2d');
       if (ctx) {
         new Chart(ctx, {

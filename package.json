@@ -14,6 +14,7 @@
 		"test": "npm run test:unit -- --run"
 	},
 	"devDependencies": {
+		"@lucide/svelte": "^0.507.0",
 		"@sveltejs/enhanced-img": "^0.5.0",
 		"@sveltejs/kit": "^2.20.8",
 		"@sveltejs/vite-plugin-svelte": "^5.0.3",
