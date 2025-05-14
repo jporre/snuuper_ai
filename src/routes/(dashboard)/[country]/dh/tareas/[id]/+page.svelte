@@ -1,11 +1,11 @@
 <script lang="ts">
+  import { invalidate } from '$app/navigation'
   import KpiRespuestas from '$lib/components/kpiRespuestas.svelte'
-  import type { PageData } from './$types'
-  import * as Tabs from "$lib/components/ui/tabs/index.js";
-  import { marked } from 'marked'
+  import * as Tabs from "$lib/components/ui/tabs/index.js"
   import Radar from 'lucide-svelte/icons/radar'
   import RotateCcw from 'lucide-svelte/icons/rotate-ccw'
-  import { invalidate } from '$app/navigation'
+  import { marked } from 'marked'
+  import type { PageData } from './$types'
   let { data }: { data: PageData } = $props()
   let mostrarCompleto = $state(false)
   function truncarTexto(texto: string, limite: number) {
@@ -50,14 +50,26 @@
   let rotaTest = $state(false)
   async function test() {
     rotaTest = true
-    const res = await fetch(`/gtyui6t7_lk/data/createTaskAnswersEmbeddings`, { method: 'POST', body: JSON.stringify({ taskId: data.taskId, country: data.country }), headers: { 'Content-Type': 'application/json' } })
+    const res = await fetch(`/gtyui6t7_lk/data/createTaskEmbedingV2`, { method: 'POST', body: JSON.stringify({ taskId: data.taskId, country: data.country }), headers: { 'Content-Type': 'application/json' } })
     if (res.ok) {
       rotaTest = false
     } else {
       rotaTest = false
     }
   }
+  let rotaSherpa = $state(false)
+  async function createSherpa() {
+    rotaSherpa = true
+    const res = await fetch(`/gtyui6t7_lk/data/createSherpa`, { method: 'POST', body: JSON.stringify({ taskId: data.taskId, country: data.country }), headers: { 'Content-Type': 'application/json' } })
+    if (res.ok) {
+      rotaSherpa = false
+    } else {
+      rotaSherpa = false
+    }
+  }
 
+  import Button from '$lib/components/ui/button/button.svelte'
+  import { Disc3 } from 'lucide-svelte'
   import { fade } from 'svelte/transition'
 
   // Estado para controlar el modal
@@ -107,6 +119,8 @@
           <Tabs.Trigger value="resultados" class="px-4 py-2 -mb-px font-medium text-gray-500 dark:text-gray-400 border-b-2 border-transparent hover:text-sky-600 hover:border-sky-500 dark:hover:text-sky-400 dark:hover:border-sky-400 data-[state=active]:text-sky-700 data-[state=active]:border-sky-600 dark:data-[state=active]:text-sky-300 dark:data-[state=active]:border-sky-400" aria-label="Resultados">Resultados</Tabs.Trigger>
           <Tabs.Trigger value="tarea" class="px-4 py-2 -mb-px font-medium text-gray-500 dark:text-gray-400 border-b-2 border-transparent hover:text-sky-600 hover:border-sky-500 dark:hover:text-sky-400 dark:hover:border-sky-400 data-[state=active]:text-sky-700 data-[state=active]:border-sky-600 dark:data-[state=active]:text-sky-300 dark:data-[state=active]:border-sky-400" aria-label="Tarea">Tarea</Tabs.Trigger>
           <Tabs.Trigger value="respuestas" class="px-4 py-2 -mb-px font-medium text-gray-500 dark:text-gray-400 border-b-2 border-transparent hover:text-sky-600 hover:border-sky-500 dark:hover:text-sky-400 dark:hover:border-sky-400 data-[state=active]:text-sky-700 data-[state=active]:border-sky-600 dark:data-[state=active]:text-sky-300 dark:data-[state=active]:border-sky-400" aria-label="Respuestas">Respuestas</Tabs.Trigger>
+          <Tabs.Trigger value="manual" class="px-4 py-2 -mb-px font-medium text-gray-500 dark:text-gray-400 border-b-2 border-transparent hover:text-sky-600 hover:border-sky-500 dark:hover:text-sky-400 dark:hover:border-sky-400 data-[state=active]:text-sky-700 data-[state=active]:border-sky-600 dark:data-[state=active]:text-sky-300 dark:data-[state=active]:border-sky-400" aria-label="Sherpa IA">Sherpa IA</Tabs.Trigger>
+          <Tabs.Trigger value="op" class="px-4 py-2 -mb-px font-medium text-gray-500 dark:text-gray-400 border-b-2 border-transparent hover:text-sky-600 hover:border-sky-500 dark:hover:text-sky-400 dark:hover:border-sky-400 data-[state=active]:text-sky-700 data-[state=active]:border-sky-600 dark:data-[state=active]:text-sky-300 dark:data-[state=active]:border-sky-400" aria-label="Operacional">OP</Tabs.Trigger>
         </Tabs.List>
         <Tabs.Content value="informe" class="p-6">
           <div class="max-w-full pl-4 mx-auto bg-right-top bg-no-repeat lg:mx-0 rounded-xl drop-shadow-md dark:drop-shadow-lg shadow-blue-900 dark:shadow-blue-700">
@@ -206,7 +220,9 @@
             <p class="mt-6 text-gray-600 dark:text-gray-300 text-lg/8 sm:text-base">Cargando...</p>
           {:then Trespuestas}
             <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4">
+              {Trespuestas?.length}
               {#if Trespuestas[0]?.stepAnswerDetails}
+              
                 {#each Trespuestas[0].stepAnswerDetails as r}
                   {#if r.tipo_paso == 'photo' && r.respuesta_cruda}
                     <button
@@ -224,6 +240,32 @@
               {/if}
             </div>
           {/await}
+        </Tabs.Content>
+        <Tabs.Content value="manual" class="p-6">
+          <!-- Contenido del tab Manual -->
+          <div class="mx-auto max-w-7xl lg:mx-0">
+            <h2 class="text-3xl font-semibold tracking-tight text-gray-900 dark:text-gray-100 text-pretty sm:text-xl">Instrucciones al Sherpa IA</h2>
+            <p class="mt-6 text-sm text-gray-600 dark:text-gray-300 sm:text-base">Instrucciones para el análisis de la Encuesta.</p>
+            <div
+              class="p-4 mt-6 text-sm text-gray-900 bg-white rounded-md shadow-md dark:bg-slate-900 dark:text-gray-200 opacity-90 font-dosis sm:text-lg"
+             >
+             {@html marked(data.tarea.manual_ai ?? '')}
+          </div>
+        </Tabs.Content>
+        <Tabs.Content value="op" class="p-6">
+          <!-- Contenido del tab Manual -->
+          <div class="mx-auto max-w-7xl lg:mx-0">
+            <h2 class="text-3xl font-semibold tracking-tight text-gray-900 dark:text-gray-100 text-pretty sm:text-xl">Pasos de Proceso - Experimental</h2>
+            <p class="mt-6 text-sm text-gray-600 dark:text-gray-300 sm:text-base">Pasos a relizar.</p>
+            <div
+              class="p-4 mt-6 text-sm text-gray-900 bg-white rounded-md shadow-md dark:bg-slate-900 dark:text-gray-200 opacity-90 font-dosis sm:text-lg"
+             >
+             <Button onclick={update}>Poblar Step Answer Details<Disc3 class="w-8 h-8 {rotaDetailes ? 'animate-spin' : 'animate-none'}"></Disc3></Button>
+             <Button onclick={createSummary}>Crear Resumen <Disc3 class="w-8 h-8 {rotaSummary ? 'animate-spin' : 'animate-none'}"></Disc3></Button>
+             <Button onclick={creaReporte}>Crear Reporte <Disc3 class="w-8 h-8 {rotaReport ? 'animate-spin' : 'animate-none'}"></Disc3></Button>
+             <Button onclick={test}>Crear Embeddings <Disc3 class="w-8 h-8 {rotaTest ? 'animate-spin' : 'animate-none'}"></Disc3></Button>
+             <Button onclick={createSherpa}>Crear Sherpa <Disc3 class="w-8 h-8 {rotaSherpa ? 'animate-spin' : 'animate-none'}"></Disc3></Button>
+          </div>
         </Tabs.Content>
       </Tabs.Root>
     </div>

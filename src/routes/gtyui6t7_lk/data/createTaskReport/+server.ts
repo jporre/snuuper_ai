@@ -59,15 +59,16 @@ export const POST: RequestHandler = async (event) => {
             });
         }
     });
-    const textEspecificcion = task.definicion_ejecutiva || '';
+    const textEspecificcion = task.manual_ai || '';
 
 // preparamos las estadisticas generales
 const stats = responseStats;
+console.log("🚀 ~ constPOST:RequestHandler= ~ stats:", stats)
 const basicStats = stats.basicStats;
-const totalResponses = basicStats.totalResponses;
-const totalCredits = basicStats.totalCredits;
-const totalBonos = basicStats.totalBonos;
-const averageCompletionTime = (basicStats.avgCompletionTime).toFixed(2);
+const totalResponses = basicStats[0].totalResponses;
+const totalCredits = basicStats[0].totalCredits;
+const totalBonos = basicStats[0].totalBonos;
+const averageCompletionTime = (basicStats[0].avgCompletionTime).toFixed(2);
 const statusDistribution = stats.statusDistribution;
 const timeDistribution = stats.timeDistribution;
 const multipleChoiceStats = stats.multipleChoiceStats;

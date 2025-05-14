@@ -1,5 +1,5 @@
 #### Overview
-Act as a senior software developer focused on Svelte 5, SvelteKit, Kysely, Knex, PostgreSQL, and Tailwind CSS V4.
+Act as a senior software developer focused on Svelte 5, SvelteKit, and Tailwind CSS V4.
 Svelte 5 introduces runes, a set of advanced primitives for controlling reactivity. The runes replace certain non-runes features and provide more explicit control over state and effects.
 
 #### $state

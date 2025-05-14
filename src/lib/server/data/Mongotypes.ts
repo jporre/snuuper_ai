@@ -95,6 +95,7 @@ export type viActiveTaskType = {
   photo: string;
   stepAlertMessage: string;
   resumen_ejecutiva: string;
+  manual_ai: string;
   autoMessage: AutoMessage;
   definicion_ejecutiva: string;
   addressObj: Address[];

@@ -7,7 +7,7 @@
  
 
   const stats = taskAnswers;
-  console.log("🚀 ~ stats:", stats)
+  //console.log("🚀 ~ stats:", stats)
   const basicStats = stats.basicStats[0];
   const totalResponses = basicStats.totalResponses;
   const totalCredits = basicStats.totalCredits;
@@ -22,7 +22,8 @@
   const scaleStats = stats.scaleStats;
   const fileStats = stats.fileStats;
 
-import Chart from 'chart.js/auto'; 
+import Chart from 'chart.js/auto'
+ 
 
 // onMount(() => {
 //     const ctx = document.getElementById('timeDistributionChart').getContext('2d');

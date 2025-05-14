@@ -1,6 +1,12 @@
 @import url('https://fonts.googleapis.com/css2?family=Raleway:wght@300;700&family=Playfair+Display:wght@900&display=swap');
 @import '@fontsource/poppins';
 @import '@fontsource-variable/dosis';
+@import '@fontsource/questrial';
+@import '@fontsource/poppins';
+@import '@fontsource/rock-salt';
+@import '@fontsource-variable/orbitron';
+@import '@fontsource-variable/raleway';
+@import '@fontsource-variable/edu-nsw-act-foundation';
 @import 'tailwindcss';
 @import './tailwindcss-animate.css';
 
@@ -55,6 +61,11 @@
     --sidebar-accent-foreground: 240 5.9% 10%;
     --sidebar-border: 220 13% 91%;
     --sidebar-ring: 217.2 91.2% 59.8%;
+    --azul-claro: #2EA4DD;
+    --azul-oscuro: #06273F;
+    --gris-claro: #EEEDED;
+    --gris-medio: #C6C6C6;
+    --gris-oscuro: #706F6F;
   }
   .dark {
     --background: 222.2 84% 4.9%;
@@ -87,8 +98,12 @@
   }
   @theme {
     --font-rocksalt: 'Rock Salt', cursive;
-    --font-Orbitron: 'Orbitron Variable', sans-serif;
+    --font-orbitron: 'Orbitron Variable', sans-serif;
     --font-questrial: 'Questrial', sans-serif;
+    --font-poppins: 'Poppins', sans-serif;
+    --font-dosis: 'Dosis', sans-serif;
+    --font-raleway: 'Raleway', sans-serif;
+    --font-edu-nsw-act-foundation: 'Edu NSW ACT Foundation', sans-serif;
     --color-primary: hsl(257.4075 100% 50%);
     --color-surface-100: hsl(180 100% 100%);
     --color-surface-200: hsl(0 0% 94.902%);

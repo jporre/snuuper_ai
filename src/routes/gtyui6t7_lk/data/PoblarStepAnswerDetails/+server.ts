@@ -2,6 +2,12 @@ import { MongoDBCL } from '$lib/server/db/mongodb';
 import { MongoDBQA } from '$lib/server/db/mongodbQA';
 import { MongoDBMX } from '$lib/server/db/mongodbMX';
 import { ObjectId } from 'mongodb'
+import { env } from "$env/dynamic/private";
+import OpenAI from 'openai';
+import { getTask } from '$lib/server/data/tasks.js';
+const openai = new OpenAI({
+    apiKey: env.OPENAI_API_KEY ?? '',
+});
 
 let MongoConn = MongoDBCL;
 
@@ -16,6 +22,9 @@ export async function POST({ request }) {
         const country = params.country;
         if(country === 'MX') { MongoConn = MongoDBMX;  } else  { MongoConn = MongoDBCL; }
         const tid = ObjectId.createFromHexString(taskId);
+        const task = await getTask(taskId, country);
+            //console.log("🚀 ~ constPOST:RequestHandler= ~ task:", task)
+            if (!task) { error(404, 'Task not found') }
         const TaskAnswer = await MongoConn.collection('TaskAnswer')
             .find({ taskId: tid })
             .project({
@@ -86,7 +95,7 @@ export async function POST({ request }) {
                         break;
                     case 'yes_no':
                     case 'mult_one':
-                        const selectedOption = alternativas.find((alt) => alt.value === respuesta_cruda || alt._id.toString() === respuesta_cruda);
+                        const selectedOption = alternativas.find((alt: any) => alt.value === respuesta_cruda || alt._id.toString() === respuesta_cruda);
                         respuesta_texto = selectedOption ? [selectedOption.value] : [null];
                         break;
                     case 'mult_mult':
@@ -138,6 +147,8 @@ export async function POST({ request }) {
                 item.respuesta_texto = respuesta_texto;
             });
             TaskAnswerSteps.sort((a, b) => a.orden - b.orden);
+            const contexto = task.manual_ai || '';
+            getAiSummaryOnTaskAnswer(contexto, TaskAnswerSteps);
             const updateResult = await MongoConn.collection('TaskAnswer').updateOne(
                 { _id: taskAnswerIdOb }, // Filtro para encontrar el documento correspondiente
                 { $set: { stepAnswerDetails: TaskAnswerSteps } } // Establece el nuevo campo
@@ -151,4 +162,45 @@ export async function POST({ request }) {
         console.error("Error al manejar la solicitud:", error);
         return new Response(JSON.stringify({ error: "Error interno del servidor" }), { status: 500 });
     }
+}
+
+async function getAiSummaryOnTaskAnswer(contexto: string, taskAnswerDetails: any) {
+  
+    const taskAnswerDetailsOb = taskAnswerDetails;
+    // Primero obtenemos cualquiera que sea free_question
+    const freeQuestion = taskAnswerDetailsOb.filter((item: any) => item.tipo_paso === 'free_question');
+    const context = 'Por favor, a partir de la siguiente pregunt y respuesta , dame una o mas etiquetas relevantes para la tarea. , es importante que digas si es de tono positivo o negativo' ;
+    const task = freeQuestion.map((item: any) => {
+        return {
+            question: item.texto_pregunta,
+            answer: item.respuesta_texto[0]
+        };
+    });
+     const ai_analisis =  await openaiHelper(context, task);
+     console.log("🚀 ~ getAiSummaryOnTaskAnswer ~ ai_analisis:", ai_analisis);
+    // const result = await MongoConn.collection('TaskAnswer').updateOne(
+    //     { _id: taskAnswerIdOb },
+    //     { $set: { stepAnswerAISummary: taskAnswerDetailsOb } }
+    // );
+    return ;
+}
+
+async function openaiHelper(context: string,task: string) {
+    
+    const conversationLog = [
+        {
+            role: "user",
+            content: `Contexto: ${context} \n\n Pregunta: ${task}`
+        }
+    ];
+
+    const completion  = await openai.chat.completions.create({
+        model: "gpt-4o-mini",
+        messages: conversationLog,
+        "temperature": 0.4
+       });
+    // console.log(completion.usage?.total_tokens);
+    const respuestaAI = completion.choices[0].message.content;
+
+    return respuestaAI;
 }
