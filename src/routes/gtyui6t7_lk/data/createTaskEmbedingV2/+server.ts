@@ -8,69 +8,141 @@ import { MongoDBQA } from '$lib/server/db/mongodbQA';
 import { error, redirect } from '@sveltejs/kit';
 import { ObjectId } from 'mongodb';
 import OpenAI from "openai";
+
 const openai = new OpenAI({
     apiKey: env.OPENAI_API_KEY ?? '',
 });
 const MongoConn = MongoDBQA;
 MongoDBCL;
 MongoDBMX;
-const CHUNK_SIZE = 2;
+const CHUNK_SIZE = 4; // Number of answers processed by a single processChunk call
+const PARALLEL_OPERATIONS_COUNT = 30; // Number of processChunk calls to run in parallel
 ObjectId;
 
 
 export const POST: RequestHandler = async (event) => {
     // Valida usuario, obtiene pais y taskId 
-        if (!event.locals.user) return redirect(302, "/login");
-        const body = await event.request.json();
-        if (!body?.taskId) throw error(400, 'No taskId provided');
-        const taskId = body.taskId;
-        if (!/^[a-f\d]{24}$/i.test(taskId)) throw error(404, "TaskID no es Valido");
-        const tid = ObjectId.createFromHexString(taskId);
-        const country = body.country ?? 'CL';
+    if (!event.locals.user) return redirect(302, "/login");
+    const body = await event.request.json();
+    if (!body?.taskId) throw error(400, 'No taskId provided');
+    const taskId = body.taskId;
+    if (!/^[a-f\d]{24}$/i.test(taskId)) throw error(404, "TaskID no es Valido");
+    const tid = ObjectId.createFromHexString(taskId);
+    const country = body.country ?? 'CL';
 
-    let taskAnswers = await getTaskAnswers(taskId, country);
+    let allTaskAnswersFromDB = await getTaskAnswers(taskId, country);
     const TaskData = await getTask(taskId, country);
+
     if (!TaskData) throw error(404, "Task no encontrada");
-    if (!taskAnswers) throw error(404, "TaskAnswers no encontrada");
-    // para no volver loco a openAI, se procesan en chunks de 10
-     const chunks = [];
-    for (let i = 0; i < taskAnswers.length; i += CHUNK_SIZE) {
-        chunks.push(taskAnswers.slice(i, i + CHUNK_SIZE));
+    if (!allTaskAnswersFromDB || allTaskAnswersFromDB.length === 0) {
+        console.log("No task answers found in the original source for this task.");
+        return new Response(JSON.stringify({ message: 'No task answers found to process' }), { status: 200 });
     }
 
-     await Promise.all(chunks.map(chunk => processChunk(chunk, tid, TaskData.manual_ai)));
+    // Fetch existing processed answer IDs from ai_TaskAnswers
+    const existingProcessedAnswers = await MongoConn.collection('ai_TaskAnswers')
+        .find({ taskId: tid }, { projection: { taskAnswerId: 1 } })
+        .toArray();
+    
+    const processedAnswerIds = new Set(existingProcessedAnswers.map(doc => doc.taskAnswerId.toString()));
+    
+    console.log(`Found ${processedAnswerIds.size} already processed answers for taskId: ${taskId}`);
 
-console.log("ok");
-    return new Response(JSON.stringify({ message: 'Task answers embeddings created' }), { status: 200 });
+    // Filter out answers that have already been processed
+    const taskAnswersToProcess = allTaskAnswersFromDB.filter(answer => !processedAnswerIds.has(new ObjectId(String(answer._id)).toString()));
+
+    if (taskAnswersToProcess.length === 0) {
+        console.log(`All ${allTaskAnswersFromDB.length} answers for taskId: ${taskId} have already been processed.`);
+        return new Response(JSON.stringify({ message: 'All task answers already processed' }), { status: 200 });
+    }
+    
+    console.log(`Processing ${taskAnswersToProcess.length} new answers out of ${allTaskAnswersFromDB.length} total for taskId: ${taskId}.`);
+
+    // Create all sub-chunks (each sub-chunk contains CHUNK_SIZE answers)
+    const allSubChunks = [];
+    for (let i = 0; i < taskAnswersToProcess.length; i += CHUNK_SIZE) {
+        allSubChunks.push(taskAnswersToProcess.slice(i, i + CHUNK_SIZE));
+    }
+
+    // Process these sub-chunks in parallel groups
+    for (let i = 0; i < allSubChunks.length; i += PARALLEL_OPERATIONS_COUNT) {
+        const batchOfSubChunks = allSubChunks.slice(i, i + PARALLEL_OPERATIONS_COUNT);
+        
+        console.log(`Starting a parallel group of ${batchOfSubChunks.length} sub-chunk operations.`);
+        
+        const promises = batchOfSubChunks.map(subChunk =>
+            processChunk(subChunk, tid, TaskData.manual_ai)
+        );
+        await Promise.all(promises);
+        
+        console.log(`Completed a parallel group of ${batchOfSubChunks.length} sub-chunk operations.`);
+    }
+
+    console.log("All new task answers processed.");
+    return new Response(JSON.stringify({ message: 'New task answers embeddings created successfully' }), { status: 200 });
 };
+
 async function processChunk(chunk: any[], tid: ObjectId, instrucciones: string) {
+    if (!chunk || chunk.length === 0) {
+        console.log("Empty chunk received in processChunk, skipping.");
+        return [];
+    }
+    console.log(`Processing a chunk of ${chunk.length} answers.`);
     const taskAnswersEmbeddings = await Promise.all(chunk.map(async (respuesta) => {
         const markdown = formatResponse(respuesta);
-        const analisis = await getAnswerAnalisis(markdown, instrucciones);
-        const vector_array = await getVectors(markdown);
-        const analisisvector = await getVectors(analisis.output_text);
-        return {
-            taskId: tid,
-            taskAnswerId: new ObjectId(respuesta._id),
-            taskAnswers: respuesta,
-            markdown: markdown,
-            markdownEmbedding: vector_array.data[0].embedding,
-            analisis: analisis.output_text,
-            analisis_cost: analisis.usage,
-            analisisEmbedding: analisisvector.data[0].embedding
-        };
-    }));
-    await MongoConn.collection('ai_TaskAnswers').bulkWrite(
-        taskAnswersEmbeddings.map(embedding => ({
-            updateOne: {
-                filter: { taskId: embedding.taskId, taskAnswerId: embedding.taskAnswerId },
-                update: { $set: embedding },
-                upsert: true
+        try {
+            const analisis = await getAnswerAnalisis(markdown, instrucciones);
+            // Ensure analisis and analisis.output_text are valid before proceeding
+            if (!analisis || typeof analisis.output_text !== 'string') {
+                console.error(`Error or invalid analysis for answer ${respuesta._id}: Missing output_text.`);
+                return null; // Skip this answer
             }
-        }))
-    );
-    console.log("procesado chunk");
-    return taskAnswersEmbeddings;
+            const vector_array = await getVectors(markdown);
+            const analisisvector = await getVectors(analisis.output_text);
+
+            // Ensure embeddings were successfully created
+            if (!vector_array?.data?.[0]?.embedding || !analisisvector?.data?.[0]?.embedding) {
+                console.error(`Error generating embeddings for answer ${respuesta._id}.`);
+                return null; // Skip this answer
+            }
+            
+            return {
+                taskId: tid,
+                taskAnswerId: new ObjectId(respuesta._id),
+                taskAnswers: respuesta, 
+                markdown: markdown,
+                markdownEmbedding: vector_array.data[0].embedding,
+                analisis: analisis.output_text,
+                analisis_cost: analisis.usage, 
+                analisisEmbedding: analisisvector.data[0].embedding
+            };
+        } catch (e: any) {
+            console.error(`Error processing answer ${respuesta._id} in processChunk: ${e.message}`, e);
+            return null; 
+        }
+    }));
+
+    const validEmbeddings = taskAnswersEmbeddings.filter(e => e !== null);
+
+    if (validEmbeddings.length > 0) {
+        await MongoConn.collection('ai_TaskAnswers').bulkWrite(
+            validEmbeddings.map(embedding => ({
+                updateOne: {
+                    filter: { taskId: embedding!.taskId, taskAnswerId: embedding!.taskAnswerId },
+                    update: { $set: embedding },
+                    upsert: true // Upsert is still useful here in case of retries or concurrent processing nuances
+                }
+            }))
+        );
+        console.log(`Successfully wrote ${validEmbeddings.length} embeddings to DB for chunk.`);
+    } else {
+        console.log("No valid embeddings to write for this chunk.");
+    }
+    
+    console.log(`Finished processing chunk of ${chunk.length} answers, now waiting 15s...`);
+    await new Promise(resolve => setTimeout(resolve, 15000));
+    console.log("15s delay completed for chunk.");
+    return validEmbeddings;
 }
 
 function formatResponse(respuesta: any) {
@@ -162,46 +234,10 @@ async function getVectors(searchString: string) {
             model: "text-embedding-3-small",
             input: searchString
         });
-        // console.log(searchVectors);
         return searchVectors;
     } catch (e: any) {
         console.error('Error fetching embeddings:', e);
-        throw error(e.status, e.message);
+        // Propagate the error so it can be caught by processChunk
+        throw e; 
     }
 }
-
-// async function procesOneAnswer(taskAnswers: any[], taskId: ObjectId) {
-//     const TaskData = await getTask(String(taskId), country);
-//     if (!TaskData) throw error(404, "Task no encontrada");
-//     let primera_respuesta = taskAnswers[0];
-//     console.log("id analizado", primera_respuesta._id);
-//     let md = formatResponse(primera_respuesta);
-//     //console.log("🚀 ~ constPOST:RequestHandler= ~ md:", md);
-//     //console.log(" El system para el modelo es: ", TaskData.manual_ai);
-//     const analisis = await getAnswerAnalisis(md, TaskData.manual_ai);
-//     //console.log("🚀 ~ constPOST:RequestHandler= ~ analisis:", analisis)
-//     const mdvector = await getVectors(md);
-//     const analisisvector = await getVectors(analisis.output_text);
-    
-//     let taskAnswerId = new ObjectId(String(primera_respuesta._id));
-
-//     let embedding_object = {
-//     taskId: tid,
-//     taskAnswerId: taskAnswerId,
-//     taskAnswers: taskAnswers[0],
-//     markdown: md,
-//     markdownEmbedding: mdvector.data[0].embedding,
-//     analisis: analisis.output_text,
-//     analisis_cost: analisis.usage,
-//     analisisEmbedding: analisisvector.data[0].embedding
-    
-// }
-// // analisisEmbedding: analisisvector.data[0].embedding,
-//     console.log("🚀 ~ constPOST:RequestHandler= ~ embedding_object:", embedding_object)
-
-//     let mongoupdat = await MongoConn.collection('ai_TaskAnswers').updateOne(
-//                    { taskId: tid, taskAnswerId: primera_respuesta._id },
-//                    { $set: embedding_object },
-//                    { upsert: true }
-//                 );
-// }
