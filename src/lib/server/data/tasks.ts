@@ -1,9 +1,8 @@
+import type { DashboardStats, stepsType, TaskAnswerType, viActiveTaskType } from '$lib/server/data/Mongotypes';
 import { MongoDBCL } from '$lib/server/db/mongodb';
 import { MongoDBQA } from '$lib/server/db/mongodbQA';
-import { MongoDBMX } from '$lib/server/db/mongodbMX';
-import { ObjectId, type Db } from 'mongodb';
-import type { viActiveTaskType, stepsType, TaskAnswerType, DashboardStats } from '$lib/server/data/Mongotypes';
 import { error } from '@sveltejs/kit';
+import { ObjectId, type Db } from 'mongodb';
 
 let MongoConn: Db = MongoDBCL;
 
@@ -673,10 +672,10 @@ export async function getStatsText(taskId: string, country: string): Promise<str
   // preparamos las estadisticas generales
   const stats = responseStats;
   const basicStats = stats.basicStats;
-  const totalResponses = basicStats.totalResponses;
-  const totalCredits = basicStats.totalCredits;
-  const totalBonos = basicStats.totalBonos;
-  const averageCompletionTime = (basicStats.avgCompletionTime / 60).toFixed(2);
+  const totalResponses = basicStats[0].totalResponses;
+  const totalCredits = basicStats[0].totalCredits;
+  const totalBonos = basicStats[0].totalBonos;
+  const averageCompletionTime = (basicStats[0].avgCompletionTime / 60).toFixed(2);
   const statusDistribution = stats.statusDistribution;
   const timeDistribution = stats.timeDistribution;
   const multipleChoiceStats = stats.multipleChoiceStats;

@@ -272,7 +272,7 @@
   </div>
 </div>
 {#if showModal}
-  <div class="fixed inset-0 bg-black bg-opacity-90 z-50 flex items-center justify-center p-4" transition:fade={{ duration: 200 }} onclick={closeModal} onkeydown={e => e.key === 'Escape' && closeModal()} role="dialog" aria-modal="true">
+  <div class="fixed inset-0 bg-black bg-opacity-90 z-50 flex items-center justify-center p-4" transition:fade={{ duration: 200 }} onclick={closeModal} onkeydown={e => e.key === 'Escape' && closeModal()} role="dialog" aria-modal="true" tabindex="0">
     <div class="relative w-full h-full flex items-center justify-center">
       <!-- Botón de cerrar -->
       <button class="absolute top-4 right-4 text-white bg-black bg-opacity-50 hover:bg-opacity-70 rounded-full p-2 transition-colors" onclick={closeModal} aria-label="Cerrar">

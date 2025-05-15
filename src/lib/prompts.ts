@@ -128,7 +128,8 @@ export const agente_concerje = async (PromptData: PromptData) => {
             \nSi el usuario solicita información que no está directamente relacionada con Snuuper, recuérdale amablemente que tu enfoque está en ese ámbito.`
     const informacion = `# Información Adicional \n - Si tienes alguna duda sobre cómo responder a una pregunta específica, no dudes en pedir ayuda a tu supervisor o a un miembro del equipo de soporte. \n - Si el usuario plantea una pregunta que no puedes responder, sé honesto y explícale que no tienes la información necesaria en ese momento. Ofrece ayudarle a encontrar la respuesta o a contactar con alguien que pueda hacerlo. \n - Si el usuario plantea una queja o un problema, escúchalo atentamente y ofrécele una solución o una vía de contacto para que pueda resolver su situación.`
     // obtenemos las preguntas frecuenets que tiene un esquema de mongo compuesto por varios elelentos, en cada elementos hay un section que describe el grupo de preguntas frecuentes y luego un array de pregunta (question) y respuesta (value)
-    const faq = await getFAQ();
+    const country : string= 'CL';
+    const faq = await getFAQ(country);
     // recorremos el array de faq y para cada elemento obtenems section y luego recorremos el array value que contiene las preguntas y respuestas
     const faqText = faq.map(f => {
         return `## ${f.section} \n${f.value.map(v => `**Pregunta:** ${v.question} \n**Respuesta:** ${v.value}`).join('\n')}`

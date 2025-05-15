@@ -1,13 +1,12 @@
 <script lang="ts">
-	import type { PageData } from './$types';
-	import { marked } from 'marked';
-
-	let { data }: { data: PageData } = $props();
-	import KpiRespuestas from '$lib/components/kpiRespuestas.svelte';
+	import { marked } from 'marked'
+	
+  let { data } = $props();
+  
 	const TaskAnswer = JSON.stringify(data.taskAnswers[0], null, 2);
 	const respuestas = data.taskAnswers;
 	const excludedTypes = ['photo', 'audio_record', 'paint', 'mapp_add_markers', 'rating', 'instruction'];
-    const stats = data.responseStats.estadisticas;
+    const stats = data.responseStats;
 //  console.log("🚀 ~ stats:", stats)
 
   const basicStats = stats.basicStats;
