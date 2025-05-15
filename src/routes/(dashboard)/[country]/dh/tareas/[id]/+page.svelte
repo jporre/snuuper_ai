@@ -289,12 +289,3 @@
   </div>
 {/if}
 
-<style>
-  h1 {
-    font-size: 2rem;
-    /* Ensure h1 color is also dark mode compatible if needed, or manage via Tailwind */
-    /* color: #1d3346; */ /* Consider removing if Tailwind handles all text colors */
-    font-weight: bold;
-  }
-  /* Remove DaisyUI specific tab styles if they were here */
-</style>
