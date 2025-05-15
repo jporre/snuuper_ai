@@ -13,8 +13,7 @@
 
 <div
 	bind:this={ref}
-	data-slot="drawer-header"
-	class={cn("flex flex-col gap-1.5 p-4", className)}
+	class={cn("grid gap-1.5 p-4 text-center sm:text-left", className)}
 	{...restProps}
 >
 	{@render children?.()}
