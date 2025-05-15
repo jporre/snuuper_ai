@@ -98,6 +98,7 @@ export type viActiveTaskType = {
   manual_ai: string;
   autoMessage: AutoMessage;
   definicion_ejecutiva: string;
+  companyDetails: Company[];
   addressObj: Address[];
   countryObj: Country[];
   companyObj: Company[];

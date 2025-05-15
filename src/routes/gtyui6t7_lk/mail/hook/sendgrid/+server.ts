@@ -109,6 +109,3 @@ export const POST: RequestHandler = async (event) => {
     }
 }
 
-function convertPublicKeyToECDSA(publicKey) {
-    return PublicKey.fromPem(publicKey);
-  }

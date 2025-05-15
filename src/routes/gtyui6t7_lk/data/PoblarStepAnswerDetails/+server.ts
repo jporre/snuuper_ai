@@ -1,15 +1,24 @@
-import { MongoDBCL } from '$lib/server/db/mongodb';
-import { MongoDBQA } from '$lib/server/db/mongodbQA';
-import { MongoDBMX } from '$lib/server/db/mongodbMX';
-import { ObjectId } from 'mongodb'
 import { env } from "$env/dynamic/private";
-import OpenAI from 'openai';
 import { getTask } from '$lib/server/data/tasks.js';
+import { MongoDBCL } from '$lib/server/db/mongodb';
+import { MongoDBMX } from '$lib/server/db/mongodbMX';
+import { ObjectId } from 'mongodb';
+import { z } from "zod";
+
+import { error } from "@sveltejs/kit";
+import OpenAI from 'openai';
+import { zodTextFormat } from "openai/helpers/zod.mjs";
+
 const openai = new OpenAI({
     apiKey: env.OPENAI_API_KEY ?? '',
 });
 
 let MongoConn = MongoDBCL;
+
+const comentTags = z.object({
+    sentiment: z.enum(['positive', 'neutral', 'negative', 'undetermined']),
+    tags: z.array(z.string()),
+});
 
 export async function POST({ request }) {
     try {
@@ -17,15 +26,15 @@ export async function POST({ request }) {
         if (!params.taskId) {
             return new Response(JSON.stringify({ error: "No se proporcionó taskId" }), { status: 400 });
         }
-        
+
         const taskId = params.taskId;
         const country = params.country;
-        if(country === 'MX') { MongoConn = MongoDBMX;  } else  { MongoConn = MongoDBCL; }
+        if (country === 'MX') { MongoConn = MongoDBMX; } else { MongoConn = MongoDBCL; }
         const tid = ObjectId.createFromHexString(taskId);
         const task = await getTask(taskId, country);
-            //console.log("🚀 ~ constPOST:RequestHandler= ~ task:", task)
-            if (!task) { error(404, 'Task not found') }
-        const TaskAnswer = await MongoConn.collection('TaskAnswer')
+
+        if (!task) { error(404, 'Task not found') }
+        let TaskAnswer = await MongoConn.collection('TaskAnswer')
             .find({ taskId: tid })
             .project({
                 _id: 1,
@@ -39,7 +48,8 @@ export async function POST({ request }) {
             const taskAnswerId = taskAnswer._id;
             const taskAnswerIdStr = taskAnswerId.toString();
             const taskAnswerIdOb = ObjectId.createFromHexString(taskAnswerIdStr);
-            const TaskAnswerSteps = await MongoConn.collection('StepAnswer')
+
+            let TaskAnswerSteps = await MongoConn.collection('StepAnswer')
                 .aggregate([
                     {
                         $match: {
@@ -118,7 +128,7 @@ export async function POST({ request }) {
                     case 'value_list':
                         respuesta_texto = Array.isArray(respuesta_cruda)
                             ? respuesta_cruda.map(respuesta => {
-                                const alt = alternativas.find(alt => alt._id.toString() === respuesta.alternativeId.toString());
+                                const alt = alternativas.find((alt: { _id: { toString: () => any; }; }) => alt._id.toString() === respuesta.alternativeId.toString());
                                 if (alt) {
                                     return {
                                         ...alt,
@@ -147,8 +157,11 @@ export async function POST({ request }) {
                 item.respuesta_texto = respuesta_texto;
             });
             TaskAnswerSteps.sort((a, b) => a.orden - b.orden);
-            const contexto = task.manual_ai || '';
-            getAiSummaryOnTaskAnswer(contexto, TaskAnswerSteps);
+
+            let tags = await getAiSummaryOnTaskAnswer(TaskAnswerSteps);
+
+            TaskAnswerSteps = [...TaskAnswerSteps, { tipo_paso: 'ai', texto_pregunta: 'Se pide analizar los textos libres, obteniendo etiquetas y sentimiento de todas las respuestas', respuesta_texto: tags }];
+
             const updateResult = await MongoConn.collection('TaskAnswer').updateOne(
                 { _id: taskAnswerIdOb }, // Filtro para encontrar el documento correspondiente
                 { $set: { stepAnswerDetails: TaskAnswerSteps } } // Establece el nuevo campo
@@ -159,48 +172,69 @@ export async function POST({ request }) {
         });
         return new Response(JSON.stringify(TaskAnswer), { status: 200 });
     } catch (error) {
-        console.error("Error al manejar la solicitud:", error);
+
         return new Response(JSON.stringify({ error: "Error interno del servidor" }), { status: 500 });
     }
 }
 
-async function getAiSummaryOnTaskAnswer(contexto: string, taskAnswerDetails: any) {
-  
+async function getAiSummaryOnTaskAnswer(taskAnswerDetails: any) {
+
     const taskAnswerDetailsOb = taskAnswerDetails;
     // Primero obtenemos cualquiera que sea free_question
     const freeQuestion = taskAnswerDetailsOb.filter((item: any) => item.tipo_paso === 'free_question');
-    const context = 'Por favor, a partir de la siguiente pregunt y respuesta , dame una o mas etiquetas relevantes para la tarea. , es importante que digas si es de tono positivo o negativo' ;
+    const context = 'Por favor, a partir de la siguiente pregunta y respuesta , dame una o mas etiquetas relevantes para la tarea. , es importante que digas si es de tono positivo , neutro,  negativo o sindeterminar';
     const task = freeQuestion.map((item: any) => {
         return {
             question: item.texto_pregunta,
             answer: item.respuesta_texto[0]
         };
     });
-     const ai_analisis =  await openaiHelper(context, task);
-     console.log("🚀 ~ getAiSummaryOnTaskAnswer ~ ai_analisis:", ai_analisis);
+
+    //  const tareasComentarios = 
+    const aiReview = await openaiHelper(context, task);
+
     // const result = await MongoConn.collection('TaskAnswer').updateOne(
     //     { _id: taskAnswerIdOb },
     //     { $set: { stepAnswerAISummary: taskAnswerDetailsOb } }
     // );
-    return ;
+    return aiReview;
 }
 
-async function openaiHelper(context: string,task: string) {
-    
-    const conversationLog = [
-        {
-            role: "user",
-            content: `Contexto: ${context} \n\n Pregunta: ${task}`
+async function openaiHelper(context: string, task: string) {
+
+    let input = [];
+    const json = JSON.stringify(task);
+    const system_prompt = {
+        "role": "system",
+        "content": [
+            {
+                "type": "input_text",
+                "text": "Por favor, a partir de la siguiente pregunta y respuesta , dame una o mas etiquetas descriptivas de la respuesta. , es importante que digas si es de tono DE LA RESPUESTA es positivo , neutro,  negativo o sindeterminar"
+            }
+        ]
+    }
+    const user_prompt = {
+        "role": "user",
+        "content": [
+            {
+                "type": "input_text",
+                "text": `json: ${json}`
+            }
+        ]
+    }
+    input.push(system_prompt);
+    input.push(user_prompt);
+
+
+
+    const response = await openai.responses.parse({
+        model: "gpt-4.1-nano",
+        input: input,
+        text: {
+            format: zodTextFormat(comentTags, "tags"),
         }
-    ];
+    });
+    const tags = response.output_parsed;
 
-    const completion  = await openai.chat.completions.create({
-        model: "gpt-4o-mini",
-        messages: conversationLog,
-        "temperature": 0.4
-       });
-    // console.log(completion.usage?.total_tokens);
-    const respuestaAI = completion.choices[0].message.content;
-
-    return respuestaAI;
+    return tags;
 }

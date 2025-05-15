@@ -1,8 +1,8 @@
-import type { RequestHandler } from './$types';
-import { knex_pg } from '$lib/server/db/knex_pg';
 import { SENDGRID_API_KEY } from '$env/static/private';
+import { knex_pg } from '$lib/server/db/knex_pg';
 import EmailTemplate from '$lib/templates/comunidad.html?raw';
 import { error } from '@sveltejs/kit';
+import type { RequestHandler } from './$types';
 
 export const GET: RequestHandler = async () => {
     const batchSize = 300; // Tamaño del lote
@@ -35,7 +35,7 @@ console.log(Mensajes.length);
                         htmlAsText,
                         id_envio
                     );
-                } catch (e) {
+                } catch (e: any) {
                     console.error(`Error  al enviar el email para el registro ${id_envio}:`, e.status, e);
 
                     // Revertir el estado del registro si hay un error

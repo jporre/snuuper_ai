@@ -1,19 +1,18 @@
 <script lang="ts">
-    import type { PageData } from './$types';
-    import BorderBeam from '$lib/components/BorderBeam.svelte';
-    import { getUserState } from '$lib/state.svelte';
-    import Search from 'lucide-svelte/icons/search';
-    import Building from 'lucide-svelte/icons/building';
-    import CircleArrowOutUpRight from 'lucide-svelte/icons/circle-arrow-out-up-right';
-    import Ellipsis from 'lucide-svelte/icons/ellipsis';
-    import Input from '$lib/components/ui/input/input.svelte';
-    import Time, { dayjs } from 'svelte-time';
-	import * as Card from "$lib/components/ui/card/index.js";
-    //import 'dayjs/locale/es';
-    import { onMount } from 'svelte';
-    import { marked } from 'marked';
-  import { ChevronLastIcon, ChevronRightCircle, ChevronRightCircleIcon } from 'lucide-svelte'
-  import Button from '$lib/components/ui/button/button.svelte'
+    import BorderBeam from '$lib/components/BorderBeam.svelte'
+    import * as Card from "$lib/components/ui/card/index.js"
+    import Input from '$lib/components/ui/input/input.svelte'
+    import { getUserState } from '$lib/state.svelte'
+    import Building from 'lucide-svelte/icons/building'
+    import CircleArrowOutUpRight from 'lucide-svelte/icons/circle-arrow-out-up-right'
+    import Ellipsis from 'lucide-svelte/icons/ellipsis'
+    import Search from 'lucide-svelte/icons/search'
+    import Time, { dayjs } from 'svelte-time'
+    import type { PageData } from './$types'
+//import 'dayjs/locale/es';
+    import Button from '$lib/components/ui/button/button.svelte'
+    import { ChevronRightCircle } from 'lucide-svelte'
+    import { marked } from 'marked'
 
     dayjs.locale('es');
     let { data }: { data: PageData } = $props();
@@ -41,11 +40,13 @@
         if (searchTerm || selectedSubtype || selectedMode || selectedCompany) currentPage = 1;
     });
 
-    $effect(() =>{
+   
+    $effect(() => {
+        // Extraer subtipos, modos y compañías únicos al cargar tareas
         extractUniqueFilters(tareas);
     });
 
-    async  function extractUniqueFilters(tareasPromise: Promise<PageData['tareas']>) {
+    async  function extractUniqueFilters(tareasPromise: any) {
         const resolvedTareas = await tareasPromise;
         if (!resolvedTareas) return;
         const subtypes = new Set<string>();
