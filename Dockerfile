@@ -11,7 +11,7 @@ WORKDIR /app
 COPY --from=builder --chown=node:node /app/build ./build
 COPY --from=builder --chown=node:node /app/node_modules ./node_modules
 COPY --chown=node:node package.json .
-ENV PORT 5050
-ENV BODY_SIZE_LIMIT 80M
+ENV PORT=5050
+ENV BODY_SIZE_LIMIT=80M
 EXPOSE 5050
 CMD ["node","build"]
