@@ -101,6 +101,30 @@
             type: "negative"
           }
         ]
+      },
+      {
+        title: "Net Promoter Score (NPS) - SIMULACIÓN",
+        description: "La medición del NPS basada en 100 encuestas muestra un resultado de 6 puntos de 10, indicando una posición ligeramente positiva pero con amplio margen de mejora. La marcada correlación entre el NPS y la intención de recompra señala áreas críticas para convertir detractores y neutros en promotores leales.",
+        points: [
+          {
+            metric: "33%",
+            description: "son promotores, de los cuales el 97% volvería a comprar.",
+            observation: "Valoran especialmente la calidad del producto y la atención personalizada.",
+            type: "positive"
+          },
+          {
+            metric: "28%",
+            description: "son neutros, con una intención de recompra dividida.",
+            observation: "Representan una oportunidad para convertirlos en promotores mejorando aspectos específicos.",
+            type: "neutral"
+          },
+          {
+            metric: "39%",
+            description: "son detractores, y solo el 14% volvería a comprar.",
+            observation: "Mencionan problemas con servicio postventa, devoluciones y especificaciones del producto.",
+            type: "warning"
+          }
+        ]
       }
     ]
   };
