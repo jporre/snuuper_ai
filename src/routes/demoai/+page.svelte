@@ -1,4 +1,5 @@
 <script lang="ts">
+  import Chat from '$lib/components/chat/chat.svelte'
   import Button from '$lib/components/ui/button/button.svelte'
   import Logo from '$lib/images/logotransparentefondoblanco.png'
   import { marked } from 'marked'
@@ -149,7 +150,7 @@
   <title>Informe Encuesta Pizzería - {companyInfo.name}</title>
   <meta name="description" content="Resultados de la encuesta de satisfacción para {companyInfo.name}, Abril 2022." />
   </svelte:head>
-
+<Chat userName="Jean Pierre" context={data.taskData}/>
 <div class="min-h-screenfont-sans text-slate-700">
   <header class="bg-gray-100 shadow-md sticky top-0 z-50">
     <div class="container mx-auto px-4 sm:px-6 lg:px-8">
