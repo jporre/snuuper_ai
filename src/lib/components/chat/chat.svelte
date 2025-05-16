@@ -79,6 +79,7 @@
 </script>
 
 <div class="fixed right-4 bottom-4 z-50 flex h-screen items-end rounded-2xl drop-shadow-2xl">
+  
   {#if !isOpen}
     <button onclick={toggleChat} class="flex h-12 w-12 items-center justify-center rounded-full bg-blue-900 text-white shadow-lg transition-transform hover:scale-105 hover:cursor-pointer hover:shadow-xl active:scale-95" aria-label="Open chat">
       <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -86,7 +87,7 @@
       </svg>
     </button>
   {:else}
-    <div transition:fly={{ y: 10, duration: 600, easing: quintOut }} class="flex h-9/10 w-[650px] flex-col rounded-lg border border-slate-200 bg-slate-100/80 shadow-2xl backdrop-blur-2xl dark:border-slate-700 dark:bg-slate-800/50">
+    <div transition:fly={{ y: 10, duration: 600, easing: quintOut }} class="flex h-9/10 w-[650px] max-w-[90vw] flex-col rounded-lg border border-slate-200 bg-slate-100/80 shadow-2xl backdrop-blur-2xl dark:border-slate-700 dark:bg-slate-800/50">
       <!-- Chat Header -->
       <div class="flex items-center justify-between rounded-t-lg bg-blue-900/80 p-4 text-white backdrop-blur-xl">
         <div>

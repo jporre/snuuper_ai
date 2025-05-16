@@ -52,8 +52,8 @@ RUN apk add --no-cache \
     libreoffice
 
 # Descargar unoconv directamente como script ejecutable
-RUN wget https://raw.githubusercontent.com/unoconv/unoconv/master/unoconv -O /usr/local/bin/unoconv && \
-    chmod +x /usr/local/bin/unoconv
+#RUN wget https://raw.githubusercontent.com/unoconv/unoconv/master/unoconv -O /usr/local/bin/unoconv && \
+ #   chmod +x /usr/local/bin/unoconv
 
 # Crear usuario para no usar root
 RUN addgroup -S appgroup && adduser -S appuser -G appgroup

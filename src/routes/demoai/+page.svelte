@@ -180,7 +180,7 @@
     <div class="container mx-auto px-4 sm:px-6 lg:px-8">
       <div class="flex items-center justify-between h-16">
         <div class="flex items-center">
-         <img src={Logo} alt="Logo" class="h-12 w-auto mr-4" />
+         <img src={Logo} alt="Logo" class="sm:w-32 md:w-48 mr-4" />
           
         </div>
         <nav class="hidden md:flex space-x-8 ">
@@ -188,27 +188,23 @@
           <Button variant="ghost"  class="text-xl uppercase  text-slate-700 font-dosis hover:text-blue-600 transition-colors" onclick={() => {resena = false, resultados=true, guia=false;}}>Resultados</Button>
           <Button variant="ghost" class=" text-xl uppercase  text-slate-700 font-dosis hover:text-blue-600 transition-colors" onclick={() => {resena = false, resultados=false, guia=true;}}>Guía Evaluación</Button>
         </nav>
-        <div class="flex items-center">
-          <button class="bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-700 transition-colors text-questrial">
-            Informe Completo
-          </button>
-        </div>
+        
       </div>
     </div>
   </header>
   <section class="py-1 md:py-1 bg-white">
     <div class="container mx-auto px-4 sm:px-6 lg:px-8 text-center font-questrial">
-      <div class="h-32 -mb-20 bg-[url('https://imgtx.interno.snuuper.com/image/https://files.snuuper.com/company/5b8470888e5db53d5bd3836b/LogoPappaJohns.jpg?height=250')] bg-contain bg-no-repeat bg-top-right"   ></div>
-      <p class="mt-4 text-xl sm:text-5xl md:text-6xl text-slate-700 max-w-4xl mx-auto font-questrial">
+      <p class="mt-4 text-xl sm:text-2xl md:text-4xl lg:text-5xl text-slate-700 max-w-4xl mx-auto font-questrial">
         Encuesta "Evaluando Pizzerías - Abril 2022"
       </p>
       <h1 class="text-xl sm:text-2xl md:text-2xl text-slate-700 leading-tight font-raleway">
         Informe Ejecutivo
       </h1>
+      <div class="h-32 bg-[url('https://imgtx.interno.snuuper.com/image/https://files.snuuper.com/company/5b8470888e5db53d5bd3836b/LogoPappaJohns.jpg?height=250')] bg-contain bg-no-repeat bg-center"   ></div>
       
       
       
-      <div class="mt-8 text-blue-500 opacity-50">
+      <div class="hidden mt-8 text-blue-500 opacity-50">
         <svg viewBox="0 0 200 50" class="mx-auto w-1/2 sm:w-1/3 md:w-1/4 h-auto" xmlns="http://www.w3.org/2000/svg">
           <circle cx="25" cy="25" r="20" fill="currentColor" class="bg-blue-600"/>
           <circle cx="75" cy="25" r="15" fill="currentColor" class="opacity-70"/>
@@ -295,8 +291,6 @@
         <p class="p-2 text-sm text-gray-800 bg-white  dark:bg-slate-800 dark:text-gray-200 font-raleway sm:text-lg tracking-wider">{@html marked(data.taskData.manual_ai ?? '')}</p>
       </div>
     </section>
-
-    
   </main>
 
   <footer class="bg-blue-950 text-slate-300 mt-16 py-12">

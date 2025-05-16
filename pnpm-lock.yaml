@@ -20,6 +20,9 @@ importers:
       '@fontsource-variable/raleway':
         specifier: ^5.2.5
         version: 5.2.5
+      '@fontsource/poppins':
+        specifier: ^5.2.6
+        version: 5.2.6
       '@fontsource/questrial':
         specifier: ^5.2.5
         version: 5.2.5
@@ -521,6 +524,9 @@ packages:
 
   '@fontsource-variable/raleway@5.2.5':
     resolution: {integrity: sha512-+7xYA98t16DzKWvbkPf3lSkieQKaKbZKpZFug4oOHCogIvGQ5qBsyGV/F8JNXzuSfqq9qn0hDx5wsHxUsxFB5w==}
+
+  '@fontsource/poppins@5.2.6':
+    resolution: {integrity: sha512-NFr0121+vWCfzLDVvSZOzwAjRUaNj6QHA9gtUh/KHHoWf1Qn23EkwVFs63XZ6UtF5K1b3UNmCx77YEMGgV7BOQ==}
 
   '@fontsource/questrial@5.2.5':
     resolution: {integrity: sha512-gEZu+tXD1kzbslWLUxIHi7YqXOmF3XaWggQsbaU8CHXr6Tb5PD2M1DAWq23fx7IHUXw8ERrS0No/gVhCn0IfPw==}
@@ -3938,6 +3944,8 @@ snapshots:
   '@fontsource-variable/orbitron@5.2.5': {}
 
   '@fontsource-variable/raleway@5.2.5': {}
+
+  '@fontsource/poppins@5.2.6': {}
 
   '@fontsource/questrial@5.2.5': {}
 

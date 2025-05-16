@@ -51,6 +51,9 @@ docker buildx build --platform linux/amd64,linux/arm64 . --no-cache --rm -t us-c
 
 docker buildx build --platform linux/amd64 . --no-cache --rm -t us-central1-docker.pkg.dev/snuuper-01/snuuper/snuuper-interno --push
 
+## Para contruir la imagen localmente
+docker buildx build --platform linux/arm64 --load . --no-cache --rm -t snuuper-interno
+
 # para hacer los commits y push automaticos utilizando fabric ai. 
 summary=$(git diff | fabric -g=es --model="gpt-4o-mini" -p summarize_git_diff -c)
 git add -A && git commit -m "$summary" && git push
