@@ -1,12 +1,12 @@
-import { Lucia, TimeSpan } from "lucia";
 import { dev } from "$app/environment";
 import { env } from '$env/dynamic/private';
 import { Google } from "arctic";
+import { Lucia, TimeSpan } from "lucia";
 
 //* Este es el caso en que la base de datos de usuarios esté en mongodb
-import { Collection, MongoClient, ObjectId } from 'mongodb';  
-import { MONGODB_HOST, MONGODB_USERNAME, MONGODB_PASSWORD } from '$env/static/private';
+import { MONGODB_HOST, MONGODB_PASSWORD, MONGODB_USERNAME } from '$env/static/private';
 import { MongodbAdapter } from '@lucia-auth/adapter-mongodb';
+import { Collection, MongoClient, ObjectId } from 'mongodb';
 
 const client = new MongoClient(`mongodb+srv://${MONGODB_USERNAME}:${MONGODB_PASSWORD}@${MONGODB_HOST}/?retryWrites=true&w=majority`);
 await client.connect();
@@ -17,7 +17,7 @@ const adapter = new MongodbAdapter(Session, User);
 
 
 export const lucia = new Lucia(adapter, {
-	sessionExpiresIn: new TimeSpan(10, "d"),
+	sessionExpiresIn: new TimeSpan(2, "d"),
 	sessionCookie: {
 		attributes: {
 			// set to `true` when using HTTPS

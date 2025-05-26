@@ -10,7 +10,12 @@ export const load = (async (event) => {
     let country = 'CL';
 
     const taskData =  await getTask(taskId, country);
+    const userdata = {
+        email: event.locals.user.email,
+        firstname: event.locals.user.personalData.firstname,
+        lastname: event.locals.user.personalData.lastname
+    }
 
 
-    return {taskData};
+    return {taskData, userdata};
 }) satisfies PageServerLoad;

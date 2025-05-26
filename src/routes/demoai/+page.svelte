@@ -168,36 +168,37 @@
   let resena = $state(false);
   let resultados = $state(true);
   let guia = $state(false);
+ // console.log(data);
 </script>
 
 <svelte:head>
   <title>Informe Encuesta Pizzería - {companyInfo.name}</title>
   <meta name="description" content="Resultados de la encuesta de satisfacción para {companyInfo.name}, Abril 2022." />
   </svelte:head>
-<Chat userName="Jean Pierre" context={data.taskData}/>
+<Chat userName={data?.userdata.firstname || 'Invitado'} context={data.taskData}/>
 <div class="min-h-screenfont-sans text-slate-700">
-  <header class="bg-gray-100 shadow-md sticky top-0 z-50">
-    <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+  <header class="sticky top-0 z-50 bg-gray-100 shadow-md">
+    <div class="container px-4 mx-auto sm:px-6 lg:px-8">
       <div class="flex items-center justify-between h-16">
         <div class="flex items-center">
-         <img src={Logo} alt="Logo" class="sm:w-32 md:w-48 mr-4" />
+         <img src={Logo} alt="Logo" class="mr-4 sm:w-32 md:w-48" />
           
         </div>
-        <nav class="hidden md:flex space-x-8 ">
-          <Button variant="ghost" class="text-xl uppercase  text-slate-700 font-dosis hover:text-blue-600 transition-colors" onclick={() => {resena = true, resultados=false, guia=false;}}>Reseña</Button>
-          <Button variant="ghost"  class="text-xl uppercase  text-slate-700 font-dosis hover:text-blue-600 transition-colors" onclick={() => {resena = false, resultados=true, guia=false;}}>Resultados</Button>
-          <Button variant="ghost" class=" text-xl uppercase  text-slate-700 font-dosis hover:text-blue-600 transition-colors" onclick={() => {resena = false, resultados=false, guia=true;}}>Guía Evaluación</Button>
+        <nav class="hidden space-x-8 md:flex ">
+          <Button variant="ghost" class="text-xl uppercase transition-colors text-slate-700 font-dosis hover:text-blue-600" onclick={() => {resena = true, resultados=false, guia=false;}}>Reseña</Button>
+          <Button variant="ghost"  class="text-xl uppercase transition-colors text-slate-700 font-dosis hover:text-blue-600" onclick={() => {resena = false, resultados=true, guia=false;}}>Resultados</Button>
+          <Button variant="ghost" class="text-xl uppercase transition-colors text-slate-700 font-dosis hover:text-blue-600" onclick={() => {resena = false, resultados=false, guia=true;}}>Guía Evaluación</Button>
         </nav>
         
       </div>
     </div>
   </header>
-  <section class="py-1 md:py-1 bg-white">
-    <div class="container mx-auto px-4 sm:px-6 lg:px-8 text-center font-questrial">
-      <p class="mt-4 text-xl sm:text-2xl md:text-4xl lg:text-5xl text-slate-700 max-w-4xl mx-auto font-questrial">
+  <section class="py-1 bg-white md:py-1">
+    <div class="container px-4 mx-auto text-center sm:px-6 lg:px-8 font-questrial">
+      <p class="max-w-4xl mx-auto mt-4 text-xl sm:text-2xl md:text-4xl lg:text-5xl text-slate-700 font-questrial">
         Encuesta "Evaluando Pizzerías - Abril 2022"
       </p>
-      <h1 class="text-xl sm:text-2xl md:text-2xl text-slate-700 leading-tight font-raleway">
+      <h1 class="text-xl leading-tight sm:text-2xl md:text-2xl text-slate-700 font-raleway">
         Informe Ejecutivo
       </h1>
       <div class="h-32 bg-[url('https://imgtx.interno.snuuper.com/image/https://files.snuuper.com/company/5b8470888e5db53d5bd3836b/LogoPappaJohns.jpg?height=250')] bg-contain bg-no-repeat bg-center"   ></div>
@@ -205,7 +206,7 @@
       
       
       <div class="hidden mt-8 text-blue-500 opacity-50">
-        <svg viewBox="0 0 200 50" class="mx-auto w-1/2 sm:w-1/3 md:w-1/4 h-auto" xmlns="http://www.w3.org/2000/svg">
+        <svg viewBox="0 0 200 50" class="w-1/2 h-auto mx-auto sm:w-1/3 md:w-1/4" xmlns="http://www.w3.org/2000/svg">
           <circle cx="25" cy="25" r="20" fill="currentColor" class="bg-blue-600"/>
           <circle cx="75" cy="25" r="15" fill="currentColor" class="opacity-70"/>
           <rect x="100" y="10" width="30" height="30" rx="5" fill="currentColor" class="opacity-60"/>
@@ -215,19 +216,19 @@
     </div>
   </section>
 
-  <main class="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
+  <main class="container px-4 py-12 mx-auto sm:px-6 lg:px-8">
     <section id="reseña" class="mb-16 scroll-mt-16 {resena ? 'block' : 'hidden'}">
-      <h2 class="text-3xl  text-slate-800 mb-8 border-b-2 border-blue-500 pb-2 font-raleway">
+      <h2 class="pb-2 mb-8 text-3xl border-b-2 border-blue-500 text-slate-800 font-raleway">
        Reseña de la Empresa: {companyInfo.name}
       </h2>
-      <div class="bg-white  space-y-4  leading-relaxed">
-        <p><strong class="text-slate-800 font-poppins text-xl">"{companyInfo.slogan}"</strong></p>
-        <p class="p-2 text-sm text-gray-800 bg-white  dark:bg-slate-800 dark:text-gray-200 font-raleway sm:text-lg tracking-wider">{companyInfo.description}</p>
+      <div class="space-y-4 leading-relaxed bg-white">
+        <p><strong class="text-xl text-slate-800 font-poppins">"{companyInfo.slogan}"</strong></p>
+        <p class="p-2 text-sm tracking-wider text-gray-800 bg-white dark:bg-slate-800 dark:text-gray-200 font-raleway sm:text-lg">{companyInfo.description}</p>
       </div>
     </section>
 
     <section id="resultados" class="mb-16 scroll-mt-16 {resena ? 'block' : 'hidden'}">
-      <h2 class="text-3xl  text-slate-800 mb-8 border-b-2 border-blue-500 pb-2 font-raleway">
+      <h2 class="pb-2 mb-8 text-3xl border-b-2 border-blue-500 text-slate-800 font-raleway">
         Características de la Encuesta
       </h2>
        {#if data.taskData.definicion_ejecutiva == '' || data.taskData.definicion_ejecutiva == null}
@@ -235,27 +236,27 @@
                 <strong>Definición Ejecutiva:</strong> No se ha proporcionado una definición ejecutiva para esta tarea.
               </p>
             {:else}
-              <p class="p-2 text-sm text-gray-800 bg-white  dark:bg-slate-800 dark:text-gray-200 font-raleway sm:text-lg tracking-wider">{@html marked(data.taskData.definicion_ejecutiva ?? '')}</p>
+              <p class="p-2 text-sm tracking-wider text-gray-800 bg-white dark:bg-slate-800 dark:text-gray-200 font-raleway sm:text-lg">{@html marked(data.taskData.definicion_ejecutiva ?? '')}</p>
             {/if}
     </section>
 <section id="resultados" class="mb-16 scroll-mt-16 {resultados ? 'block' : 'hidden'}">
-   <h2 class="text-3xl  text-slate-800 mb-8 border-b-2 border-blue-500 pb-2 font-raleway">
+   <h2 class="pb-2 mb-8 text-3xl border-b-2 border-blue-500 text-slate-800 font-raleway">
         Resultados de la Encuesta
       </h2>
-       <p class="p-2 text-sm text-gray-800 bg-white  dark:bg-slate-800 dark:text-gray-200 font-raleway sm:text-lg tracking-wider">
+       <p class="p-2 text-sm tracking-wider text-gray-800 bg-white dark:bg-slate-800 dark:text-gray-200 font-raleway sm:text-lg">
   La encuesta realizada en 139 oportunidades, en locales de Papa John's , ha proporcionado información valiosa sobre la experiencia del cliente en sus locales. A continuación, se presentan los hallazgos más relevantes
   </p>
       {#each surveyData.sections as section, i (section.title)}
         <div class="mb-10">
           <div class="gap-6">
-          <h3 class=" mt-6 mb-2 text-xl text-slate-600 dark:text-gray-300 sm:text-md font-raleway grid grid-cols-1 md:grid-cols-2 ">{section.title}</h3>
-          <p class="flex p-2  text-gray-800 bg-white  dark:bg-slate-800 dark:text-gray-200 font-raleway sm:text-normal tracking-wider">{section.description}</p>
+          <h3 class="grid grid-cols-1 mt-6 mb-2 text-xl text-slate-600 dark:text-gray-300 sm:text-md font-raleway md:grid-cols-2">{section.title}</h3>
+          <p class="flex p-2 tracking-wider text-gray-800 bg-white dark:bg-slate-800 dark:text-gray-200 font-raleway sm:text-normal">{section.description}</p>
             {#each section.points as point (point.metric)}
               <div class="bg-white p-6 rounded-xl shadow-lg border-l-4 {getBorderColorClass(point.type)}">
                 <p class="text-3xl font-bold {getMetricColorClass(point.type)} mb-2">{point.metric}</p>
-                <p class="text-slate-600 mb-1">{point.description}</p>
+                <p class="mb-1 text-slate-600">{point.description}</p>
                 {#if point.observation}
-                  <p class="text-sm text-slate-500 italic mt-2"><strong>Observación:</strong> {point.observation}</p>
+                  <p class="mt-2 text-sm italic text-slate-500"><strong>Observación:</strong> {point.observation}</p>
                 {/if}
               </div>
             {/each}
@@ -264,39 +265,39 @@
       {/each}
     </section>
     <section id="conclusiones" class="mb-16 scroll-mt-16 {resultados ? 'block' : 'hidden'}">
-      <h2 class="text-3xl  text-slate-800 mb-8 border-b-2 border-blue-500 pb-2 font-raleway">
+      <h2 class="pb-2 mb-8 text-3xl border-b-2 border-blue-500 text-slate-800 font-raleway">
         Conclusiones y recomendaciones 
       </h2>
       
       <div class="space-y-6">
         {#each conclusions as item, i (item.title)}
-          <div class="bg-white p-6 rounded-xl shadow-lg">
-            <h4 class="text-xl font-semibold text-slate-800 mb-2 font-raleway">{i + 1}. {item.title}</h4>
-            <p class="text-slate-600 leading-relaxed font-raleway">{item.suggestion}</p>
+          <div class="p-6 bg-white shadow-lg rounded-xl">
+            <h4 class="mb-2 text-xl font-semibold text-slate-800 font-raleway">{i + 1}. {item.title}</h4>
+            <p class="leading-relaxed text-slate-600 font-raleway">{item.suggestion}</p>
           </div>
         {/each}
       </div>
 
-      <div class="mt-12 bg-blue-50 p-6 sm:p-8 rounded-xl border-l-4 border-blue-500">
-        <h4 class="text-xl font-semibold text-slate-700 mb-3">En Resumen</h4>
-        <p class="text-slate-600 leading-relaxed">{summary}</p>
+      <div class="p-6 mt-12 border-l-4 border-blue-500 bg-blue-50 sm:p-8 rounded-xl">
+        <h4 class="mb-3 text-xl font-semibold text-slate-700">En Resumen</h4>
+        <p class="leading-relaxed text-slate-600">{summary}</p>
       </div>
     </section>
 
     <section id="reseña" class="mb-16 scroll-mt-16 {guia ? 'block' : 'hidden'}">
-      <h2 class="text-3xl  text-slate-800 mb-8 border-b-2 border-blue-500 pb-2 font-raleway">
+      <h2 class="pb-2 mb-8 text-3xl border-b-2 border-blue-500 text-slate-800 font-raleway">
        Instrucciones para la Evaluación de Resultados
       </h2>
-      <div class="bg-white  space-y-4  leading-relaxed">
-        <p class="p-2 text-sm text-gray-800 bg-white  dark:bg-slate-800 dark:text-gray-200 font-raleway sm:text-lg tracking-wider">{@html marked(data.taskData.manual_ai ?? '')}</p>
+      <div class="space-y-4 leading-relaxed bg-white">
+        <p class="p-2 text-sm tracking-wider text-gray-800 bg-white dark:bg-slate-800 dark:text-gray-200 font-raleway sm:text-lg">{@html marked(data.taskData.manual_ai ?? '')}</p>
       </div>
     </section>
   </main>
 
-  <footer class="bg-blue-950 text-slate-300 mt-16 py-12">
-    <div class="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
+  <footer class="py-12 mt-16 bg-blue-950 text-slate-300">
+    <div class="container px-4 mx-auto text-center sm:px-6 lg:px-8">
       <p>&copy; {new Date().getFullYear()} Snuuper.com. Todos los derechos reservados.</p>
-      <p class="text-sm text-slate-400 mt-2">Recolectamos datos, analizamos experiencias.</p>
+      <p class="mt-2 text-sm text-slate-400">Recolectamos datos, analizamos experiencias.</p>
     </div>
   </footer>
 </div>
