@@ -193,14 +193,14 @@
               {:then pasos}
                 <div class="space-y-6">
                   {#each pasos as ans}
-                    <div class="overflow-hidden bg-white dark:bg-slate-800 rounded-lg shadow-md dark:shadow-lg">
+                    <div class="overflow-hidden bg-white rounded-lg shadow-md dark:bg-slate-800 dark:shadow-lg">
                       <div class="grid grid-cols-5 gap-4">
                         <div class="col-span-5 p-4">
                           <span class="text-sm text-gray-700 dark:text-gray-300">Numero: {ans.correlativeNumber + 1} de tipo {ans.type}</span>
                           <h2 class="mb-2 text-base font-normal text-gray-800 dark:text-gray-200">{@html ans.instruction[0].data || ''}</h2>
                           {#if ans.alternatives && ans.alternatives.length > 0}
                             <span class="text-sm text-gray-700 dark:text-gray-300">Alternativas:</span>
-                            <ul class="mt-2 ml-5 text-gray-700 dark:text-gray-300 list-disc">
+                            <ul class="mt-2 ml-5 text-gray-700 list-disc dark:text-gray-300">
                               {#each ans.alternatives as alternativa, i}
                                 <li>{i + 1}: {alternativa.value}</li>
                               {/each}
@@ -219,24 +219,24 @@
           {#await data.taskAnswers}
             <p class="mt-6 text-gray-600 dark:text-gray-300 text-lg/8 sm:text-base">Cargando...</p>
           {:then Trespuestas}
-            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4">
+            <div class="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6">
               {Trespuestas?.length}
               {#if Trespuestas[0]?.stepAnswerDetails}
-              
-                {#each Trespuestas[0].stepAnswerDetails as r}
+              {#each Trespuestas as tt}
+                {#each tt.stepAnswerDetails as r}
                   {#if r.tipo_paso == 'photo' && r.respuesta_cruda}
                     <button
                       type="button"
-                      class="group overflow-hidden bg-gray-100 dark:bg-gray-800 rounded-lg shadow-sm dark:shadow-md h-auto cursor-pointer"
+                      class="h-auto overflow-hidden bg-gray-100 rounded-lg shadow-sm cursor-pointer group dark:bg-gray-800 dark:shadow-md"
                       onclick={() => openModal(`https://imgtx.interno.snuuper.com/image/https://files.snuuper.com/${r.respuesta_cruda}?quality=50`)}
                       onkeydown={e => e.key === 'Enter' && openModal(`https://imgtx.interno.snuuper.com/image/https://files.snuuper.com/${r.respuesta_cruda}?width=1200`)}
                       aria-label="Ver imagen ampliada">
                       <div class="relative pb-[75%]">
-                        <img src="https://imgtx.interno.snuuper.com/image/https://files.snuuper.com/{r.respuesta_cruda}?width=350" alt="Foto respuesta" class="absolute inset-0 w-full h-full object-contain transition-all duration-300 group-hover:scale-105" loading="lazy" />
+                        <img src="https://imgtx.interno.snuuper.com/image/https://files.snuuper.com/{r.respuesta_cruda}?width=350" alt="Foto respuesta" class="absolute inset-0 object-contain w-full h-full transition-all duration-300 group-hover:scale-105" loading="lazy" />
                       </div>
                     </button>
                   {/if}
-                {/each}
+                {/each}{/each}
               {/if}
             </div>
           {/await}
@@ -272,18 +272,18 @@
   </div>
 </div>
 {#if showModal}
-  <div class="fixed inset-0 bg-black bg-opacity-90 z-50 flex items-center justify-center p-4" transition:fade={{ duration: 200 }} onclick={closeModal} onkeydown={e => e.key === 'Escape' && closeModal()} role="dialog" aria-modal="true" tabindex="0">
-    <div class="relative w-full h-full flex items-center justify-center">
+  <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-90" transition:fade={{ duration: 200 }} onclick={closeModal} onkeydown={e => e.key === 'Escape' && closeModal()} role="dialog" aria-modal="true" tabindex="0">
+    <div class="relative flex items-center justify-center w-full h-full">
       <!-- Botón de cerrar -->
-      <button class="absolute top-4 right-4 text-white bg-black bg-opacity-50 hover:bg-opacity-70 rounded-full p-2 transition-colors" onclick={closeModal} aria-label="Cerrar">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <button class="absolute p-2 text-white transition-colors bg-black bg-opacity-50 rounded-full top-4 right-4 hover:bg-opacity-70" onclick={closeModal} aria-label="Cerrar">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
         </svg>
       </button>
 
       <!-- Imagen ampliada -->
       <div class="max-h-[90vh] max-w-[90vw]">
-        <img src={selectedImage} alt="Imagen ampliada" class="h-full w-full object-contain" />
+        <img src={selectedImage} alt="Imagen ampliada" class="object-contain w-full h-full" />
       </div>
     </div>
   </div>

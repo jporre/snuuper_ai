@@ -7,9 +7,9 @@
 
   // Datos de la empresa y encuesta (sin cambios respecto al anterior)
   const companyInfo = {
-    name: "Papa John's",
+    name: "Pizza Paradise",
     slogan: "Mejores ingredientes, mejor pizza",
-    description: "Papa John's es una destacada cadena de pizzerías que ha dejado huella en el mercado chileno desde su llegada en 2010. Operando a través de Drake Food Service International, cuenta con más de 150 locales y emplea a más de 4.000 personas. Su compromiso con la calidad y la innovación es evidente, destacándose como la primera empresa de comida en Chile en compensar el 100% de las emisiones de carbono generadas por su servicio de delivery. Además, ha implementado medidas de seguridad vial, obteniendo la certificación ISO 39001, un reconocimiento que la posiciona como pionera en el sector alimenticio en Chile. Con un enfoque en la expansión y el desarrollo sostenible, Papa John's sigue fortaleciendo su presencia en el país, ofreciendo productos de alta calidad y promoviendo prácticas responsables con el medio ambiente y la comunidad."
+    description: `Pizza Paradise es una cadena de pizzerías que ha encantado a los paladares chilenos desde su apertura en 2017, consolidándose como un verdadero oasis de sabor en el mercado. Operando bajo una filosofía de indulgencia responsable, la empresa cuenta con más de 95 locales estratégicamente ubicados y emplea a cerca de 2.800 apasionados colaboradores. Su compromiso con la excelencia y la innovación es el corazón de su éxito, destacándose como la primera empresa en Chile en ofrecer una línea completa de pizzas con masa madre fermentada por 72 horas, garantizando una experiencia digestiva superior y un sabor inigualable.Además, Pizza Paradise se ha distinguido por su iniciativa "Rebanadas de Esperanza", un programa que destina un porcentaje de cada venta a fundaciones locales que apoyan la alimentación infantil, lo que le ha valido el reconocimiento de la Cámara Chilena de la Alimentación por su impacto social positivo. Con un enfoque en la expansión sostenible y la creación de nuevas experiencias culinarias, Pizza Paradise continúa fortaleciendo su presencia en el país, invitando a todos a disfrutar de un pedazo de paraíso en cada bocado, mientras contribuye activamente al bienestar de la comunidad..`
   };
 
   const surveyData = {
@@ -144,11 +144,11 @@
     },
     {
       title: "Monitoreo de la Satisfacción",
-      suggestion: "Continuar realizando encuestas de satisfacción de manera regular para identificar tendencias y áreas de mejora. Esto permitirá a Papa John's adaptarse rápidamente a las necesidades y expectativas de los clientes."
+      suggestion: "Continuar realizando encuestas de satisfacción de manera regular para identificar tendencias y áreas de mejora. Esto permitirá a Pizza Store adaptarse rápidamente a las necesidades y expectativas de los clientes."
     }
   ];
 
-  const summary = "En resumen, los resultados de la encuesta ofrecen una visión clara de la experiencia del cliente en Papa John's, destacando tanto fortalezas como áreas de mejora. Con un enfoque continuo en la capacitación del personal y la optimización de procesos, la empresa puede seguir fortaleciendo su posición como líder en el mercado chileno de pizzerías.";
+  const summary = "En resumen, los resultados de la encuesta ofrecen una visión clara de la experiencia del cliente en Pizza Store, destacando tanto fortalezas como áreas de mejora. Con un enfoque continuo en la capacitación del personal y la optimización de procesos, la empresa puede seguir fortaleciendo su posición como líder en el mercado chileno de pizzerías.";
 
   // Helper para obtener color de Tailwind basado en el tipo de resultado
   function getMetricColorClass(type: any) {
@@ -196,12 +196,12 @@
   <section class="py-1 bg-white md:py-1">
     <div class="container px-4 mx-auto text-center sm:px-6 lg:px-8 font-questrial">
       <p class="max-w-4xl mx-auto mt-4 text-xl sm:text-2xl md:text-4xl lg:text-5xl text-slate-700 font-questrial">
-        Encuesta "Evaluando Pizzerías - Abril 2022"
+        {data.taskData.title}
       </p>
       <h1 class="text-xl leading-tight sm:text-2xl md:text-2xl text-slate-700 font-raleway">
         Informe Ejecutivo
       </h1>
-      <div class="h-32 bg-[url('https://imgtx.interno.snuuper.com/image/https://files.snuuper.com/company/5b8470888e5db53d5bd3836b/LogoPappaJohns.jpg?height=250')] bg-contain bg-no-repeat bg-center"   ></div>
+      <div class="h-32 bg-[url('https://imgtx.interno.snuuper.com/image/https://s3.interno.snuuper.com/public-images/pizza_store.png?height=250')] bg-contain bg-no-repeat bg-center"   ></div>
       
       
       
@@ -244,7 +244,7 @@
         Resultados de la Encuesta
       </h2>
        <p class="p-2 text-sm tracking-wider text-gray-800 bg-white dark:bg-slate-800 dark:text-gray-200 font-raleway sm:text-lg">
-  La encuesta realizada en 139 oportunidades, en locales de Papa John's , ha proporcionado información valiosa sobre la experiencia del cliente en sus locales. A continuación, se presentan los hallazgos más relevantes
+  La encuesta realizada en 139 oportunidades, en locales de Pizza Store , ha proporcionado información valiosa sobre la experiencia del cliente en sus locales. A continuación, se presentan los hallazgos más relevantes
   </p>
       {#each surveyData.sections as section, i (section.title)}
         <div class="mb-10">
