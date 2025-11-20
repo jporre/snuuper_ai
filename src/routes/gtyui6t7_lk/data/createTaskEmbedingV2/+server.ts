@@ -89,6 +89,16 @@ async function processChunk(chunk: any[], tid: ObjectId, instrucciones: string) 
     }
     console.log(`Processing a chunk of ${chunk.length} answers.`);
     const taskAnswersEmbeddings = await Promise.all(chunk.map(async (respuesta) => {
+        //Convertir la respuesta  a un string, para poder reemplazar cualquier parte del texto donde diga "Papa John%s"  (% es un comodin donde puede estar ' o ` por "Pizza Paradise". Luego de reemplazar, volver a serializar para poder seguir con el proceso.
+        const respuestaString = JSON.stringify(respuesta);
+        const sanitizedRespuesta = respuestaString.replace(/Papa John/g, 'Pizza Paradi');
+      //  console.log("🚀 ~ taskAnswersEmbeddings ~ sanitizedRespuesta:", sanitizedRespuesta)
+        try {
+            respuesta = JSON.parse(sanitizedRespuesta);
+        } catch (e) {
+            console.error(`Error parsing answer ${respuesta._id} in processChunk:`, e);
+            return null; // Skip this answer if parsing fails
+        }
         const markdown = formatResponse(respuesta);
         try {
             const analisis = await getAnswerAnalisis(markdown, instrucciones);
@@ -190,7 +200,7 @@ async function getAnswerAnalisis(markdown:string, instrucciones:string) {
     const queryAlModelo = `Utilizando el manual de instrucciones entregado, quiero que actúes como un analista experto en analisis de encuestas y analices el resultado de esta encuesta: \n${markdown} \n Recuerda que el informe debe ser en tono profesional, utilizando lenguaje coloquial y debe incluir un resumen de los resultados, una evaluación de la calidad de la encuesta y cualquier recomendación que consideres necesaria. \n\n\n`;
 
     const response = await openai.responses.create({
-  model: "gpt-4.1-mini",
+  model: "gpt-5-mini-2025-08-07",
   input: [
     {
       "role": "system",

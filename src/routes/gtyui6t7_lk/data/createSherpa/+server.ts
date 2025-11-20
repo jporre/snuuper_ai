@@ -70,18 +70,20 @@ export const POST: RequestHandler = async (event) => {
     ${textTarea}
     *Datos de la encuesta*. 
     `;
+    //console.log("🚀 ~ POST ~ SystemPrompt:", SystemPrompt)
    
-    let contents = [{ role: `user`,parts: [ { text: "Tú misión es  asegurarte de analizar muy bien la encuesta y  sus preguntas para hacer un manual de instrucciones que permita hacer un correcto análisis de las respuestas a esta encuesta. Este manual será entregado sin que puedas aclarar conceptos o responder preguntas, por lo que tus instrucciones deben ser claras, considerar los Pilares que se deben analizar, que buscar en las respuestas, y en general los elementos para que una persona sin experiencia pueda obtener resultados excepcionales." }]}];
+    let contents = [{ role: `user`,parts: [ { text: `${ SystemPrompt} \nTú misión es  asegurarte de analizar muy bien la encuesta y  sus preguntas para hacer un manual de instrucciones que permita hacer un correcto análisis de las respuestas a esta encuesta. Este manual será entregado sin que puedas aclarar conceptos o responder preguntas, por lo que tus instrucciones deben ser claras, considerar los Pilares que se deben analizar, que buscar en las respuestas, y en general los elementos para que una persona sin experiencia pueda obtener resultados excepcionales.` }]}];
+    //console.log("🚀 ~ POST ~ contents:", contents)
 
 
     const config = {responseMimeType: 'text/plain', systemInstruction: [ { text: SystemPrompt} ] }
-    const model = 'gemini-2.5-pro-preview-05-06';
+    const model = 'gemini-2.5-pro';
     const response = await googleai.models.generateContent({
         model,
         config,
         contents,
       });
-    console.log("🚀 ~ constPOST:RequestHandler= ~ response:", response)
+    console.log("🚀 ~ constPOST:RequestHandler= ~ response:", response.text)
 
     // const completion  = await openai.chat.completions.create({
     //     model: "gpt-4o-mini",
@@ -91,7 +93,7 @@ export const POST: RequestHandler = async (event) => {
     // // console.log(completion.usage?.total_tokens);
     // const respuestaAI = completion.choices[0].message.content;
     // // ahora necensito actualizar el campo definicion_ejecutiva de la coleccion Task en Mongodb
-    // const updateTask = await MongoConn.collection('Task').updateOne({_id: tid}, {$set: {manual_ai: respuestaAI}});
+     const updateTask = await MongoConn.collection('Task').updateOne({_id: tid}, {$set: {manual_ai: response.text}});
     
     return new Response(JSON.stringify({message: 'Task summary created', taskId: body.taskId, taskSummary: 'respuestaAI'}), {status: 200});
 };
